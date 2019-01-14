@@ -44,7 +44,7 @@ $ npm run client-dev
 > red_tetrisboilerplate@0.0.1 client-dev /home/eric/JS/red_tetris_boilerplate
 > webpack-dev-server --colors --hot --inline --host 0.0.0.0 --port 8080
 
-http://0.0.0.0:8080/
+http://0.0.0.0:3000/
 webpack result is served from /
 content is served from /home/eric/JS/red_tetris_boilerplate
 …
