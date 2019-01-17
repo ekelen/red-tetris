@@ -5,3 +5,7 @@ log
 tmp
 node_modules
 .DS_Store
+.nyc_output
+coverage
+package-lock.json
+.vscode

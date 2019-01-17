@@ -1,6 +1,8 @@
 import fs  from 'fs'
 import debug from 'debug'
 
+const games = []
+
 const logerror = debug('tetris:error')
   , loginfo = debug('tetris:info')
 
@@ -29,11 +31,15 @@ const initApp = (app, params, cb) => {
 
 const initEngine = io => {
   io.on('connection', function(socket){
-    loginfo("Socket connected: " + socket.id)
+	loginfo("Socket connected: " + socket.id)
+	// try to join a room
+
     socket.on('action', (action) => {
-      if(action.type === 'server/ping'){
-        socket.emit('action', {type: 'pong'})
-      }
+		console.log(action.type);
+		if(action.type === 'server/ping'){
+			socket.emit('action', {type: 'pong'})
+		}
+	  // do whatever action (case statement for action type)
     })
   })
 }
