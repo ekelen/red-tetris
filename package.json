@@ -6,21 +6,25 @@
   "scripts": {
     "eslint": "eslint src",
     "client-dist": "NODE_ENV=production webpack --progress --colors",
-    "client-dev": "webpack-dev-server --colors --hot --inline --host 0.0.0.0 --port 8080",
+    "client-dev": "webpack-dev-server --devtool source-map --colors --hot --inline --host 0.0.0.0 --port 8080",
     "srv-dev": "DEBUG=tetris:* babel-watch -w src src/server/main.js",
     "srv-dist": "DEBUG=tetris:* babel src --out-dir dist",
     "test": "mocha --require babel-core/register --reporter spec",
     "coverage": "NODE_ENV=test nyc --include src --all -r text -r lcov -r text --require babel-core/register mocha "
   },
   "dependencies": {
+    "css-loader": "^2.1.0",
+    "node-sass": "^4.11.0",
     "react": "^15.0.2",
     "react-dom": "^15.0.2",
     "react-redux": "^4.4.5",
     "redux": "^3.5.2",
     "redux-logger": "^2.6.1",
     "redux-thunk": "^2.0.1",
+    "sass-loader": "^7.1.0",
     "socket.io": "^1.4.6",
-    "socket.io-client": "^2.2.0"
+    "socket.io-client": "^2.2.0",
+    "style-loader": "^0.23.1"
   },
   "devDependencies": {
     "babel-cli": "^6.7.7",
@@ -36,10 +40,13 @@
     "chai-as-promised": "^5.3.0",
     "chai-equal-jsx": "^1.0.9",
     "eslint": "^2.13.1",
+    "eslint-config-prettier": "^3.6.0",
     "eslint-plugin-babel": "^3.3.0",
+    "eslint-plugin-prettier": "^3.0.1",
     "eslint-plugin-react": "^5.2.2",
     "mocha": "^2.4.5",
     "nyc": "^6.4.4",
+    "prettier": "^1.16.0",
     "webpack": "^1.13.0",
     "webpack-dev-middleware": "^1.6.1",
     "webpack-dev-server": "^1.14.1",

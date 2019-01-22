@@ -1,5 +1,12 @@
 import alert from './alert'
-export default alert
+import game from './game'
+import {
+  combineReducers
+} from 'redux'
 
+const reducers = combineReducers({
+  alert,
+  game
+})
 
-
+export default reducers
