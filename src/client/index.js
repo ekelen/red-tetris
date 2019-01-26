@@ -7,10 +7,10 @@ import { Provider } from 'react-redux'
 import { storeStateMiddleWare } from './middleware/storeStateMiddleWare'
 import { socketMiddleWare } from './middleware/socketMiddleWare'
 import reducer from './reducers'
-import App from './containers/App'
 import { alert } from './actions/alert'
 import io from 'socket.io-client'
 import params from '../../params'
+import Root from './components/Root'
 
 const initialState = {}
 
@@ -24,7 +24,7 @@ const store = createStore(
 
 ReactDom.render((
   <Provider store={store}>
-    <App />
+  	<Root />
   </Provider>
 ), document.getElementById('tetris'))
 
