@@ -2,6 +2,18 @@ import React from 'react'
 import Player from '../components/Player'
 import Ghost from '../components/Ghost'
 import { connect } from 'react-redux'
+import lifecycle from 'react-pure-lifecycle';
+
+const methods = {
+  componentDidMount(props) {
+    console.log('I mounted! Here are my props: ', props);
+	// TODO: nothing after # in URL : start single player mode
+		// TODO: Start timer ----redux action
+	// TODO: room id after # in URL : 
+		// TODO: join a room if well formated #<roomid>[<playername>]
+		// TODO: Start timer when everyone arrives----redux action
+  }
+}
 
 const Game = ({ alive, board, gameTimerStarted, opponents, pieces }) => (
 	<div>
@@ -23,4 +35,5 @@ const mapStateToProps = state => {
   }
 }
 
-export default connect(mapStateToProps, null)(Game)
+const withLifecycleHooks = lifecycle(methods)(Game)
+export default connect(mapStateToProps, null)(withLifecycleHooks)
