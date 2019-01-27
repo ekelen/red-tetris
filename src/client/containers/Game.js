@@ -1,46 +1,32 @@
 import React from 'react'
 import Player from '../components/Player'
 import Ghost from '../components/Ghost'
+import lifecycle from 'react-pure-lifecycle'
 import { connect } from 'react-redux'
-import lifecycle from 'react-pure-lifecycle';
-import { parseURL } from '../actions/game'
+import { startTimer } from '../actions/timer'
 
 const methods = {
-  componentDidMount(props) {
-		console.log('I mounted! Here are my props: ', props);
-		props.parseURL(props.match);
-
-	// TODO: nothing after # in URL : start single player mode
-		// TODO: Start timer ----redux action
-	// TODO: room id after # in URL :
-		// TODO: join a room if well formated #<roomid>[<playername>]
-		// TODO: Start timer when everyone arrives----redux action
+  componentDidMount({startTimer}) {
+	  startTimer()
   }
 }
 
-const Game = ({ alive, board, gameTimerStarted, opponents, pieces }) => (
+const Game = ({opponents, alive, pieces, board}) => (
 	<div>
 		<div className={'opponents'}>
 			{opponents && opponents.map(opponent => (<Ghost board={opponent.board} alive={opponent.alive} />))}
 		</div>
-		<Player alive={alive} board={board} gameTimerStarted={gameTimerStarted} pieces={pieces} />
+		<Player alive={alive} board={board} pieces={pieces} />
 	</div>
 )
 
-const mapStateToProps = state => {
-  return {
-    message: state.alert.message,
-    alive: state.game.alive,
-    board: state.game.board,
-    gameTimerStarted: state.game.gameTimerStarted, // has game started?
-	  opponents: [], // TODO: unmock
-	  pieces: [] // TODO: unmock
-  }
-}
+const mapStateToProps = state => ({
+	...state.game
+})
 
 const mapDispatchToProps = {
-    parseURL
+	startTimer
 }
 
-const withLifecycleHooks = lifecycle(methods)(Game)
+const withLifecycleHooks = lifecycle(methods)(Game) 
 export default connect(mapStateToProps, mapDispatchToProps)(withLifecycleHooks)

@@ -6,7 +6,7 @@ import {
 const initialState = {
   alive: false,
   board: EMPTY_BOARD,
-  gameTimerStarted: false,
+  started: false,
   opponents: [],
   pieces: []
 }
@@ -16,7 +16,7 @@ const reducer = (state = initialState, action) => {
     case START_SINGLE_PLAYER_GAME:
       return { ...state,
         alive: true,
-        gameTimerStarted: true
+        started: true
       }
     default:
       return state

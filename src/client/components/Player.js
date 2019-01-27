@@ -2,7 +2,7 @@
 import React from 'react'
 import '../styles/board.scss'
 
-const Player = ({ alive, board, gameTimerStarted }) => (
+const Player = ({ alive, board }) => (
 	<div className={'board large'}>
 		<span>MY BOARD</span>
 		{board.map((row, i) => (
@@ -11,8 +11,7 @@ const Player = ({ alive, board, gameTimerStarted }) => (
 					<div key={i} className={'cell'} />
 				))}
 			</div>
-		))
-		}
+		))}
 		{/* display board (different design if alive or not) */}
 	</div>
 )
