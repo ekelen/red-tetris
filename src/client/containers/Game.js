@@ -3,13 +3,16 @@ import Player from '../components/Player'
 import Ghost from '../components/Ghost'
 import { connect } from 'react-redux'
 import lifecycle from 'react-pure-lifecycle';
+import { parseURL } from '../actions/game'
 
 const methods = {
   componentDidMount(props) {
-    console.log('I mounted! Here are my props: ', props);
+		console.log('I mounted! Here are my props: ', props);
+		props.parseURL(props.match);
+
 	// TODO: nothing after # in URL : start single player mode
 		// TODO: Start timer ----redux action
-	// TODO: room id after # in URL : 
+	// TODO: room id after # in URL :
 		// TODO: join a room if well formated #<roomid>[<playername>]
 		// TODO: Start timer when everyone arrives----redux action
   }
@@ -30,10 +33,14 @@ const mapStateToProps = state => {
     alive: state.game.alive,
     board: state.game.board,
     gameTimerStarted: state.game.gameTimerStarted, // has game started?
-	opponents: [], //TODO: unmock
-	pieces: [] //TODO: unmock
+	  opponents: [], // TODO: unmock
+	  pieces: [] // TODO: unmock
   }
 }
 
+const mapDispatchToProps = {
+    parseURL
+}
+
 const withLifecycleHooks = lifecycle(methods)(Game)
-export default connect(mapStateToProps, null)(withLifecycleHooks)
+export default connect(mapStateToProps, mapDispatchToProps)(withLifecycleHooks)
