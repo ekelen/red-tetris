@@ -1,6 +1,3 @@
-import {
-  START_SINGLE_PLAYER_GAME,
-} from "../actions/game";
 import { START_SINGLE_PLAYER_GAME, START_MULTI_PLAYER_GAME, URL_INPUT_ERROR } from "../actions/parse";
 
 const initialState = {
