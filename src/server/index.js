@@ -35,7 +35,6 @@ const initEngine = io => {
 	// try to join a room
 
     socket.on('action', (action) => {
-		console.log(action.type);
 		if(action.type === 'server/ping'){
 			socket.emit('action', {type: 'pong'})
 		}

@@ -1,11 +1,10 @@
 import {
-  EMPTY_BOARD
+  START_SINGLE_PLAYER_GAME,
 } from "../actions/game";
 import { START_SINGLE_PLAYER_GAME, START_MULTI_PLAYER_GAME, URL_INPUT_ERROR } from "../actions/parse";
 
 const initialState = {
   alive: false,
-  board: EMPTY_BOARD,
   currNPlayers: 1, // current number of players
   nPlayers: 1, // n players specified in URL
   playerName: '',
@@ -19,7 +18,8 @@ const initialState = {
 const reducer = (state = initialState, action) => {
   switch (action.type) {
     case START_SINGLE_PLAYER_GAME:
-      return { ...state,
+      return { 
+        ...state,
         alive: true,
         started: true
       }

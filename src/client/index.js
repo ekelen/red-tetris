@@ -19,7 +19,7 @@ const socket = io(params.server.url)
 const store = createStore(
   reducer,
   initialState,
-  applyMiddleware(thunk, createLogger(), storeStateMiddleWare, socketMiddleWare(socket))
+  applyMiddleware(thunk, storeStateMiddleWare, socketMiddleWare(socket))
 )
 
 ReactDom.render((

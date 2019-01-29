@@ -11,18 +11,20 @@ const methods = {
   }
 }
 
-const Game = ({opponents, alive, pieces, board, stopTimer}) => (
-	<div>
-		<div className={'opponents'}>
-			{opponents && opponents.map(opponent => (<Ghost board={opponent.board} alive={opponent.alive} />))}
-		</div>
-		<Player alive={alive} board={board} pieces={pieces} />
-		<div><button onClick={stopTimer}>Stop Timer</button></div>
-	</div>
-)
+const Game = ({opponents, alive, pieces, board, stopTimer}) => {
+  return (
+    <div>
+      <div className={'opponents'}>
+        {opponents && opponents.map(opponent => (<Ghost board={opponent.board} alive={opponent.alive} />))}
+      </div>
+      <Player alive={alive} board={board} pieces={pieces} />
+  		<div><button onClick={stopTimer}>Stop Timer</button></div>
+    </div>
+  )
+}
 
 const mapStateToProps = state => ({
-	...state.game
+	...state.game, board: state.board
 })
 
 const mapDispatchToProps = {
