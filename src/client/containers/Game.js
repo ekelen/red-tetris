@@ -3,7 +3,7 @@ import Player from '../components/Player'
 import Ghost from '../components/Ghost'
 import lifecycle from 'react-pure-lifecycle'
 import { connect } from 'react-redux'
-import { startTimer, stopTimer } from '../actions/timer'
+import { startTimer, stopTimer } from '../actions/update'
 
 const methods = {
   componentDidMount({startTimer}) {
