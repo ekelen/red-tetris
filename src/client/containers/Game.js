@@ -3,22 +3,22 @@ import Player from '../components/Player'
 import Ghost from '../components/Ghost'
 import lifecycle from 'react-pure-lifecycle'
 import { connect } from 'react-redux'
-import { startTimer, stopTimer } from '../actions/update'
+import { startGame, stopGame } from '../actions/update'
 
 const methods = {
-  componentDidMount({startTimer}) {
-	  startTimer()
+  componentDidMount({startGame}) {
+	  startGame()
   }
 }
 
-const Game = ({opponents, alive, pieces, board, stopTimer}) => {
+const Game = ({opponents, alive, pieces, board, stopGame}) => {
   return (
     <div>
       <div className={'opponents'}>
         {opponents && opponents.map(opponent => (<Ghost board={opponent.board} alive={opponent.alive} />))}
       </div>
       <Player alive={alive} board={board} pieces={pieces} />
-  		<div><button onClick={stopTimer}>Stop Timer</button></div>
+  		<div><button onClick={stopGame}>Stop Timer</button></div>
     </div>
   )
 }
@@ -28,8 +28,8 @@ const mapStateToProps = state => ({
 })
 
 const mapDispatchToProps = {
-	startTimer,
-	stopTimer
+	startGame,
+	stopGame
 }
 
 const withLifecycleHooks = lifecycle(methods)(Game) 
