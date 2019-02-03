@@ -1,5 +1,6 @@
 import fs  from 'fs'
 import debug from 'debug'
+import Game from './Game.class'
 
 const games = []
 
@@ -31,14 +32,30 @@ const initApp = (app, params, cb) => {
 
 const initEngine = io => {
   io.on('connection', function(socket){
-	loginfo("Socket connected: " + socket.id)
-	// try to join a room
-
+    loginfo("Socket connected: " + socket.id)
+  
     socket.on('action', (action) => {
-		if(action.type === 'server/ping'){
-			socket.emit('action', {type: 'pong'})
-		}
-	  // do whatever action (case statement for action type)
+		  if(action.type === 'server/ping'){
+		  	socket.emit('action', {type: 'pong'})
+      }
+      switch (action.type) {
+        case 'server/ENTER_MULTIPLAYER_GAME':
+          // TODO: Socketio room/namespace init
+          const { playerName, roomName, nPlayers } = action
+          if (Game.doesRoomExist(games, roomName)) {
+            // TODO: Check player allowed to enter room
+            const game = Game.getRoomFromName(games, roomName)
+            game.addPlayer(playerName)
+            socket.emit('action', { type: 'ENTER_MULTIPLAYER_GAME', currNPlayers: game.players.length + 1, nPlayers, playerName, roomName })
+          } else {
+            let game = new Game({ nPlayers, playerName, roomName, io })
+            games.push(game)
+            socket.emit('action', { type: 'CREATE_MULTIPLAYER_GAME', nPlayers, playerName, roomName } )
+          }
+          break;
+        default:
+          break;
+      }
     })
   })
 }

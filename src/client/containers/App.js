@@ -8,26 +8,28 @@ import { parseURL } from '../actions/parse'
 
 const methods = {
   componentDidMount({ location, parseURL }) {
-    console.log(location)
     parseURL(location.pathname)
 
-    // TODO: nothing after # in URL : start single player mode
-      // TODO: Start timer ----redux action
-    // TODO: room id after # in URL :
-      // TODO: join a room if well formated #<roomid>[<playername>]
-      // TODO: Start timer when everyone arrives----redux action
+    // TODO: Start timer ----redux action
+    // TODO: join a room if well formated #<roomid>[<playername>]
+    // TODO: Start timer when everyone arrives----redux action
   }
 }
 
-// TODO: Add url error prop and create component with usage
-const App = ({ started }) => (
+// TODO: Proper usage message
+const App = ({ currNPlayers, nPlayers, started, urlInputError }) => (
   started ?
   <Game /> :
-  <Loading />
+    urlInputError ?
+    <div>{'ERROR: Expected multiplayer URL format: localhost:8080/#<num_users>-<room_name>[<player_name>] \nSingle player: localhost:8080/'}</div>
+    : <Loading currNPlayers={currNPlayers} nPlayers={nPlayers}/>
 )
 
 const mapStateToProps = state => ({
-  started: state.game.started
+  started: state.game.started,
+  nPlayers: state.game.nPlayers,
+  currNPlayers: state.game.currNPlayers,
+  urlInputError: state.game.urlInputError
 })
 
 const mapDispatchToProps = {

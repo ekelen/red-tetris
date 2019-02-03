@@ -1,9 +1,10 @@
 import React from 'react'
 
-const Loading = () => (
+const Loading = ({ currNPlayers, nPlayers }) => (
 	<div>
-		{/* TODO: make different loading for single player and multiplayer */}
 		Loading...
+		{ nPlayers > 1 && <span>Multiplayer game being prepared...</span> }
+		{ (currNPlayers < nPlayers) && <span>Waiting for all the players...</span>}
 	</div>
 )
 

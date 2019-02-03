@@ -1,4 +1,4 @@
-import { START_SINGLE_PLAYER_GAME, START_MULTI_PLAYER_GAME, URL_INPUT_ERROR } from "../actions/parse";
+import { START_SINGLE_PLAYER_GAME, CREATE_MULTIPLAYER_GAME, ENTER_MULTIPLAYER_GAME, URL_INPUT_ERROR } from "../actions/parse";
 
 const initialState = {
   alive: false,
@@ -20,12 +20,19 @@ const reducer = (state = initialState, action) => {
         alive: true,
         started: true
       }
-    case START_MULTI_PLAYER_GAME:
+    case CREATE_MULTIPLAYER_GAME:
       return { ...state,
           alive: true,
           nPlayers: action.nPlayers,
           roomName: action.roomName,
           playerName: action.playerName
+      }
+    case ENTER_MULTIPLAYER_GAME: // Placeholder reducer for when server accepts client into existing room
+      return  { ...state,
+        currNPlayers: action.currNPlayers,
+        nPlayers: action.nPlayers,
+        roomName: action.roomName,
+        playerName: action.playerName
       }
     case URL_INPUT_ERROR:
       return { ...state,

@@ -1,5 +1,11 @@
 export const START_SINGLE_PLAYER_GAME = 'START_SINGLE_PLAYER_GAME'
-export const START_MULTI_PLAYER_GAME = 'START_MULTI_PLAYER_GAME'
+export const CREATE_MULTIPLAYER_GAME = 'CREATE_MULTIPLAYER_GAME'
+
+export const ENTER_MULTIPLAYER_GAME = 'ENTER_MULTIPLAYER_GAME' // Placeholder: not sure if can join yet
+export const JOIN_MULTIPLAYER_GAME = 'JOIN_MULTIPLAYER_GAME' // can join
+
+export const SERVER_ENTER_MULTIPLAYER_GAME = 'server/ENTER_MULTIPLAYER_GAME'
+
 export const URL_INPUT_ERROR = 'URL_INPUT_ERROR'
 
 const _parseURL = (url) => {
@@ -9,8 +15,9 @@ const _parseURL = (url) => {
   if (!isValid) return ({type: URL_INPUT_ERROR })
 
   const alphaNum = /[a-zA-Z0-9]{1,20}/g
-  const [nPlayers, roomName, playerName] = url.match(alphaNum)
-  return ({ type: START_MULTI_PLAYER_GAME, nPlayers, roomName, playerName })
+  const [ nPlayerStr, roomName, playerName ] = url.match(alphaNum)
+  const nPlayers = parseInt(nPlayerStr, 10)
+  return ({ type: SERVER_ENTER_MULTIPLAYER_GAME, nPlayers, roomName, playerName })
 }
 
 export const parseURL = (url) => {
