@@ -33,6 +33,10 @@ class Game {
 	addPlayer(playerName) {
 		this.players.push(playerName)
 	}
+
+  isFull() {
+    return this.players.length >= this.nPlayers
+  }
 }
 
 export default Game

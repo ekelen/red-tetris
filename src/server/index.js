@@ -45,8 +45,15 @@ const initEngine = io => {
           if (Game.doesRoomExist(games, roomName)) {
             // TODO: Check player allowed to enter room
             const game = Game.getRoomFromName(games, roomName)
-            game.addPlayer(playerName)
-            socket.emit('action', { type: 'ENTER_MULTIPLAYER_GAME', currNPlayers: game.players.length + 1, nPlayers, playerName, roomName })
+            if (!game.isFull()) {
+              game.addPlayer(playerName)
+              socket.emit('action', { type: 'ENTER_MULTIPLAYER_GAME', currNPlayers: game.players.length + 1, nPlayers, playerName, roomName })
+            } else {
+              socket.emit(
+                'action',
+                { type: 'ROOM_ERROR', err: `room ${game.roomName} is full` }
+              )
+            }
           } else {
             let game = new Game({ nPlayers, playerName, roomName, io })
             games.push(game)
