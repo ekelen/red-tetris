@@ -29,6 +29,13 @@ describe('Server test', () => {
     store.dispatch(parseURL('/2-bananaband[joe]'))
   })
 
+  //TODO
+  it('shouldn\'t let the player join a room with non-unique username')
+  it('shouldn\'t let the player join a room with non-alphanumeric, 3-20 char username')
+  it('shouldn\'t let the player create a room with non-alphanumeric, 3-20 char roomname')
+  it('shouldn\'t let the player make a room with < 2 or > 5 players')
+  it('shouldn\'t let the player put badly formatted nPlayers specifier')
+
   it('should join multiplayer game if given good existing game URL', done => {
     const initialState = {}
     const socket = io(params.serverTest.url)
@@ -36,7 +43,7 @@ describe('Server test', () => {
       'JOIN_MULTIPLAYER_GAME': () => done(),
       'ROOM_ERROR': action => done(new Error(action.err))
     })
-    store.dispatch(parseURL('/2-bananaband[joe]'))
+    store.dispatch(parseURL('/2-bananaband[jane]'))
   })
 
   it('shouldn\'t let the player join a full room', done => {
@@ -45,6 +52,6 @@ describe('Server test', () => {
     const store =  configureStore(rootReducer, socket, initialState, {
       'ROOM_ERROR': () =>  done()
     })
-    store.dispatch(parseURL('/2-bananaband[joe]'))
+    store.dispatch(parseURL('/2-bananaband[pete]'))
   })
 })
