@@ -3,7 +3,6 @@ import Game from './Game'
 import Loading from '../components/Loading'
 import { connect } from 'react-redux'
 import lifecycle from 'react-pure-lifecycle'
-import { startTimer } from '../actions/game'
 import { parseURL } from '../actions/parse'
 
 const methods = {

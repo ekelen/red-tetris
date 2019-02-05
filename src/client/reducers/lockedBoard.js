@@ -1,4 +1,5 @@
-import { EMPTY_BOARD, PIECE_LAND } from '../actions/game'
+import { EMPTY_BOARD } from './board'
+import { PIECE_LAND } from '../actions/board'
 import { merge } from '../actions/physics'
 
 const initialState = EMPTY_BOARD

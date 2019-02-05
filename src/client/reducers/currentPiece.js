@@ -1,4 +1,4 @@
-import { PIECE_FALL, RESET_PIECE } from '../actions/game'
+import { PIECE_FALL, RESET_PIECE } from '../actions/piece'
 
 const initialState = {
   pos: {x: 4, y: 10},

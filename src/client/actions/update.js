@@ -1,4 +1,5 @@
-import { pieceFall, updateCurrentPiece, pieceLand, resetPiece,  } from './game'
+import { pieceFall, resetPiece,  } from './piece'
+import { updateCurrentPiece, pieceLand } from './board'
 import { isColliding } from './physics'
 const LEFT = 37
 const UP = 38
