@@ -31,8 +31,8 @@ describe('Server test', () => {
 
   //TODO
   it('shouldn\'t let the player join a room with non-unique username')
-  it('shouldn\'t let the player join a room with non-alphanumeric, 3-20 char username')
-  it('shouldn\'t let the player create a room with non-alphanumeric, 3-20 char roomname')
+  it('shouldn\'t let the player join a room with non-alphanumeric, !3-20 char username')
+  it('shouldn\'t let the player create a room with non-alphanumeric, !3-20 char roomname')
   it('shouldn\'t let the player make a room with < 2 or > 5 players')
   it('shouldn\'t let the player put badly formatted nPlayers specifier')
 
