@@ -1,10 +1,9 @@
 import chai from "chai"
-import {startServer, configureStore} from './helpers/server'
-import rootReducer from '../src/client/reducers'
-import {ping} from '../src/client/actions/server'
+import {startServer, configureStore} from '../helpers/server'
+import rootReducer from '../../src/client/reducers'
 import io from 'socket.io-client'
-import params from '../params'
-import { parseURL } from '../src/client/actions/parse'
+import params from '../../params'
+import { parseURL } from '../../src/client/actions/parse'
 
 chai.should()
 
@@ -29,7 +28,6 @@ describe('Server test', () => {
     store.dispatch(parseURL('/2-bananaband[joe]'))
   })
 
-  //TODO
   it('shouldn\'t let the player join a room with non-unique username')
   it('shouldn\'t let the player join a room with non-alphanumeric, !3-20 char username')
   it('shouldn\'t let the player create a room with non-alphanumeric, !3-20 char roomname')
@@ -39,7 +37,7 @@ describe('Server test', () => {
   it('should join multiplayer game if given good existing game URL', done => {
     const initialState = {}
     const socket = io(params.serverTest.url)
-    const store =  configureStore(rootReducer, socket, initialState, {
+    const store = configureStore(rootReducer, socket, initialState, {
       'JOIN_MULTIPLAYER_GAME': () => done(),
       'ROOM_ERROR': action => done(new Error(action.err))
     })

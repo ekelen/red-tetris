@@ -1,6 +1,6 @@
-import { configureStore } from './helpers/server'
-import rootReducer from '../src/client/reducers'
-import { PIECE_FALL } from '../src/client/actions/game'
+import { configureStore } from '../helpers/server'
+import rootReducer from '../../src/client/reducers'
+import { PIECE_FALL } from '../../src/client/actions/piece'
 import chai from "chai"
 
 chai.should()
@@ -22,4 +22,3 @@ describe('Redux game test', () => {
     store.dispatch({type: PIECE_FALL})
   })
 })
-  
