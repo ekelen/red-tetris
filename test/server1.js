@@ -20,7 +20,7 @@ describe('Server test', () => {
     tetrisServer.stop(done)
   })
 
-  it('should create multiplayer game', done => {
+  it('should create multiplayer game if given good URL', done => {
     const initialState = {}
     const socket = io(params.serverTest.url)
     const store =  configureStore(rootReducer, socket, initialState, {
@@ -29,12 +29,12 @@ describe('Server test', () => {
     store.dispatch(parseURL('/2-bananaband[joe]'))
   })
 
-  it('should enter multiplayer game', done => {
+  it('should join multiplayer game if given good existing game URL', done => {
     const initialState = {}
     const socket = io(params.serverTest.url)
     const store =  configureStore(rootReducer, socket, initialState, {
-      'ENTER_MULTIPLAYER_GAME': () =>  done(),
-      'ROOM_ERROR': action =>  done(new Error('action.err'))
+      'JOIN_MULTIPLAYER_GAME': () => done(),
+      'ROOM_ERROR': action => done(new Error(action.err))
     })
     store.dispatch(parseURL('/2-bananaband[joe]'))
   })
