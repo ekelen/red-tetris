@@ -11,17 +11,9 @@ class Game {
 		return !!(games.find((game) => game instanceof Game && game.roomName === roomName))
 	}
 
-	//TODO: Room/namespace for socket
 	connect(socket) {
-		return true
-		// TODO: Room?
-		// socket.join(`${this.roomName}`)
-		// this.io.to(`${this.roomName}`).emit('action', {type: 'TEST'});
-
-		// TODO: ...Or namespace?
-		// this.io.of(`/${this.roomName}`).on('connection', (socket) => {
-		// 	socket.emit('action', { type: 'TEST' })
-		// })
+		socket.join(`${this.roomName}`)
+		this.io.to(`${this.roomName}`).emit('action', {type: 'TEST'});
 	}
 
 	static getRoomFromName(games, roomName) {
