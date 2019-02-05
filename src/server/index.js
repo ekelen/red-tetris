@@ -47,7 +47,7 @@ const initEngine = io => {
             const game = Game.getRoomFromName(games, roomName)
             if (!game.isFull()) {
               game.addPlayer(playerName)
-              socket.emit('action', { type: 'ENTER_MULTIPLAYER_GAME', currNPlayers: game.players.length + 1, nPlayers, playerName, roomName })
+              socket.emit('action', { type: 'JOIN_MULTIPLAYER_GAME', currNPlayers: game.players.length + 1, nPlayers, playerName, roomName })
             } else {
               socket.emit(
                 'action',
