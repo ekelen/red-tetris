@@ -35,10 +35,10 @@ const initEngine = io => {
     loginfo("Socket connected: " + socket.id)
   
     socket.on('action', (action) => {
-		  if(action.type === 'server/ping'){
-		  	socket.emit('action', {type: 'pong'})
-      }
+      loginfo('action received : ', action)
       switch (action.type) {
+        case 'server/ping':
+          socket.emit('action', {type: 'pong'})
         case 'server/ENTER_MULTIPLAYER_GAME':
           // TODO: Socketio room/namespace init
           const { playerName, roomName, nPlayers } = action
@@ -47,7 +47,9 @@ const initEngine = io => {
             const game = Game.getRoomFromName(games, roomName)
             if (!game.isFull()) {
               game.addPlayer(playerName)
-              socket.emit('action', { type: 'JOIN_MULTIPLAYER_GAME', currNPlayers: game.players.length + 1, nPlayers, playerName, roomName })
+              socket.emit(
+                'action', 
+                { type: 'JOIN_MULTIPLAYER_GAME', currNPlayers: game.players.length + 1, nPlayers, playerName, roomName })
             } else {
               socket.emit(
                 'action',
@@ -57,7 +59,9 @@ const initEngine = io => {
           } else {
             let game = new Game({ nPlayers, playerName, roomName, io })
             games.push(game)
-            socket.emit('action', { type: 'CREATE_MULTIPLAYER_GAME', nPlayers, playerName, roomName } )
+            socket.emit(
+              'action',
+              { type: 'CREATE_MULTIPLAYER_GAME', nPlayers, playerName, roomName })
           }
           break;
         default:
