@@ -7,6 +7,26 @@ import Game from './Game.class'
 
 const games = []
 
+export const joinGame = ({game, playerName, roomName, nPlayers}) => {
+  try {
+    game.addPlayer(playerName)
+    return({ type: 'JOIN_MULTIPLAYER_GAME', currNPlayers: game.players.length + 1, nPlayers, playerName, roomName })
+  } catch (error) {
+    return({ type: 'ROOM_ERROR', err: `Error joining ${game.roomName}: ${error.message}` })
+  }
+}
+
+export const createGame = ({nPlayers, playerName, roomName}) => {
+  try {
+    let game = new Game({nPlayers, playerName, roomName})
+    games.push(game)
+    return ({ type: 'CREATE_MULTIPLAYER_GAME', nPlayers, playerName, roomName })
+  } catch (error) {
+    logerror(error)
+    return ({ type: 'CREATE_GAME_ERROR', err: `Error creating game: ${error.message}` })
+  }
+}
+
 export const initEngine = io => {
   io.on('connection', function(socket){
     loginfo("Socket connected: " + socket.id)
@@ -20,29 +40,10 @@ export const initEngine = io => {
           // TODO: Socketio room/namespace init
           const { playerName, roomName, nPlayers } = action
           if (Game.doesRoomExist(games, roomName)) {
-            // TODO: Check player allowed to enter room
             const game = Game.getRoomFromName(games, roomName)
-            if (!game.isFull()) {
-              game.addPlayer(playerName)
-              socket.emit(
-                'action', 
-                { type: 'JOIN_MULTIPLAYER_GAME', currNPlayers: game.players.length + 1, nPlayers, playerName, roomName })
-            } else {
-              socket.emit(
-                'action',
-                { type: 'ROOM_ERROR', err: `room ${game.roomName} is full` }
-              )
-            }
+            socket.emit('action', joinGame({game, playerName, roomName, nPlayers}))
           } else {
-            try {
-              let game = new Game({ nPlayers, playerName, roomName })
-              games.push(game)
-              socket.emit(
-              'action',
-              { type: 'CREATE_MULTIPLAYER_GAME', nPlayers, playerName, roomName })
-            } catch (error) {
-              logerror(error)
-            }
+            socket.emit('action', createGame({playerName, roomName, nPlayers}))
           }
           break;
         default:

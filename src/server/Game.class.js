@@ -18,24 +18,29 @@ class Game {
 		return !!(games.find((game) => game instanceof Game && game.roomName === roomName))
 	}
 
-	connect(io, socket) {
-		socket.join(`${this.roomName}`)
-		io.to(`${this.roomName}`).emit('action', {type: 'TEST'});
-	}
-
 	static getRoomFromName(games, roomName) {
 		return Game.doesRoomExist(games, roomName) 
 			? games.find((game) => game instanceof Game && game.roomName === roomName) 
 			: null
 	}
 
+	connect(io, socket) {
+		socket.join(`${this.roomName}`)
+		io.to(`${this.roomName}`).emit('action', {type: 'TEST'});
+	}
+
 	addPlayer(playerName) {
 		validator.isAlphanumeric(playerName)
 		validator.isLength(playerName, {min: 3, max: 20})
+
+		if (this._isFull())
+			throw 'Room is full.'
+		if (this.players.includes(playerName))
+			throw `Username ${playerName} is taken.`
 		this.players.push(playerName)
 	}
 
-  isFull() {
+  _isFull() {
     return this.players.length >= this.nPlayers
   }
 }

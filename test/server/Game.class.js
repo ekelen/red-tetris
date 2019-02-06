@@ -46,4 +46,23 @@ describe('Join game', () => {
     const res = (game) => game.addPlayer('!@#$%')
     res.should.throw()
   })
+
+  it('throws if player name is not unique', () => {
+    const game = games[0]
+    const res = (game) => game.addPlayer('jim')
+    res.should.throw()
+  })
+
+  it('accepts valid playername if room not full', () => {
+    const game = games[0]
+    game.addPlayer('carly')
+    const res = game.players
+    res.should.include('carly')
+  })
+
+  it('rejects valid playerName if room is full', () => {
+    const game = games[0]
+    const res = (game) => game.addPlayer('maria')
+    res.should.throw()
+  })
 })
