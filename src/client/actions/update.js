@@ -8,6 +8,18 @@ const DOWN = 40
 
 let dropCounter = 0 //TODO: Put that in a state ?
 
+//TODO: find a way to test this
+const pieceDown = () => (dispatch, getState) => {
+  dropCounter = 0
+  const { currentPiece, lockedBoard } = getState()
+  dispatch(pieceFall())
+  const { currentPiece: pieceMaybe } = getState()
+  if (isColliding(lockedBoard, pieceMaybe)) {
+    dispatch(resetPiece(currentPiece))
+  }
+  dispatch(updateCurrentPiece(getState().currentPiece, lockedBoard))
+}
+
 const update = () => (dispatch, getState) => {
   const { currentPiece, lockedBoard } = getState()
   dispatch(pieceFall())
@@ -30,7 +42,7 @@ const animationHandler = (dispatch, lastTime) => timestamp => {
 }
 
 //TODO: find a way to test this
-export const move = dir => (dispatch, getState) => {
+const move = dir => (dispatch, getState) => {
   const { currentPiece } = getState() //TODO: use for the reset
   dispatch(movePiece(dir))
   const { currentPiece: pieceMaybe, lockedBoard } = getState()
@@ -52,8 +64,7 @@ const handleEvents = dispatch => e => {
       console.log('rotate')
       break
     case DOWN:
-      dropCounter = 0
-      console.log('go down')
+      dispatch(pieceDown())
       break
     default:
       dispatch({type: 'KEYDOWN', keyCode: e.keyCode})
