@@ -1,7 +1,7 @@
 import { PIECE_FALL, RESET_PIECE, MOVE_PIECE } from '../actions/piece'
 
 const initialState = {
-  pos: {x: 4, y: 10},
+  pos: {x: 4, y: 0},
   shape: [
     [1,0,0],
     [1,1,1],
