@@ -36,6 +36,7 @@ export const initEngine = io => {
       switch (action.type) {
         case 'server/ping':
           socket.emit('action', {type: 'pong'})
+          break
         case 'server/ENTER_MULTIPLAYER_GAME':
           // TODO: Socketio room/namespace init
           const { playerName, roomName, nPlayers } = action
