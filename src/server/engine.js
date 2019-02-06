@@ -34,11 +34,15 @@ export const initEngine = io => {
               )
             }
           } else {
-            let game = new Game({ nPlayers, playerName, roomName, io })
-            games.push(game)
-            socket.emit(
+            try {
+              let game = new Game({ nPlayers, playerName, roomName })
+              games.push(game)
+              socket.emit(
               'action',
               { type: 'CREATE_MULTIPLAYER_GAME', nPlayers, playerName, roomName })
+            } catch (error) {
+              logerror(error)
+            }
           }
           break;
         default:

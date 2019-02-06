@@ -1,6 +1,13 @@
+import validator from 'validator';
+
 class Game {
 	constructor(params) {
-		this.io = params.io
+		validator.isInt(params['nPlayers'].toString(), { min: 2, max: 5 })
+		validator.isAlphanumeric(params['playerName'])
+		validator.isLength(params['playerName'], {min: 3, max: 20})
+		validator.isAlphanumeric(params['roomName'])
+		validator.isLength(params['roomName'], {min: 3, max: 20})
+
 		this.nPlayers = params.nPlayers
 		this.pieces = []
 		this.players = [params.playerName]
@@ -11,9 +18,9 @@ class Game {
 		return !!(games.find((game) => game instanceof Game && game.roomName === roomName))
 	}
 
-	connect(socket) {
+	connect(io, socket) {
 		socket.join(`${this.roomName}`)
-		this.io.to(`${this.roomName}`).emit('action', {type: 'TEST'});
+		io.to(`${this.roomName}`).emit('action', {type: 'TEST'});
 	}
 
 	static getRoomFromName(games, roomName) {
@@ -23,6 +30,8 @@ class Game {
 	}
 
 	addPlayer(playerName) {
+		validator.isAlphanumeric(playerName)
+		validator.isLength(playerName, {min: 3, max: 20})
 		this.players.push(playerName)
 	}
 
