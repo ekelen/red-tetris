@@ -1,4 +1,4 @@
-import { PIECE_FALL, RESET_PIECE } from '../actions/piece'
+import { PIECE_FALL, RESET_PIECE, MOVE_PIECE } from '../actions/piece'
 
 const initialState = {
   pos: {x: 4, y: 10},
@@ -14,7 +14,9 @@ const currentPiece = (state=initialState, action) => {
     case PIECE_FALL:
       return {...state, pos: {...state.pos, y: state.pos.y + 1}}
     case RESET_PIECE:
-     return {...state, pos: {x:4, y: 10}}
+     return action.piece || initialState
+    case MOVE_PIECE:
+      return {...state, pos: {...state.pos, x: state.pos.x + action.dir}}
     default:
       return state
   }

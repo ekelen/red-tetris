@@ -1,4 +1,4 @@
-import { pieceFall, resetPiece,  } from './piece'
+import { pieceFall, resetPiece, movePiece,  } from './piece'
 import { updateCurrentPiece, pieceLand } from './board'
 import { isColliding } from './physics'
 const LEFT = 37
@@ -29,17 +29,32 @@ const animationHandler = (dispatch, lastTime) => timestamp => {
   requestAnimationFrame(animationHandler(dispatch, timestamp))
 }
 
+//TODO: find a way to test this
+export const move = dir => (dispatch, getState) => {
+  const { currentPiece } = getState() //TODO: use for the reset
+  dispatch(movePiece(dir))
+  const { currentPiece: pieceMaybe, lockedBoard } = getState()
+  if (isColliding(lockedBoard, pieceMaybe)) {
+    dispatch(resetPiece(currentPiece))
+  }
+  dispatch(updateCurrentPiece(getState().currentPiece, lockedBoard))
+}
+
 const handleEvents = dispatch => e => {
   switch (e.keyCode) {
     case LEFT:
-      console.log('move left')
+      dispatch(move(-1))
+      break
     case RIGHT:
-      console.log('move right')
+      dispatch(move(1))
+      break
     case UP:
       console.log('rotate')
+      break
     case DOWN:
       dropCounter = 0
       console.log('go down')
+      break
     default:
       dispatch({type: 'KEYDOWN', keyCode: e.keyCode})
   }
