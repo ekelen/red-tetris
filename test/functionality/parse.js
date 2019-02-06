@@ -7,7 +7,7 @@ import { parseURL } from '../../src/client/actions/parse'
 
 chai.should()
 
-describe('Server test', () => {
+describe('Multiplayer gatekeeping', () => {
   let tetrisServer
 
   before(cb => startServer( params.serverTest, (err, server) => {
