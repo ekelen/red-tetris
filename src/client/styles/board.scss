@@ -26,11 +26,41 @@
 
     .cell0 {
       @extend %cell
-    }
+    };
 
     .cell1 {
       @extend %cell;
       background-color: blue;
-    }
+    };
+
+    .cell2 {
+      @extend %cell;
+      background-color: red;
+    };
+
+    .cell3 {
+      @extend %cell;
+      background-color: yellow;
+    };
+
+    .cell4 {
+      @extend %cell;
+      background-color: purple;
+    };
+
+    .cell5 {
+      @extend %cell;
+      background-color: orange;
+    };
+
+    .cell6 {
+      @extend %cell;
+      background-color: green;
+    };
+
+    .cell7 {
+      @extend %cell;
+      background-color: pink;
+    };
   }
 }
