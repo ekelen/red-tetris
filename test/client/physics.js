@@ -1,5 +1,5 @@
 import chai from "chai"
-import { merge, isColliding } from '../../src/client/actions/physics'
+import { merge, isColliding, checkclearedLines } from '../../src/client/actions/physics'
 import { EMPTY_BOARD } from "../../src/client/reducers/board"
 import { cloneDeep } from 'lodash'
 
@@ -38,6 +38,10 @@ describe('Physics test', () => {
       [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
       [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
       [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
       [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
     ]
     const newBoard = merge(board, piece)
@@ -46,9 +50,16 @@ describe('Physics test', () => {
   }),
   it('Should collide', done => {
     const board = cloneDeep(EMPTY_BOARD)
-    const piece = {...cloneDeep(pieceMock), pos: {x: 0, y: 20}}
+    const piece = {...cloneDeep(pieceMock), pos: {x: 0, y: 24}}
     const colliding = isColliding(board, piece)
     colliding.should.equal(true)
+    done()
+  })
+  it('should remove line', done => {
+    const board = cloneDeep(EMPTY_BOARD)
+    board[board.length - 1].fill(1)
+    const newBoard = checkclearedLines(board)
+    newBoard.should.deep.equal(EMPTY_BOARD)
     done()
   })
 })

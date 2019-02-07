@@ -1,5 +1,5 @@
 import { pieceFall, resetPiece, movePiece,  } from './piece'
-import { updateCurrentPiece, pieceLand } from './board'
+import { updateCurrentPiece, pieceLand, checkLine } from './board'
 import { isColliding } from './physics'
 const LEFT = 37
 const UP = 38
@@ -27,6 +27,7 @@ const update = () => (dispatch, getState) => {
   if (isColliding(lockedBoard, pieceMaybe)) {
     dispatch(pieceLand(currentPiece))
     dispatch(resetPiece())
+    dispatch(checkLine())
   }
   dispatch(updateCurrentPiece(currentPiece, lockedBoard))
 }

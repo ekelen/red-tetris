@@ -1,5 +1,21 @@
 import { cloneDeep } from 'lodash'
 
+// TODO: make it cleaner
+export const checkclearedLines = board => {
+  const newBoard = cloneDeep(board)
+  outer: for (let y = 0; y < board.length; y++) {
+    for (let x = 0; x < board[y].length; x++) {
+      if (board[y][x] === 0) {
+        continue outer
+      }
+    }
+    const row = newBoard.splice(y,1)[0].fill(0)
+    newBoard.unshift(row)
+  }
+  return newBoard
+}
+
+
 //TODO: to be tested
 export const merge = (board, piece) => {
   const newBoard = cloneDeep(board)
