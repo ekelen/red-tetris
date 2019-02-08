@@ -25,7 +25,7 @@ export function create(params) {
     app.on('request', handler)
 
     app.listen({ host, port }, () => {
-      loginfo(`tetris listen on ${params.url}`)
+      loginfo(`Tetris listening on ${params.url}`)
 
       const io = require('socket.io')(app)
       const stop = (onStop) => {
@@ -34,22 +34,15 @@ export function create(params) {
           app.unref()
         })
         loginfo('Engine stopped.')
-        onStop()
+        if (onStop)
+          onStop()
       }
-
       initEngine(io)
-      resolve({ stop })
+      resolve({ io, stop })
     })
     .on('error', (err) => {
-      const stop = (onStop) => {
-        app.close(() => {
-          app.unref()
-        })
-
-        logerror(`Engine stopped due to error: ${err.message}`)
-        onStop()
-      }
-      reject({ err, stop })
+      logerror(`Engine error: ${err.message}`)
+      reject(err)
     })
   })
   return promise

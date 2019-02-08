@@ -4,23 +4,23 @@ import rootReducer from '../../src/client/reducers'
 import io from 'socket.io-client'
 import params from '../../params'
 import { parseURL } from '../../src/client/actions/parse'
-import { startServer } from "../helpers/server";
 import { configureStore } from "../helpers/client";
+import * as server from '../../src/server/index'
 
 chai.should()
 
 describe('Multiplayer gatekeeping', () => {
-  let tetrisServer
+  let tetrisServer = null
 
-  before(done => startServer(params.serverTest, (err, server) => {
-    if (err)
-      return done(err)
-    tetrisServer = server
-    done()
-  }))
+  before(done => {
+    server.create(params.serverTest)
+      .then(
+        server => { tetrisServer = server; done(); },
+        err => { done(err) })
+  })
 
   after(done => {
-    tetrisServer.stop(done)
+    return tetrisServer ? tetrisServer.stop(done) : done()
   })
 
   it('should create multiplayer game if given good URL', done => {
@@ -52,7 +52,7 @@ describe('Multiplayer gatekeeping', () => {
     const initialState = {}
     const socket = io(params.serverTest.url)
     const store =  configureStore(rootReducer, socket, initialState, {
-      'ROOM_ERROR': () =>  done()
+      'ROOM_ERROR': () => done()
     })
     store.dispatch(parseURL('/2-bananaband[pete]'))
   })
