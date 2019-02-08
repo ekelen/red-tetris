@@ -1,29 +1,33 @@
+/* eslint-env node, mocha */
 import chai from "chai"
-import {startServer, configureStore} from '../helpers/server'
 import rootReducer from '../../src/client/reducers'
 import io from 'socket.io-client'
 import params from '../../params'
 import { parseURL } from '../../src/client/actions/parse'
+import { configureStore } from "../helpers/client";
+import * as server from '../../src/server/index'
 
 chai.should()
 
 describe('Multiplayer gatekeeping', () => {
-  let tetrisServer
+  let tetrisServer = null
 
-  before(cb => startServer( params.serverTest, (err, server) => {
-    tetrisServer = server
-    cb()
-  }))
+  before(done => {
+    server.create(params.serverTest)
+      .then(
+        server => { tetrisServer = server; done(); },
+        err => { done(err) })
+  })
 
   after(done => {
-    tetrisServer.stop(done)
+    return tetrisServer ? tetrisServer.stop(done) : done()
   })
 
   it('should create multiplayer game if given good URL', done => {
     const initialState = {}
     const socket = io(params.serverTest.url)
-    const store =  configureStore(rootReducer, socket, initialState, {
-      'CREATE_MULTIPLAYER_GAME': () =>  done()
+    const store = configureStore(rootReducer, socket, initialState, {
+      'CREATE_MULTIPLAYER_GAME': () => done()
     })
     store.dispatch(parseURL('/2-bananaband[joe]'))
   })
@@ -48,7 +52,7 @@ describe('Multiplayer gatekeeping', () => {
     const initialState = {}
     const socket = io(params.serverTest.url)
     const store =  configureStore(rootReducer, socket, initialState, {
-      'ROOM_ERROR': () =>  done()
+      'ROOM_ERROR': () => done()
     })
     store.dispatch(parseURL('/2-bananaband[pete]'))
   })

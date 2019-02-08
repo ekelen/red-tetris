@@ -1,48 +1,48 @@
-import fs  from 'fs'
+import fs from 'fs'
 import debug from 'debug'
 import { initEngine } from './engine';
 
-const logerror = debug('tetris:error')
-  , loginfo = debug('tetris:info')
+const logerror = debug('tetris:error'), loginfo = debug('tetris:info')
 
-const initApp = (app, params, cb) => {
-  const {host, port} = params
-  const handler = (req, res) => {
-    const file = req.url === '/bundle.js' ? '/../../build/bundle.js' : '/../../index.html'
-    fs.readFile(__dirname + file, (err, data) => {
-      if (err) {
-        logerror(err)
-        res.writeHead(500)
-        return res.end('Error loading index.html')
-      }
-      res.writeHead(200)
-      res.end(data)
-    })
-  }
-
-  app.on('request', handler)
-
-  app.listen({host, port}, () =>{
-    loginfo(`tetris listen on ${params.url}`)
-    cb()
-  })
-}
-
-export function create(params){
-  const promise = new Promise( (resolve, reject) => {
+export function create(params) {
+  const promise = new Promise((resolve, reject) => {
     const app = require('http').createServer()
-    initApp(app, params, () => {
+
+    const { host, port } = params
+    const handler = (req, res) => {
+      const file = req.url === '/bundle.js' ? '/../../build/bundle.js' : '/../../index.html'
+      fs.readFile(__dirname + file, (err, data) => {
+        if (err) {
+          logerror(err)
+          res.writeHead(500)
+          return res.end('Error loading index.html')
+        }
+        res.writeHead(200)
+        res.end(data)
+      })
+    }
+
+    app.on('request', handler)
+
+    app.listen({ host, port }, () => {
+      loginfo(`Tetris listening on ${params.url}`)
+
       const io = require('socket.io')(app)
-      const stop = (cb) => {
+      const stop = (onStop) => {
         io.close()
-        app.close( () => {
+        app.close(() => {
           app.unref()
         })
-        loginfo(`Engine stopped.`)
-        cb()
+        loginfo('Engine stopped.')
+        if (onStop)
+          onStop()
       }
       initEngine(io)
-      resolve({stop})
+      resolve({ io, stop })
+    })
+    .on('error', (err) => {
+      logerror(`Engine error: ${err.message}`)
+      reject(err)
     })
   })
   return promise
