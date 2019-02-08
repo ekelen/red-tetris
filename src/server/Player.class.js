@@ -1,4 +1,5 @@
 import validator from 'validator';
+import { cloneDeep } from 'lodash'
 
 class Player {
   constructor(params) {
@@ -18,10 +19,7 @@ class Player {
 
   set playerName(playerName) {
     validator.isAlphanumeric(playerName)
-    validator.isLength(playerName, {
-      min: 3,
-      max: 20
-    })
+    validator.isLength(playerName, { min: 3, max: 20 })
     this._playerName = playerName
   }
 
@@ -29,13 +27,19 @@ class Player {
     return this._playerName
   }
 
-  destroysLine() {
-    // emit malus to room
+  destroysLine(board, roomName) { // this player clears a line
+    this.board = cloneDeep(board)
+    this.socket.to(roomName).emit('action', { type: 'MALUS', fromPlayer: this.playerName, ghost: this.board })
   }
 
-  dies() {
+  dies(roomName) {
     this.alive = false
-    // emit death to room
+    this.socket.to(roomName).emit('action', { type: 'OPPONENT_DIED', deadPlayerName: this.playerName })
+  }
+
+  lockPiece(board, roomName) { // update ghost
+    this.board = cloneDeep(board)
+    this.socket.to(roomName).emit('action', { type: 'GHOST_UPDATED', playerName: this.playerName, ghost: this.board })
   }
 }
 

@@ -20,7 +20,7 @@ describe('Multiplayer gatekeeping', () => {
   })
 
   after(done => {
-    return tetrisServer ? tetrisServer.stop(done) : done()
+    tetrisServer ? tetrisServer.stop(done) : done()
   })
 
   it('should create multiplayer game if given good URL', done => {
