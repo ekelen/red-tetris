@@ -1,44 +1,62 @@
 import validator from 'validator';
 
 class Game {
-	constructor(params) {
-		validator.isInt(params['nPlayers'].toString(), { min: 2, max: 5 })
-		validator.isAlphanumeric(params['playerName'])
-		validator.isLength(params['playerName'], {min: 3, max: 20})
-		validator.isAlphanumeric(params['roomName'])
-		validator.isLength(params['roomName'], {min: 3, max: 20})
+  constructor(params) {
+    if (!params.player || !params.nPlayers || !params.roomName)
+      throw new Error('Missing some parameters.')
 
-		this.nPlayers = params.nPlayers
-		this.pieces = []
-		this.players = [params.playerName]
-		this.roomName = params.roomName
-	}
+    validator.isInt(params['nPlayers'].toString(), {
+      min: 2,
+      max: 5
+    })
+    validator.isAlphanumeric(params['roomName'])
+    validator.isLength(params['roomName'], {
+      min: 3,
+      max: 20
+    })
 
-	static doesRoomExist(games, roomName) {
-		return !!(games.find((game) => game instanceof Game && game.roomName === roomName))
-	}
+    // TODO: Too annoying when testing, find another solution to make sure player is valid if even necessary
 
-	static getRoomFromName(games, roomName) {
-		return Game.doesRoomExist(games, roomName) 
-			? games.find((game) => game instanceof Game && game.roomName === roomName) 
-			: null
-	}
+    // if (!params.player || !params.player instanceof Player) {
+    // 	throw 'Invalid lead player type.'
+    // }
+    if (!params.player || !params.player['playerName'])
+      throw new Error('Invalid lead player type.')
 
-	connect(io, socket) {
-		socket.join(`${this.roomName}`)
-		io.to(`${this.roomName}`).emit('action', {type: 'TEST'});
-	}
+    this.nPlayers = params.nPlayers
+    this.pieces = []
 
-	addPlayer(playerName) {
-		validator.isAlphanumeric(playerName)
-		validator.isLength(playerName, {min: 3, max: 20})
+    this.roomName = params.roomName
+    this.lead = params.player
+    this.players = [this.lead]
+  }
 
-		if (this._isFull())
-			throw 'Room is full.'
-		if (this.players.includes(playerName))
-			throw `Username ${playerName} is taken.`
-		this.players.push(playerName)
-	}
+  get playerNames() {
+    return this.players.map(player => player.playerName)
+  }
+
+  static doesRoomExist(games, roomName) {
+    return Boolean(games.find((game) => game instanceof Game && game.roomName === roomName))
+  }
+
+  static getRoomFromName(games, roomName) {
+    return Game.doesRoomExist(games, roomName) ?
+      games.find((game) => game instanceof Game && game.roomName === roomName) :
+      null
+  }
+
+  addPlayer(player) {
+    // TODO: Too annoying when testing
+    // if (!player instanceof Player || !player['playerName']) throw 'Invalid new player.'
+
+    if (!player['playerName'] || !player['socket'])
+      throw new Error('Invalid new player.')
+
+    if (this._isFull()) throw new Error('Room is full.')
+    if (this.playerNames.includes(player.playerName))
+      throw new Error(`Username ${player.playerName} is taken.`)
+    this.players.push(player)
+  }
 
   _isFull() {
     return this.players.length >= this.nPlayers

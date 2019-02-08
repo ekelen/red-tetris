@@ -1,19 +1,59 @@
+/* eslint-env node, mocha */
 import chai from "chai"
 import Game from "../../src/server/Game.class";
 
 chai.should()
 
-const mockGame1 = new Game({playerName: 'fred', roomName: 'room1', nPlayers: 3})
-mockGame1.addPlayer('jim')
+class MockPlayer {
+  constructor({
+    playerName,
+    socketId
+  }) {
+    this.playerName = playerName
+    this.socket = {
+      id: socketId
+    }
+  }
+}
+
+const fred = new MockPlayer({
+  playerName: 'fred',
+  socketId: 1
+})
+const jim = new MockPlayer({
+  playerName: 'jim',
+  socketId: 2
+})
+
+const mockGame1 = new Game({
+  player: fred,
+  roomName: 'fredsroom',
+  nPlayers: 3
+})
+mockGame1.addPlayer(jim)
 
 const games = [mockGame1]
 
 describe('Game constructor', () => {
-  const validParams = { nPlayers: 2, roomName: 'room', playerName: 'coolPlayer1' }
-  let gameParams = { ...validParams }
+  const validJane = new MockPlayer({
+    playerName: 'jane',
+    socketId: 3
+  })
+
+  const validParams = {
+    nPlayers: 2,
+    roomName: 'janesroom',
+    player: validJane
+  }
+
+  let gameParams = {
+    ...validParams
+  }
 
   beforeEach(() => {
-    gameParams = { ...validParams }
+    gameParams = {
+      ...validParams
+    }
   })
 
   it('number of players must be between 2 and 5 inclusive', () => {
@@ -28,8 +68,11 @@ describe('Game constructor', () => {
     res.should.throw()
   })
 
-  it('throws if playerName is not alphanumeric', () => {
-    gameParams.playerName = '!@#$'
+  it('throws if player has no name', () => {
+    gameParams.player = new MockPlayer({
+      playerName: null,
+      socket: validJane.socket
+    })
     const res = (gameParams) => new Game(gameParams)
     res.should.throw()
   })
@@ -41,28 +84,40 @@ describe('Game constructor', () => {
 })
 
 describe('Join game', () => {
-  it('throws if player has invalid name', () => {
-    const game = games[0]
-    const res = (game) => game.addPlayer('!@#$%')
-    res.should.throw()
+  const validJane = new MockPlayer({
+    playerName: 'jane',
+    socketId: 3
   })
+
+  it('throws if player has invalid name')
 
   it('throws if player name is not unique', () => {
     const game = games[0]
-    const res = (game) => game.addPlayer('jim')
+    const res = (game) => game.addPlayer(validJane)
     res.should.throw()
   })
 
   it('accepts valid playername if room not full', () => {
     const game = games[0]
-    game.addPlayer('carly')
-    const res = game.players
+    game.addPlayer(new MockPlayer({
+      playerName: 'carly',
+      socket: {
+        id: 5
+      }
+    }))
+
+    const res = game.playerNames
     res.should.include('carly')
   })
 
   it('rejects valid playerName if room is full', () => {
     const game = games[0]
-    const res = (game) => game.addPlayer('maria')
+    const res = (game) => game.addPlayer(new MockPlayer({
+      playerName: 'maria',
+      socket: {
+        id: 6
+      }
+    }))
     res.should.throw()
   })
 })
