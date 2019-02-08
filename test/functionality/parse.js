@@ -1,3 +1,4 @@
+/* eslint-env node, mocha */
 import chai from "chai"
 import rootReducer from '../../src/client/reducers'
 import io from 'socket.io-client'
@@ -11,9 +12,11 @@ chai.should()
 describe('Multiplayer gatekeeping', () => {
   let tetrisServer
 
-  before(cb => startServer( params.serverTest, (err, server) => {
+  before(done => startServer(params.serverTest, (err, server) => {
+    if (err)
+      return done(err)
     tetrisServer = server
-    cb()
+    done()
   }))
 
   after(done => {
@@ -23,8 +26,8 @@ describe('Multiplayer gatekeeping', () => {
   it('should create multiplayer game if given good URL', done => {
     const initialState = {}
     const socket = io(params.serverTest.url)
-    const store =  configureStore(rootReducer, socket, initialState, {
-      'CREATE_MULTIPLAYER_GAME': () =>  done()
+    const store = configureStore(rootReducer, socket, initialState, {
+      'CREATE_MULTIPLAYER_GAME': () => done()
     })
     store.dispatch(parseURL('/2-bananaband[joe]'))
   })

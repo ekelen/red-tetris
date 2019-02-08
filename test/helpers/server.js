@@ -1,7 +1,8 @@
 import * as server from '../../src/server/index'
 
-export const startServer = (params, cb) => {
+// onServerStart = (err: Error, server: Server) => any
+export const startServer = (params, onServerStart) => {
   server.create(params)
-    .then( server => cb(null, server) )
-    .catch( err => cb(err) )
+    .then(server => onServerStart(null, server))
+    .catch(err => onServerStart(err))
 }
