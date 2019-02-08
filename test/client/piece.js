@@ -1,4 +1,4 @@
-import { configureStore } from '../helpers/server'
+import { configureStore } from '../helpers/client'
 import rootReducer from '../../src/client/reducers'
 import { PIECE_FALL } from '../../src/client/actions/piece'
 import chai from "chai"

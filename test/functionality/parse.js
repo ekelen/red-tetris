@@ -1,9 +1,10 @@
 import chai from "chai"
-import {startServer, configureStore} from '../helpers/server'
 import rootReducer from '../../src/client/reducers'
 import io from 'socket.io-client'
 import params from '../../params'
 import { parseURL } from '../../src/client/actions/parse'
+import { startServer } from "../helpers/server";
+import { configureStore } from "../helpers/client";
 
 chai.should()
 

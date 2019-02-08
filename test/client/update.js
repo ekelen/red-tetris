@@ -1,4 +1,4 @@
-import { configureStore } from '../helpers/server'
+import { configureStore } from '../helpers/client'
 import rootReducer from '../../src/client/reducers'
 import { MOVE_PIECE, PIECE_FALL } from '../../src/client/actions/piece'
 import { move } from '../../src/client/actions/update'
