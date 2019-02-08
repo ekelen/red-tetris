@@ -1,5 +1,6 @@
 import validator from 'validator';
 import debug from 'debug'
+import Piece from '../../src/server/Piece.class';
 const logerror = debug('tetris:error'), loginfo = debug('tetris:info')
 
 class Game {
@@ -22,15 +23,23 @@ class Game {
 
     this.nPlayers = params.nPlayers
     // TODO: Current nPlayers so that new players can wait for others to leave+end of game
-    this.pieces = []
 
     this.roomName = params.roomName
     this.lead = params.player
     this.players = [this.lead]
+    this.inProgress = false
+    this._pieceLineup = []
   }
 
   get playerNames() {
     return this.players.map(player => player.playerName)
+  }
+
+  get pieceLineup() {
+    if (this._pieceLineup.length < 10) {
+      Piece.generateLineup(this._pieceLineup)
+    }
+    return this._pieceLineup
   }
 
   static doesRoomExist(games, roomName) {
@@ -85,14 +94,16 @@ class Game {
     return this.players.length >= this.nPlayers
   }
 
-  leaveGame({ games, io, playerName }) {
+  leaveGame(games, io, playerName) {
     // already checked if player in game
     this.players = this.players.filter(player => player.playerName !== playerName)
 
     if (!this.players.length) {
-      games.filter(game => game !== this)
+      const gameIndex = games.findIndex(game => game === this)
+      games.splice(gameIndex, 1)
       return
     }
+
     if (this.lead.playerName === playerName) {
       this.lead = this.players[0]
       io.in(this.roomName).emit('action', { type: 'LEAD_PLAYER_CHANGED', playerName })

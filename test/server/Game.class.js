@@ -81,16 +81,26 @@ describe('Game constructor', () => {
     const res = new Game(gameParams)
     res.should.be.instanceOf(Game)
   })
+
+  it('has 50 tetraminos', () => {
+    const game = mockGame1
+    game.pieceLineup.length.should.equal(50)
+  })
+
+  it('assigns the creating player as the lead player', () => {
+    const game = mockGame1
+    game.lead.playerName === 'fred'
+  })
 })
 
-describe('Join game', () => {
+describe('addPlayer', () => {
+  // TODO: Remake game for clarity
   const validJane = new MockPlayer({
     playerName: 'jane',
     socketId: 3
   })
 
-  it('throws if player has invalid name')
-
+  it('throws if player does not have required props of player')
   it('throws if player name is not unique', () => {
     const game = games[0]
     const res = (game) => game.addPlayer(validJane)
