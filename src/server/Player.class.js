@@ -1,8 +1,47 @@
-export class Player {
-	constructor(params) {
-		this.board = [[]]
-		this.alive = true
-	}
+import validator from 'validator';
+import { cloneDeep } from 'lodash'
 
-	// method malus on me if other player destroys line
+class Player {
+  constructor(params) {
+    this.board = [
+      []
+    ]
+    this.alive = true
+    this._playerName = ''
+
+    // if (!params.socket || !params.socket instanceof Socket) throw 'Invalid socket.'
+    if (!params.socket || !params.socket.id) throw new Error('Invalid socket.')
+    this.socket = params.socket
+  }
+
+  get id() {
+    return this.socket.id || 0
+  }
+
+  set playerName(playerName) {
+    validator.isAlphanumeric(playerName)
+    validator.isLength(playerName, { min: 3, max: 20 })
+    this._playerName = playerName
+  }
+
+  get playerName() {
+    return this._playerName
+  }
+
+  destroysLine(board, roomName) { // this player clears a line
+    this.board = cloneDeep(board)
+    this.socket.to(roomName).emit('action', { type: 'OPPONENT_GIVES_MALUS', fromPlayer: this.playerName, ghost: this.board })
+  }
+
+  dies(roomName) {
+    this.alive = false
+    this.socket.to(roomName).emit('action', { type: 'OPPONENT_DIES', deadPlayerName: this.playerName })
+  }
+
+  lockPiece(board, roomName) { // update ghost
+    this.board = cloneDeep(board)
+    this.socket.to(roomName).emit('action', { type: 'OPPONENT_GHOST_UPDATED', playerName: this.playerName, ghost: this.board })
+  }
 }
+
+export default Player
