@@ -1,6 +1,6 @@
 import chai from "chai"
-import { merge, isColliding, checkclearedLines } from '../../src/client/actions/physics'
-import { EMPTY_BOARD } from "../../src/client/reducers/board"
+import { merge, isColliding, checkclearedLines } from '../../../src/client/actions/physics'
+import { EMPTY_BOARD } from "../../../src/client/reducers/board"
 import { cloneDeep } from 'lodash'
 
 chai.should()

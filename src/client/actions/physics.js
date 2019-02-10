@@ -51,3 +51,27 @@ export const isColliding = (board, currentPiece) => {
   }
   return false;
 }
+
+const subMatrix = (a,b = [1,1]) => a.map((e, i) => e - b[i])
+const addMatrix = (a,b = [1,1]) => a.map((e, i) => e + b[i])
+
+//Clockwise rotation
+const rotateMatrix = ([y, x]) => {
+  const newX = x * 0 + y * 1
+  const newY = x * -1 + y * 0
+  return [newY, newX]
+}
+
+//TODO: to be tested
+export const rotate = (shape, pivot) => {
+  const newPiece = cloneDeep(shape)
+  for (let y = 0; y < shape.length; y++) {
+    for (let x = 0; x < shape[y].length; x++) {
+      const relCoords = subMatrix([y, x], pivot)
+      const [ny, nx] = rotateMatrix(relCoords)
+      const [yy, xx] = addMatrix([ny, nx], pivot)
+      newPiece[yy][xx] = shape[y][x]
+    }
+  }
+  return newPiece
+}

@@ -1,4 +1,4 @@
-import { pieceFall, resetPiece, movePiece,  } from './piece'
+import { pieceFall, resetPiece, movePiece, rotate } from './piece'
 import { updateCurrentPiece, pieceLand, checkLine } from './board'
 import { isColliding } from './physics'
 const LEFT = 37
@@ -53,6 +53,12 @@ const move = dir => (dispatch, getState) => {
   dispatch(updateCurrentPiece(getState().currentPiece, lockedBoard))
 }
 
+const handleRotation = () => (dispatch, getState) => {
+  dispatch(rotate())
+  const { currentPiece, lockedBoard } = getState() 
+  dispatch(updateCurrentPiece(currentPiece, lockedBoard))
+}
+
 const handleEvents = dispatch => e => {
   switch (e.keyCode) {
     case LEFT:
@@ -62,7 +68,7 @@ const handleEvents = dispatch => e => {
       dispatch(move(1))
       break
     case UP:
-      console.log('rotate')
+      dispatch(handleRotation())
       break
     case DOWN:
       dispatch(pieceDown())
