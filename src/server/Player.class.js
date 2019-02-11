@@ -19,8 +19,10 @@ class Player {
   }
 
   set playerName(playerName) {
-    validator.isAlphanumeric(playerName)
-    validator.isLength(playerName, { min: 3, max: 20 })
+    if (
+      !validator.isAlphanumeric(playerName) ||
+      !validator.isLength(playerName, { min: 3, max: 20 })
+    ) throw new Error('Invalid player name.')
     this._playerName = playerName
   }
 
