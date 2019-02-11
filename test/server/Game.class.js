@@ -25,109 +25,133 @@ const jim = new MockPlayer({
   socketId: 2
 })
 
-const mockGame1 = new Game({
-  player: fred,
-  roomName: 'fredsroom',
-  nPlayers: 3
+const george = new MockPlayer({
+  playerName: 'george',
+  socketId: 10
 })
-mockGame1.addPlayer(jim)
 
-const games = [mockGame1]
+const amy = new MockPlayer({
+  playerName: 'amy',
+  socketId: 11
+})
 
-describe('Game constructor', () => {
-  const validJane = new MockPlayer({
-    playerName: 'jane',
-    socketId: 3
+const clara = new MockPlayer({
+  playerName: 'clara',
+  socketId: 12
+})
+
+const jane = new MockPlayer({
+  playerName: 'jane',
+  socketId: 13
+})
+
+describe('Game creation', () => {
+  let game, player, roomName, janeParams, fredsGame
+
+  before(() => {
+    fredsGame = new Game({
+      player: fred,
+      roomName: 'fredsroom'
+    })
   })
 
-  const validParams = {
-    nPlayers: 2,
-    roomName: 'janesroom',
-    player: validJane
-  }
-
-  let gameParams = {
-    ...validParams
-  }
-
   beforeEach(() => {
-    gameParams = {
-      ...validParams
+    roomName = ''
+    player = null
+    game = null
+
+    janeParams = {
+      playerName: 'jane',
+      socketId: 13
     }
   })
 
-  it('number of players must be between 2 and 5 inclusive', () => {
-    gameParams.nPlayers = 6
-    const res = (gameParams) => new Game(gameParams)
-    res.should.throw()
-  })
+  it('throws if roomName is not unique')
 
   it('throws if roomName is not alphanumeric', () => {
-    gameParams.roomName = '!@#$'
-    const res = (gameParams) => new Game(gameParams)
-    res.should.throw()
+    player = jane
+    roomName = '!@#$'
+    const res = (player, roomName) => new Game({ player, roomName })
+    chai.expect(res.bind(res, player, roomName)).to.throw(/room/i)
   })
 
   it('throws if player has no name', () => {
-    gameParams.player = new MockPlayer({
-      playerName: null,
-      socket: validJane.socket
-    })
-    const res = (gameParams) => new Game(gameParams)
-    res.should.throw()
+    janeParams.playerName = ''
+    player = new MockPlayer(janeParams)
+    roomName = 'janesroom'
+    const res = (player, roomName) => new Game({ player, roomName })
+    chai.expect(res.bind(res, player, roomName)).to.throw(/invalid/i)
   })
 
   it('creates a new game with valid params', () => {
-    const res = new Game(gameParams)
+    roomName = 'janesroom'
+    const res = new Game({ player: jane, roomName })
     res.should.be.instanceOf(Game)
   })
 
   it('has 50 tetraminos', () => {
-    const game = mockGame1
+    roomName = 'janesroom'
+    game = new Game({ player: jane, roomName })
     game.pieceLineup.length.should.equal(50)
   })
 
   it('assigns the creating player as the lead player', () => {
-    const game = mockGame1
-    game.lead.playerName === 'fred'
+    roomName = 'janesroom'
+    game = new Game({ player: jane, roomName })
+    game.lead.playerName.should.equal('jane')
   })
 })
 
-describe('addPlayer', () => {
-  // TODO: Remake game for clarity
-  const validJane = new MockPlayer({
-    playerName: 'jane',
-    socketId: 3
+describe('add player', () => {
+  let fredsGame
+
+  beforeEach(() => {
+    fredsGame = new Game({
+      player: fred,
+      roomName: 'fredsroom'
+    })
+  })
+
+  it('has players fred, jim, george, amy', () => {
+    fredsGame.addPlayer(jim)
+    fredsGame.addPlayer(george)
+    fredsGame.addPlayer(amy)
+    fredsGame.playerNames.should.include.members(['fred', 'george', 'jim', 'amy'])
+  })
+
+  it('has 4 players', () => {
+    fredsGame.addPlayer(jim)
+    fredsGame.addPlayer(george)
+    fredsGame.addPlayer(amy)
+    fredsGame.nPlayers.should.equal(4)
+  })
+
+  it('has not started', () => {
+    fredsGame.inProgress.should.equal(false)
   })
 
   it('throws if player does not have required props of player')
+
   it('throws if player name is not unique', () => {
-    const game = games[0]
-    const res = (game) => game.addPlayer(validJane)
-    res.should.throw()
+    const anotherFred = new MockPlayer({ playerName: 'fred', socketId: 2 })
+    const res = (fredsGame) => fredsGame.addPlayer(anotherFred)
+    chai.expect(res.bind(res, fredsGame)).to.throw(/not unique/)
   })
 
   it('accepts valid playername if room not full', () => {
-    const game = games[0]
-    game.addPlayer(new MockPlayer({
-      playerName: 'carly',
-      socket: {
-        id: 5
-      }
-    }))
-
-    const res = game.playerNames
-    res.should.include('carly')
+    fredsGame.addPlayer(jim)
+    fredsGame.addPlayer(george)
+    fredsGame.addPlayer(amy)
+    fredsGame.addPlayer(jane)
+    fredsGame.players.should.include(jane)
   })
 
   it('rejects valid playerName if room is full', () => {
-    const game = games[0]
-    const res = (game) => game.addPlayer(new MockPlayer({
-      playerName: 'maria',
-      socket: {
-        id: 6
-      }
-    }))
-    res.should.throw()
+    fredsGame.addPlayer(jim)
+    fredsGame.addPlayer(george)
+    fredsGame.addPlayer(amy)
+    fredsGame.addPlayer(jane)
+    const res = (fredsGame) => fredsGame.addPlayer(clara)
+    chai.expect(res.bind(res, fredsGame)).to.throw(/full/)
   })
 })

@@ -3,26 +3,22 @@ import debug from 'debug'
 import Piece from '../../src/server/Piece.class';
 const logerror = debug('tetris:error'), loginfo = debug('tetris:info')
 
+const maxPlayers = 5
+
 class Game {
   constructor(params) {
-    if (!params.player || !params.nPlayers || !params.roomName)
+    if (!params.player || !params.roomName)
       throw new Error('Missing some parameters.')
 
-    validator.isInt(params['nPlayers'].toString(), {
-      min: 2,
-      max: 5
-    })
-    validator.isAlphanumeric(params['roomName'])
-    validator.isLength(params['roomName'], {
+    if (!validator.isAlphanumeric(params.roomName) ||
+    !validator.isLength(params.roomName, {
       min: 3,
       max: 20
-    })
+    }))
+      throw new Error('Invalid room name.')
 
-    if (!params.player || !params.player['playerName'])
+    if (!params.player || !params.player.playerName)
       throw new Error('Invalid lead player type.')
-
-    this.nPlayers = params.nPlayers
-    // TODO: Current nPlayers so that new players can wait for others to leave+end of game
 
     this.roomName = params.roomName
     this.lead = params.player
@@ -33,6 +29,10 @@ class Game {
 
   get playerNames() {
     return this.players.map(player => player.playerName)
+  }
+
+  get nPlayers() {
+    return this.players.length
   }
 
   get pieceLineup() {
@@ -52,46 +52,41 @@ class Game {
       null
   }
 
-  static createGame({ games, nPlayers, player, playerName, roomName }) {
+  static createGame({ games, player, playerName, roomName }) {
     try {
       player.playerName = playerName
-      const game = new Game({ nPlayers, player, roomName })
+      const game = new Game({ player, roomName })
       games.push(game)
       player.socket.join('roomName')
-      player.socket.emit('action', { type: 'CREATE_MULTIPLAYER_GAME', nPlayers, playerName, roomName })
+      player.socket.emit('action', { type: 'CREATE_GAME', playerName, roomName })
     } catch (error) {
       player.socket.emit('action', { type: 'CREATE_GAME_ERROR', err: `Error creating game: ${error.message}` })
     }
   }
 
   addPlayer(player) {
-    if (!player['playerName'] || !player['socket'])
+    if (!player.playerName || !player.socket || !player.socket.id)
       throw new Error('Invalid new player.')
-    if (this._isFull()) throw new Error('Room is full.')
+    if (this.nPlayers >= maxPlayers) throw new Error('Room is full.')
     if (this.playerNames.includes(player.playerName))
-      throw new Error(`Username ${player.playerName} is taken.`)
+      throw new Error(`Username ${player.playerName} is not unique.`)
     this.players.push(player)
   }
 
-  joinGame({ io, player, playerName, roomName, nPlayers }) {
+  joinGame({ io, player, playerName, roomName }) {
     try {
       player.playerName = playerName
       this.addPlayer(player)
       player.socket.join(roomName)
       io.in(roomName).emit('action', {
-        type: 'JOIN_MULTIPLAYER_GAME',
-        currNPlayers: this.players.length + 1,
-        nPlayers,
+        type: 'JOIN_GAME',
+        nPlayers: this.nPlayers,
         playerName: player.playerName,
         roomName
       })
     } catch (error) {
       player.socket.emit('action', { type: 'ROOM_ERROR', err: `Error joining ${roomName}: ${error.message}` })
     }
-  }
-
-  _isFull() {
-    return this.players.length >= this.nPlayers
   }
 
   leaveGame(games, io, playerName) {
@@ -108,7 +103,7 @@ class Game {
       this.lead = this.players[0]
       io.in(this.roomName).emit('action', { type: 'LEAD_PLAYER_CHANGED', playerName })
     }
-    io.in(this.roomName).emit('action', { type: 'PLAYER_LEFT', playerName, currNPlayers: this.players.length - 1 })
+    io.in(this.roomName).emit('action', { type: 'PLAYER_LEFT', playerName, nPlayers: this.nPlayers })
   }
 }
 

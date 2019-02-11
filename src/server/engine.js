@@ -17,12 +17,12 @@ export const initEngine = io => {
       case 'server/ping':
         return socket.emit('action', { type: 'pong' })
       case 'server/ENTER_MULTIPLAYER_GAME':
-        const { playerName, roomName, nPlayers } = action
+        const { playerName, roomName } = action
         if (Game.doesRoomExist(games, roomName)) {
           const game = Game.getRoomFromName(games, roomName)
-          game.joinGame({ io, player, playerName, roomName, nPlayers })
+          game.joinGame({ io, player, playerName, roomName })
         } else {
-          Game.createGame({ games, nPlayers, player, playerName, roomName })
+          Game.createGame(games, { player, playerName, roomName })
         }
         return
       default:
