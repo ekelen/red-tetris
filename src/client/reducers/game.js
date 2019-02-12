@@ -1,10 +1,14 @@
 import { START_SINGLE_PLAYER_GAME, CREATE_MULTIPLAYER_GAME, JOIN_MULTIPLAYER_GAME, URL_INPUT_ERROR } from "../actions/parse";
+import { cloneDeep } from 'lodash'
 
 const initialState = {
   alive: false,
+  errmsg: '',
   currNPlayers: 1, // current number of players
-  nPlayers: 1, // n players specified in URL
+  nPlayers: 1, // current number of players
   playerName: '',
+  playerNames: [],
+  players: [],
   roomName: '',
   started: false,
   opponents: [],
@@ -15,7 +19,7 @@ const initialState = {
 const reducer = (state = initialState, action) => {
   switch (action.type) {
     case START_SINGLE_PLAYER_GAME:
-      return { 
+      return {
         ...state,
         alive: true,
         started: true
@@ -37,6 +41,33 @@ const reducer = (state = initialState, action) => {
     case URL_INPUT_ERROR:
       return { ...state,
         urlInputError: true
+      }
+    case 'ENTER_GAME_FAIL': // Placeholder reducer for when server accepts client into existing room
+      return  {
+        ...state,
+        errmsg: action.errmsg
+      }
+    case 'CREATE_GAME_SUCCESS':
+      return {
+        ...state,
+        errmsg: '',
+        playerName: action.playerName,
+        roomName: action.roomName,
+        playerNames: [...action.playerNames]
+      }
+    case 'JOIN_GAME_SUCCESS':
+      return {
+        ...state,
+        errmsg: '',
+        playerName: action.playerName,
+        roomName: action.roomName
+      }
+    case 'UPDATE_GAME':
+      return {
+        ...state,
+        playerNames: [...action.playerNames],
+        players: cloneDeep(action.players),
+        nPlayers: action.nPlayers
       }
     default:
       return state

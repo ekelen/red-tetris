@@ -14,7 +14,6 @@ class MockPlayer {
       id: socketId
     },
     this.ghost = new Array(20).fill(new Array(10).fill(0));
-    console.log('this.ghost: ', this.ghost);
   }
 }
 
@@ -96,12 +95,6 @@ describe('Game creation', () => {
     game = new Game({ player: jane, roomName })
     game.pieceLineup.length.should.equal(50)
   })
-
-  it('assigns the creating player as the lead player', () => {
-    roomName = 'janesroom'
-    game = new Game({ player: jane, roomName })
-    game.lead.playerName.should.equal('jane')
-  })
 })
 
 describe('add player', () => {
@@ -126,6 +119,13 @@ describe('add player', () => {
     fredsGame.addPlayer(george)
     fredsGame.addPlayer(amy)
     fredsGame.nPlayers.should.equal(4)
+  })
+
+  it('has 4 players but fred still is at index 0', () => {
+    fredsGame.addPlayer(jim)
+    fredsGame.addPlayer(george)
+    fredsGame.addPlayer(amy)
+    fredsGame.playerNames[0].should.equal('fred')
   })
 
   it('has not started', () => {

@@ -2,6 +2,7 @@ import validator from 'validator';
 import debug from 'debug'
 import Piece from '../../src/server/Piece.class';
 const logerror = debug('tetris:error'), loginfo = debug('tetris:info')
+require('./engine.js')
 
 const maxPlayers = 5
 
@@ -21,8 +22,7 @@ class Game {
       throw new Error('Invalid lead player type.')
 
     this.roomName = params.roomName
-    this.lead = params.player
-    this.players = [this.lead]
+    this.players = [params.player]
     this.inProgress = false
     this._pieceLineup = []
   }
@@ -35,11 +35,21 @@ class Game {
     return this.players.length
   }
 
+  // Test
   get pieceLineup() {
-    if (this._pieceLineup.length < 10) {
+    const remainingPieces = this._pieceLineup.length - Math.max(this.players.map(player => player.pieceIndex))
+    if (remainingPieces < 10) {
       Piece.generateLineup(this._pieceLineup)
     }
     return this._pieceLineup
+  }
+
+  get gameInfo() {
+    return ({
+      nPlayers: this.nPlayers,
+      playerNames: this.playerNames,
+      players: this.players.map(player => player.playerStatus)
+    })
   }
 
   static doesRoomExist(games, roomName) {
@@ -57,10 +67,17 @@ class Game {
       player.playerName = playerName
       const game = new Game({ player, roomName })
       games.push(game)
-      player.socket.join('roomName')
-      player.socket.emit('action', { type: 'CREATE_GAME', playerName, roomName })
+      player.socket.join('roomName', () => {
+        player.socket.emit('action', {
+          type: 'CREATE_GAME_SUCCESS',
+          playerName,
+          roomName
+        })
+      })
     } catch (error) {
-      player.socket.emit('action', { type: 'CREATE_GAME_ERROR', err: `Error creating game: ${error.message}` })
+      player.socket.emit('action', {
+        type: 'ENTER_GAME_FAIL',
+        errmsg: `Error creating game: ${error.message}` })
     }
   }
 
@@ -79,18 +96,56 @@ class Game {
       player.playerName = playerName
       this.addPlayer(player)
       player.socket.join(roomName)
-      io.in(roomName).emit('action', {
-        type: 'JOIN_GAME',
+      player.emit('action', {
+        type: 'JOIN_GAME_SUCCESS',
+        roomName,
         nPlayers: this.nPlayers,
-        playerName: player.playerName,
-        roomName
+        playerNames: this.playerNames,
+        players: this.players.map(player => player.playerStatus)
+      })
+      player.socket.to(roomName).emit('action', {
+        type: 'UPDATE_GAME',
+        ...this.gameInfo
       })
     } catch (error) {
-      player.socket.emit('action', { type: 'ROOM_ERROR', err: `Error joining ${roomName}: ${error.message}` })
+      player.socket.emit('action', {
+        type: 'ENTER_GAME_FAIL',
+        errmsg: `Error joining ${roomName}: ${error.message}`
+      })
     }
   }
 
-  leaveGame(games, io, playerName) {
+  playerDies({ playerName }) {
+    const player = this.players.find(player => player.playerName === playerName)
+    const { roomName } = this
+    player.dies({ roomName })
+    player.socket.to(roomName).emit('action', {
+      type: 'UPDATE_GAME',
+      ...this.gameInfo
+    })
+  }
+
+  playerDestroysLine({ playerName, ghost }) {
+    const player = this.players.find(player => player.playerName === playerName)
+    const { roomName } = this
+    player.destroysLine({ ghost })
+    player.socket.to(roomName).emit('action', {
+      type: 'UPDATE_GAME',
+      ...this.gameInfo
+    })
+  }
+
+  playerLocksPiece({ playerName, ghost }) {
+    const player = this.players.find(player => player.playerName === playerName)
+    const { roomName } = this
+    player.lockPieceLine({ ghost })
+    player.socket.to(roomName).emit('action', {
+      type: 'UPDATE_GAME',
+      ...this.gameInfo
+    })
+  }
+
+  leaveGame({ games, io, playerName }) {
     // already checked if player in game
     this.players = this.players.filter(player => player.playerName !== playerName)
 
@@ -100,11 +155,10 @@ class Game {
       return
     }
 
-    if (this.lead.playerName === playerName) {
-      this.lead = this.players[0]
-      io.in(this.roomName).emit('action', { type: 'LEAD_PLAYER_CHANGED', playerName })
-    }
-    io.in(this.roomName).emit('action', { type: 'PLAYER_LEFT', playerName, nPlayers: this.nPlayers })
+    io.in(this.roomName).emit('action', {
+      type: 'UPDATE_GAME',
+      ...this.gameInfo
+    })
   }
 }
 

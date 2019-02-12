@@ -4,7 +4,7 @@ const logerror = debug('tetris:error'), loginfo = debug('tetris:info')
 import Game from './Game.class'
 import Player from './Player.class';
 
-const games = []
+global.games = []
 
 export const initEngine = io => {
   io.on('connection', socket => {

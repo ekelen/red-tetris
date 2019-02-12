@@ -12,6 +12,10 @@ const reducer = (state = initialState, action) => {
       return {
         message: action.message
       }
+    case 'ENTER_GAME_FAIL':
+      return {
+        message: action.errmsg
+      }
     default:
       return state
   }
