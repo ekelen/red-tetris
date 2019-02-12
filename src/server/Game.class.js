@@ -111,6 +111,7 @@ class Game {
       player.socket.join(roomName, () => {
         player.socket.to(roomName).emit('action', {
           type: UPDATE_GAME,
+          message: `Player ${playerName} joined!`,
           ...this.gameInfo
         })
       })
@@ -128,6 +129,7 @@ class Game {
     player.dies({ roomName })
     player.socket.to(roomName).emit('action', {
       type: UPDATE_GAME,
+      message: `Player ${playerName} is dead!`,
       ...this.gameInfo
     })
   }
@@ -138,6 +140,7 @@ class Game {
     player.destroysLine({ ghost })
     player.socket.to(roomName).emit('action', {
       type: UPDATE_GAME,
+      message: 'I got a malus, alas',
       ...this.gameInfo
     })
   }
