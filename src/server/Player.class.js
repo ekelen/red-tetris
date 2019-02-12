@@ -6,6 +6,7 @@ class Player {
     this.board = [
       []
     ]
+    this.ghost = new Array(20).fill(0).map((_) => new Array(10).fill(0))
     this.alive = true
     this._playerName = ''
 
