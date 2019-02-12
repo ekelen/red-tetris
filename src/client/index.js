@@ -7,7 +7,6 @@ import { Provider } from 'react-redux'
 import { storeStateMiddleWare } from './middleware/storeStateMiddleWare'
 import { socketMiddleWare } from './middleware/socketMiddleWare'
 import reducer from './reducers'
-import { alert } from './actions/alert'
 import io from 'socket.io-client'
 import params from '../../params'
 import Root from './components/Root'
@@ -25,9 +24,8 @@ const store = createStore(
 
 ReactDom.render((
   <Provider store={store}>
-  	<Root />
+    <Root />
   </Provider>
 ), document.getElementById('tetris'))
 
-store.dispatch(alert('Welcome to tetris!'))
 store.dispatch({ type: 'server/ping' })

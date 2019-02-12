@@ -9,7 +9,7 @@ describe('URL parser', () => {
   it('Should start singleplayer game if no hash part of URL', done => {
     const initialState = {}
     const store = configureStore(rootReducer, null, initialState, {
-      START_SINGLE_PLAYER_GAME: ({getState}) => {
+      START_SINGLE_PLAYER_GAME: ({ getState }) => {
         const state = getState()
         state.game.started.should.equal(true)
         done()

@@ -4,35 +4,29 @@ import Loading from '../components/Loading'
 import { connect } from 'react-redux'
 import lifecycle from 'react-pure-lifecycle'
 import { parseURL } from '../actions/parse'
+import Message from '../components/Message';
 
 const methods = {
   componentDidMount({ location, parseURL }) {
     parseURL(location.pathname)
-
-    // TODO: Start timer ----redux action
-    // TODO: join a room if well formated #<roomid>[<playername>]
-    // TODO: Start timer when everyone arrives----redux action
   }
 }
 
-// TODO: Proper usage message
-const App = ({ currNPlayers, nPlayers, started, urlInputError }) => (
-  started ?
-  <Game /> :
-    urlInputError ?
-    <div>{'ERROR: Expected multiplayer URL format: localhost:8080/#<num_users>-<room_name>[<player_name>] \nSingle player: localhost:8080/'}</div>
-    : <Loading currNPlayers={currNPlayers} nPlayers={nPlayers}/>
+const App = ({ errmsg, message, urlParsed }) => (
+  <div>
+     <Message errmsg={errmsg} message={message} />
+    {(!errmsg && urlParsed) && <Game />}
+  </div>
 )
 
 const mapStateToProps = state => ({
-  started: state.game.started,
-  nPlayers: state.game.nPlayers,
-  currNPlayers: state.game.currNPlayers,
-  urlInputError: state.game.urlInputError
+  ...state.game,
+  errmsg: state.alert.errmsg,
+  message: state.alert.message
 })
 
 const mapDispatchToProps = {
-    parseURL
+  parseURL
 }
 
 const withLifecycleHooks = lifecycle(methods)(App)

@@ -15,8 +15,6 @@ class Player {
 
     // if (!params.socket || !params.socket instanceof Socket) throw 'Invalid socket.'
     if (!params.socket || !params.socket.id) throw new Error('Invalid socket.')
-
-    loginfo('socket: ', params.socket);
     this.socket = params.socket
   }
 

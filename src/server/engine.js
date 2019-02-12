@@ -3,6 +3,7 @@ import debug from 'debug'
 const logerror = debug('tetris:error'), loginfo = debug('tetris:info')
 import Game from './Game.class'
 import Player from './Player.class';
+import { SERVER_ENTER_GAME } from '../../common/constants';
 
 global.__games = []
 
@@ -16,7 +17,7 @@ export const initEngine = io => {
       switch (action.type) {
       case 'server/ping':
         return socket.emit('action', { type: 'pong' })
-      case 'server/ENTER_MULTIPLAYER_GAME':
+      case SERVER_ENTER_GAME:
         const { playerName, roomName } = action
         if (Game.doesRoomExist(roomName)) {
           const game = Game.getRoomFromName(roomName)

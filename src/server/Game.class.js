@@ -1,6 +1,7 @@
 import validator from 'validator';
 import debug from 'debug'
 import Piece from '../../src/server/Piece.class';
+import { ENTER_GAME_FAIL, CREATE_GAME_SUCCESS, UPDATE_GAME } from '../../common/constants';
 const logerror = debug('tetris:error'), loginfo = debug('tetris:info')
 require('./engine.js')
 
@@ -35,7 +36,6 @@ class Game {
     return this.players.length
   }
 
-  // Test
   get pieceLineup() {
     const remainingPieces = this._pieceLineup.length - Math.max(this.players.map(player => player.pieceIndex))
     if (remainingPieces < 10) {
@@ -70,13 +70,13 @@ class Game {
       __games.push(game)
       player.socket.join('roomName', () => {
         return player.socket.emit('action', {
-          type: 'CREATE_GAME_SUCCESS',
+          type: CREATE_GAME_SUCCESS,
           ...game.gameInfo
         })
       })
     } catch (error) {
       player.socket.emit('action', {
-        type: 'ENTER_GAME_FAIL',
+        type: ENTER_GAME_FAIL,
         errmsg: `Error creating game: ${error.message}` })
     }
   }
@@ -105,13 +105,13 @@ class Game {
       })
       player.socket.join(roomName, () => {
         player.socket.to(roomName).emit('action', {
-          type: 'UPDATE_GAME',
+          type: UPDATE_GAME,
           ...this.gameInfo
         })
       })
     } catch (error) {
       player.socket.emit('action', {
-        type: 'ENTER_GAME_FAIL',
+        type: ENTER_GAME_FAIL,
         errmsg: `Error joining ${roomName}: ${error.message}`
       })
     }
@@ -122,7 +122,7 @@ class Game {
     const { roomName } = this
     player.dies({ roomName })
     player.socket.to(roomName).emit('action', {
-      type: 'UPDATE_GAME',
+      type: UPDATE_GAME,
       ...this.gameInfo
     })
   }
@@ -132,7 +132,7 @@ class Game {
     const { roomName } = this
     player.destroysLine({ ghost })
     player.socket.to(roomName).emit('action', {
-      type: 'UPDATE_GAME',
+      type: UPDATE_GAME,
       ...this.gameInfo
     })
   }
@@ -142,7 +142,7 @@ class Game {
     const { roomName } = this
     player.lockPieceLine({ ghost })
     player.socket.to(roomName).emit('action', {
-      type: 'UPDATE_GAME',
+      type: UPDATE_GAME,
       ...this.gameInfo
     })
   }
@@ -158,7 +158,8 @@ class Game {
     }
 
     io.in(this.roomName).emit('action', {
-      type: 'UPDATE_GAME',
+      type: UPDATE_GAME,
+      message: `${playerName} left!`,
       ...this.gameInfo
     })
   }
