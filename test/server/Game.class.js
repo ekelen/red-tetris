@@ -14,6 +14,7 @@ class MockPlayer {
       id: socketId
     },
     this.ghost = new Array(20).fill(new Array(10).fill(0));
+    console.log('this.ghost: ', this.ghost);
   }
 }
 
