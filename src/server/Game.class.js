@@ -63,6 +63,11 @@ class Game {
       null
   }
 
+  static deleteGame(game) {
+    const gameIndex = __games.findIndex(g => g === game)
+    if (gameIndex > -1) __games.splice(gameIndex, 1)
+  }
+
   static createGame({ player, playerName, roomName }) {
     try {
       player.playerName = playerName
@@ -147,21 +152,19 @@ class Game {
     })
   }
 
-  leaveGame({ __games, io, playerName }) {
-    // already checked if player in game
+  leaveGame({ player }) {
+    const { playerName } = player
     this.players = this.players.filter(player => player.playerName !== playerName)
 
-    if (!this.players.length) {
-      const gameIndex = __games.findIndex(game => game === this)
-      __games.splice(gameIndex, 1)
-      return
-    }
-
-    io.in(this.roomName).emit('action', {
+    player.socket.to(this.roomName).emit('action', {
       type: UPDATE_GAME,
-      message: `${playerName} left!`,
+      message: `Player ${playerName} left!`,
       ...this.gameInfo
     })
+
+    if (!this.players.length) {
+      Game.deleteGame(this)
+    }
   }
 }
 
