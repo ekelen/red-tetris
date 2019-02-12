@@ -59,6 +59,8 @@ const reducer = (state = initialState, action) => {
       return {
         ...state,
         errmsg: '',
+        nPlayers: action.nPlayers,
+        players: cloneDeep(action.players),
         playerName: action.playerName,
         roomName: action.roomName
       }

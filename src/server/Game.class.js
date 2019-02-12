@@ -46,32 +46,32 @@ class Game {
 
   get gameInfo() {
     return ({
+      roomName: this.roomName,
       nPlayers: this.nPlayers,
       playerNames: this.playerNames,
       players: this.players.map(player => player.playerStatus)
     })
   }
 
-  static doesRoomExist(games, roomName) {
-    return Boolean(games.find((game) => game instanceof Game && game.roomName === roomName))
+  static doesRoomExist(roomName) {
+    return Boolean(__games.find((game) => game.roomName === roomName))
   }
 
-  static getRoomFromName(games, roomName) {
-    return Game.doesRoomExist(games, roomName) ?
-      games.find((game) => game instanceof Game && game.roomName === roomName) :
+  static getRoomFromName(roomName) {
+    return Game.doesRoomExist(roomName) ?
+      __games.find((game) => game.roomName === roomName) :
       null
   }
 
-  static createGame({ games, player, playerName, roomName }) {
+  static createGame({ player, playerName, roomName }) {
     try {
       player.playerName = playerName
       const game = new Game({ player, roomName })
-      games.push(game)
+      __games.push(game)
       player.socket.join('roomName', () => {
-        player.socket.emit('action', {
+        return player.socket.emit('action', {
           type: 'CREATE_GAME_SUCCESS',
-          playerName,
-          roomName
+          ...game.gameInfo
         })
       })
     } catch (error) {
@@ -91,21 +91,23 @@ class Game {
     this.players.push(player)
   }
 
-  joinGame({ io, player, playerName, roomName }) {
+  joinGame({ player, playerName, roomName }) {
     try {
       player.playerName = playerName
       this.addPlayer(player)
-      player.socket.join(roomName)
-      player.emit('action', {
+
+      player.socket.emit('action', {
         type: 'JOIN_GAME_SUCCESS',
         roomName,
         nPlayers: this.nPlayers,
         playerNames: this.playerNames,
         players: this.players.map(player => player.playerStatus)
       })
-      player.socket.to(roomName).emit('action', {
-        type: 'UPDATE_GAME',
-        ...this.gameInfo
+      player.socket.join(roomName, () => {
+        player.socket.to(roomName).emit('action', {
+          type: 'UPDATE_GAME',
+          ...this.gameInfo
+        })
       })
     } catch (error) {
       player.socket.emit('action', {
@@ -145,13 +147,13 @@ class Game {
     })
   }
 
-  leaveGame({ games, io, playerName }) {
+  leaveGame({ __games, io, playerName }) {
     // already checked if player in game
     this.players = this.players.filter(player => player.playerName !== playerName)
 
     if (!this.players.length) {
-      const gameIndex = games.findIndex(game => game === this)
-      games.splice(gameIndex, 1)
+      const gameIndex = __games.findIndex(game => game === this)
+      __games.splice(gameIndex, 1)
       return
     }
 

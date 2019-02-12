@@ -4,7 +4,7 @@ const logerror = debug('tetris:error'), loginfo = debug('tetris:info')
 import Game from './Game.class'
 import Player from './Player.class';
 
-global.games = []
+global.__games = []
 
 export const initEngine = io => {
   io.on('connection', socket => {
@@ -18,11 +18,11 @@ export const initEngine = io => {
         return socket.emit('action', { type: 'pong' })
       case 'server/ENTER_MULTIPLAYER_GAME':
         const { playerName, roomName } = action
-        if (Game.doesRoomExist(games, roomName)) {
-          const game = Game.getRoomFromName(games, roomName)
+        if (Game.doesRoomExist(roomName)) {
+          const game = Game.getRoomFromName(roomName)
           game.joinGame({ io, player, playerName, roomName })
         } else {
-          Game.createGame(games, { player, playerName, roomName })
+          Game.createGame({ player, playerName, roomName })
         }
         return
       default:
@@ -34,9 +34,9 @@ export const initEngine = io => {
       loginfo('Player disconnected', player.socket.id)
       if (player.playerName) {
         const { playerName } = player
-        const game = games.find(game => game.playerNames.includes(playerName))
+        const game = __games.find(game => game.playerNames.includes(playerName))
         if (game) {
-          game.leaveGame(games, io, playerName)
+          game.leaveGame({ __games, io, playerName })
         }
       }
     })

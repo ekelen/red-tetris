@@ -1,5 +1,7 @@
 import validator from 'validator';
 import { cloneDeep } from 'lodash'
+import debug from 'debug'
+const logerror = debug('tetris:error'), loginfo = debug('tetris:info')
 
 class Player {
   constructor(params) {
@@ -13,6 +15,8 @@ class Player {
 
     // if (!params.socket || !params.socket instanceof Socket) throw 'Invalid socket.'
     if (!params.socket || !params.socket.id) throw new Error('Invalid socket.')
+
+    loginfo('socket: ', params.socket);
     this.socket = params.socket
   }
 
