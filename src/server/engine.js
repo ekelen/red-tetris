@@ -31,7 +31,7 @@ export const initEngine = io => {
     })
 
     socket.on('disconnect', () => {
-      loginfo('Player disconnected', player)
+      loginfo('Player disconnected', player.socket.id)
       if (player.playerName) {
         const { playerName } = player
         const game = games.find(game => game.playerNames.includes(playerName))

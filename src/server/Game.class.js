@@ -67,6 +67,7 @@ class Game {
   addPlayer(player) {
     if (!player.playerName || !player.socket || !player.socket.id)
       throw new Error('Invalid new player.')
+    if (this.inProgress) throw new Error('Game is in progress, please return later.')
     if (this.nPlayers >= maxPlayers) throw new Error('Room is full.')
     if (this.playerNames.includes(player.playerName))
       throw new Error(`Username ${player.playerName} is not unique.`)

@@ -154,4 +154,10 @@ describe('add player', () => {
     const res = (fredsGame) => fredsGame.addPlayer(clara)
     chai.expect(res.bind(res, fredsGame)).to.throw(/full/)
   })
+
+  it('rejects valid player if game is in progress', () => {
+    fredsGame.inProgress = true
+    const res = (fredsGame) => fredsGame.addPlayer(clara)
+    chai.expect(res.bind(res, fredsGame)).to.throw(/progress/)
+  })
 })
