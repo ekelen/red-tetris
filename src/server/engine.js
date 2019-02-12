@@ -3,8 +3,9 @@ import debug from 'debug'
 const logerror = debug('tetris:error'), loginfo = debug('tetris:info')
 import Game from './Game.class'
 import Player from './Player.class';
+import { SERVER_ENTER_GAME } from '../../common/constants';
 
-const games = []
+global.__games = []
 
 export const initEngine = io => {
   io.on('connection', socket => {
@@ -16,13 +17,13 @@ export const initEngine = io => {
       switch (action.type) {
       case 'server/ping':
         return socket.emit('action', { type: 'pong' })
-      case 'server/ENTER_MULTIPLAYER_GAME':
-        const { playerName, roomName, nPlayers } = action
-        if (Game.doesRoomExist(games, roomName)) {
-          const game = Game.getRoomFromName(games, roomName)
-          game.joinGame({ io, player, playerName, roomName, nPlayers })
+      case SERVER_ENTER_GAME:
+        const { playerName, roomName } = action
+        if (Game.doesRoomExist(roomName)) {
+          const game = Game.getRoomFromName(roomName)
+          game.joinGame({ io, player, playerName, roomName })
         } else {
-          Game.createGame({ games, nPlayers, player, playerName, roomName })
+          Game.createGame({ player, playerName, roomName })
         }
         return
       default:
@@ -31,12 +32,12 @@ export const initEngine = io => {
     })
 
     socket.on('disconnect', () => {
-      loginfo('Player disconnected', player)
+      loginfo('Player disconnected', player.socket.id)
       if (player.playerName) {
         const { playerName } = player
-        const game = games.find(game => game.playerNames.includes(playerName))
+        const game = __games.find(game => game.playerNames.includes(playerName))
         if (game) {
-          game.leaveGame(games, io, playerName)
+          game.leaveGame({ __games, player })
         }
       }
     })

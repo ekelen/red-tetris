@@ -32,7 +32,7 @@ describe('Player properties', () => {
   it('does not instantiate a player without a socket with id', () => {
     playerParams.socket = null
     const res = (playerParams) => new Player(playerParams)
-    res.should.throw()
+    chai.expect(res.bind(res, playerParams)).to.throw(/socket/i)
   })
 
   it('makes socket id accessible with id getter [ get id() ]', () => {
@@ -43,13 +43,13 @@ describe('Player properties', () => {
   it('playerName setter throws if name too short', () => {
     const player = new Player(playerParams)
     const res = (player) => player.playerName = '42'
-    res.should.throw()
+    chai.expect(res.bind(res, player)).to.throw(/name/i)
   })
 
   it('playerName setter throws if name not alphanumeric', () => {
     const player = new Player(playerParams)
     const res = (player) => player.playerName = '!@#$'
-    res.should.throw()
+    chai.expect(res.bind(res, player)).to.throw(/name/i)
   })
 
   it('updates player name if valid param given to playerName setter', () => {
