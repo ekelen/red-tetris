@@ -27,7 +27,7 @@ const Game = ({
         {!offlineMode && (<button onClick={startGame} disabled={started}>Start Game with {opponents.length + 1} Players</button>)}
       </div>
       <div className={'opponents'}>
-        {opponents && opponents.map((opponent, i) => (<Ghost board={opponent.ghost} key={i} alive={opponent.alive} />))}
+        {opponents && opponents.map((opponent, i) => (<Ghost alive={opponent.alive} board={opponent.ghost} playerName={opponent.playerName} key={i} />))}
       </div>
       <Player alive={alive} board={board} pieces={pieces} />
 

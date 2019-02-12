@@ -11,7 +11,6 @@ import {
 
 const initialState = {
   alive: false,
-  errmsg: '',
   currNPlayers: 1,
   nPlayers: 1, // current number of players
   playerName: '',
@@ -40,13 +39,11 @@ const reducer = (state = initialState, action) => {
   case ENTER_GAME_FAIL:
     return {
       ...state,
-      errmsg: action.errmsg,
       urlParsed: true
     }
   case CREATE_GAME_SUCCESS:
     return {
       ...state,
-      errmsg: '',
       playerName: action.playerName,
       playerNames: [...action.playerNames],
       players: cloneDeep(action.players),
@@ -56,7 +53,6 @@ const reducer = (state = initialState, action) => {
   case JOIN_GAME_SUCCESS:
     return {
       ...state,
-      errmsg: '',
       nPlayers: action.nPlayers,
       playerName: action.playerName,
       players: cloneDeep(action.players),
@@ -68,7 +64,7 @@ const reducer = (state = initialState, action) => {
     return {
       ...state,
       nPlayers: action.nPlayers,
-      opponents: getOpponents(action.players, action.playerName),
+      opponents: getOpponents(action.players, state.playerName),
       playerNames: [...action.playerNames],
       players: cloneDeep(action.players)
     }

@@ -3,10 +3,10 @@ import '../styles/board.scss'
 
 // The ghost board (opponents boards)
 
-const Ghost = ({ alive, board }) => (
+const Ghost = ({ alive, board, playerName }) => (
   <div className={'board ghost'}>
     {/* display board (different design if alive or not) */}
-    <span> GHOST HERE!</span>
+    <span>{`GHOST ${playerName} HERE!`}</span>
   </div>
 )
 
