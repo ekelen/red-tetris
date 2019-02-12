@@ -8,15 +8,14 @@ export const SERVER_ENTER_MULTIPLAYER_GAME = 'server/ENTER_MULTIPLAYER_GAME'
 export const URL_INPUT_ERROR = 'URL_INPUT_ERROR'
 
 const _parseURL = (url) => {
-  const validMultiplayerUrl = /^[\/][2-5][-][a-zA-Z0-9]{1,20}[\[][a-zA-Z0-9]{1,20}[\]]$/g
+  const validMultiplayerUrl = /^[\/][a-zA-Z0-9]{1,20}[\[][a-zA-Z0-9]{1,20}[\]]$/g
   const isValid = validMultiplayerUrl.test(url)
 
-  if (!isValid) return ({type: URL_INPUT_ERROR })
+  if (!isValid) return ({ type: 'ENTER_GAME_FAIL', errmsg: 'Invalid URL entered. (Usage: ...)' })
 
   const alphaNum = /[a-zA-Z0-9]{1,20}/g
-  const [ nPlayerStr, roomName, playerName ] = url.match(alphaNum)
-  const nPlayers = parseInt(nPlayerStr, 10)
-  return ({ type: SERVER_ENTER_MULTIPLAYER_GAME, nPlayers, roomName, playerName })
+  const [roomName, playerName] = url.match(alphaNum)
+  return ({ type: SERVER_ENTER_MULTIPLAYER_GAME, roomName, playerName })
 }
 
 export const parseURL = (url) => {
