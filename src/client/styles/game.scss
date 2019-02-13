@@ -1,0 +1,23 @@
+@import './variables.scss';
+@import './app.scss';
+
+.game {
+  @include flex-row-wrap;
+  flex-basis: 100%;
+  color: $darkgray;
+  justify-content: space-around;
+
+  .opponents {
+    @include flex-row-wrap;
+    align-items: flex-start;
+    justify-content: stretch;
+    flex: 0 1 200px;
+  }
+
+  .player {
+    flex-basis: 300px;
+    flex: initial;
+    display: flex;
+    flex-direction: column;
+  }
+}

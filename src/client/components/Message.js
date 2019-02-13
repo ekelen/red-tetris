@@ -1,18 +1,9 @@
 import React from 'react'
-
-const messageStyle = {
-  backgroundColor: 'green',
-  color: 'white',
-  fontWeight: 'bolder'
-}
-
-const errStyle = {
-  backgroundColor: 'red'
-}
+import '../styles/message.scss'
 
 const Message = ({ message, errmsg }) => (
-	<div>
-    <span className={'messageStyle'}>{errmsg || message}</span>
+	<div className={'message'}>
+    <span className={errmsg && 'errmsg'}>{errmsg || message}</span>
 	</div>
 )
 
