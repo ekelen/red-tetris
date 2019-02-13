@@ -1,3 +1,9 @@
+/**
+|--------------------------------------------------
+| MESSAGES
+|--------------------------------------------------
+*/
+
 export const MSG_USAGE = 'ERROR: Expected multiplayer URL format: localhost:8080/#<num_users>-<room_name>[<player_name>] \nSingle player: localhost:8080/'
 
 /**
@@ -24,3 +30,13 @@ export const SERVER_PLAYER_DIES = 'SERVER_PLAYER_DIES'
 export const SERVER_PLAYER_LOCKS_PIECE = 'SERVER_PLAYER_LOCKS_PIECE'
 export const SERVER_PLAYER_DESTROYS_LINE = 'SERVER_PLAYER_DESTROYS_LINE'
 export const SERVER_PLAYER_STARTS_GAME = 'SERVER_PLAYER_DESTROYS_LINE'
+
+/**
+|--------------------------------------------------
+| NUMERIC CONSTANTS
+|--------------------------------------------------
+*/
+
+export const MIN_N_PIECES_REMAINING = 10
+export const START_N_PIECES = 50
+export const N_PIECES_TO_APPEND = 50

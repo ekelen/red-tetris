@@ -1,6 +1,7 @@
 /* eslint-env node, mocha */
 import chai from "chai"
 import Game from "../../src/server/Game.class";
+import { START_N_PIECES, N_PIECES_TO_APPEND } from '../../common/constants';
 
 chai.should()
 
@@ -103,8 +104,8 @@ describe('Game creation', () => {
     res.should.be.instanceOf(Game)
   })
 
-  it('has 50 tetraminos', () => {
-    fredsGame.pieceLineup.length.should.equal(50)
+  it('has 50 (START_N_PIECES) tetraminos', () => {
+    fredsGame.pieceLineup.length.should.equal(START_N_PIECES).and.equal(50)
   })
 })
 
@@ -194,11 +195,15 @@ describe('Game action', () => {
     fredsGame.addPlayer(george)
   })
 
+  it('has 50 pieces at the beginning', () => {
+    const nRemainingPieces = fredsGame.pieceLineup.length
+    nRemainingPieces.should.equal(START_N_PIECES)
+  })
+
   it('get pieceLineup: uses player with highest piece index to get more pieces', () => {
     jim.pieceIndex = 45
     fred.pieceIndex = 9
     const nRemainingPieces = fredsGame.pieceLineup.length
-    nRemainingPieces.should.equal(100)
+    nRemainingPieces.should.equal(START_N_PIECES + N_PIECES_TO_APPEND)
   })
-
 })

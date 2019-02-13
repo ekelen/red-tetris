@@ -75,13 +75,19 @@ describe('Player properties', () => {
     chai.expect(new Player(playerParams)).to.respondTo('destroysLine')
   })
 
+  it('has a destroysLine method that updates ghost')
+
   it('has a dies method', () => {
     chai.expect(new Player(playerParams)).to.respondTo('dies')
   })
 
+  it('has a dies method that sets alive to false')
+
   it('has a lockPiece method', () => {
     chai.expect(new Player(playerParams)).to.respondTo('lockPiece')
   })
+
+  it('has a lockpiece method that updates ghost')
 
   it('lockPiece advances player.pieceIndex by 1', () => {
     const player = new Player(playerParams)
