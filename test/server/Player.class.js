@@ -6,7 +6,7 @@ chai.should()
 
 describe('Player properties', () => {
   const validParams = {
-    socket: { id: 3 }
+    socket: { id: '3sdf' }
   }
 
   let playerParams = {
@@ -36,8 +36,9 @@ describe('Player properties', () => {
   })
 
   it('makes socket id accessible with id getter [ get id() ]', () => {
-    const res = new Player(playerParams)
-    res.id.should.equal(res.socket.id)
+    const player = new Player(playerParams)
+    const id = player.id
+    id.should.equal(player.socket.id).and.be.a('string')
   })
 
   it('playerName setter throws if name too short', () => {
@@ -57,5 +58,36 @@ describe('Player properties', () => {
     const validName = 'jane42'
     player.playerName = validName
     player.playerName.should.equal(validName)
+  })
+
+  it('player starts at pieceIndex 0', () => {
+    const player = new Player(playerParams)
+    player.pieceIndex.should.equal(0)
+  })
+
+  it('playerStatus getter should return alive, ghost, pieceIndex, and playerName', () => {
+    const player = new Player(playerParams)
+    const playerStatus = player.playerStatus
+    playerStatus.should.have.all.keys('alive', 'ghost', 'playerName', 'pieceIndex')
+  })
+
+  it('has a destroysLine method', () => {
+    chai.expect(new Player(playerParams)).to.respondTo('destroysLine')
+  })
+
+  it('has a dies method', () => {
+    chai.expect(new Player(playerParams)).to.respondTo('dies')
+  })
+
+  it('has a lockPiece method', () => {
+    chai.expect(new Player(playerParams)).to.respondTo('lockPiece')
+  })
+
+  it('lockPiece advances player.pieceIndex by 1', () => {
+    const player = new Player(playerParams)
+    const initialIndex = player.pieceIndex
+    player.lockPiece({ ghost: [[]] })
+    const newPlayerPieceIndex = player.pieceIndex
+    newPlayerPieceIndex.should.equal(initialIndex + 1)
   })
 })

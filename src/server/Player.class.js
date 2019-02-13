@@ -19,7 +19,7 @@ class Player {
   }
 
   get id() {
-    return this.socket.id || 0
+    return this.socket.id || ''
   }
 
   get playerName() {
@@ -43,7 +43,7 @@ class Player {
     })
   }
 
-  destroysLine({ ghost }) {
+  destroysLine({ ghost }) { // TODO: Possibly redundant with lockPiece
     this.ghost = cloneDeep(ghost)
   }
 
