@@ -6,6 +6,7 @@ const logerror = debug('tetris:error'), loginfo = debug('tetris:info')
 require('./engine.js')
 
 const maxPlayers = 5
+const minPieces = 10
 
 class Game {
   constructor(params) {
@@ -25,7 +26,7 @@ class Game {
     this.roomName = params.roomName
     this.players = [params.player]
     this.inProgress = false
-    this._pieceLineup = []
+    this._pieceLineup = Piece.generateLineup()
   }
 
   get playerNames() {
@@ -37,9 +38,9 @@ class Game {
   }
 
   get pieceLineup() {
-    const remainingPieces = this._pieceLineup.length - Math.max(this.players.map(player => player.pieceIndex))
-    if (remainingPieces < 10) {
-      Piece.generateLineup(this._pieceLineup)
+    const nRemainingPieces = this._pieceLineup.length - Math.max(...this.players.map(player => player.pieceIndex))
+    if (nRemainingPieces < minPieces) {
+      this._pieceLineup = [...this._pieceLineup, ...Piece.generateLineup()]
     }
     return this._pieceLineup
   }
@@ -49,7 +50,8 @@ class Game {
       roomName: this.roomName,
       nPlayers: this.nPlayers,
       playerNames: this.playerNames,
-      players: this.players.map(player => player.playerStatus)
+      players: this.players.map(player => player.playerStatus),
+      pieceLineup: this.pieceLineup
     })
   }
 
@@ -147,13 +149,14 @@ class Game {
     const player = this.players.find(player => player.playerName === playerName)
     const { roomName } = this
     player.lockPieceLine({ ghost })
+
     player.socket.to(roomName).emit('action', {
       type: UPDATE_GAME,
       ...this.gameInfo
     })
   }
 
-  leaveGame({ player }) {
+  playerLeavesGame({ player }) {
     const { playerName } = player
     this.players = this.players.filter(player => player.playerName !== playerName)
 
