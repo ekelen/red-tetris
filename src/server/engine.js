@@ -37,7 +37,7 @@ export const initEngine = io => {
         const { playerName } = player
         const game = __games.find(game => game.playerNames.includes(playerName))
         if (game) {
-          game.leaveGame({ __games, player })
+          game.playerLeavesGame({ player })
         }
       }
     })

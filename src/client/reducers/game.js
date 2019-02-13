@@ -9,16 +9,16 @@ import {
   UPDATE_GAME
 } from '../../../common/constants';
 
+// TODO: Split this file? e.g. with a Player reducer (for my status) ?
 const initialState = {
   alive: false,
-  currNPlayers: 1,
-  nPlayers: 1, // current number of players
+  nPlayers: 1,
   playerName: '',
   playerNames: [],
   players: [],
   roomName: '',
   started: false,
-  opponents: [],
+  opponents: [], // { alive, ghost, pieceIndex, playerName }
   pieces: [],
   offlineMode: false, // TODO: Decide if keeping or what
   urlParsed: false
@@ -48,7 +48,8 @@ const reducer = (state = initialState, action) => {
       playerNames: [...action.playerNames],
       players: cloneDeep(action.players),
       roomName: action.roomName,
-      urlParsed: true
+      urlParsed: true,
+      pieces: cloneDeep(action.pieceLineup)
     }
   case JOIN_GAME_SUCCESS:
     return {
@@ -58,6 +59,7 @@ const reducer = (state = initialState, action) => {
       players: cloneDeep(action.players),
       opponents: getOpponents(action.players, action.playerName),
       roomName: action.roomName,
+      pieces: cloneDeep(action.pieceLineup),
       urlParsed: true
     }
   case UPDATE_GAME:
@@ -66,7 +68,8 @@ const reducer = (state = initialState, action) => {
       nPlayers: action.nPlayers,
       opponents: getOpponents(action.players, state.playerName),
       playerNames: [...action.playerNames],
-      players: cloneDeep(action.players)
+      players: cloneDeep(action.players),
+      pieces: cloneDeep(action.pieceLineup)
     }
   case 'GAME_LOOP_STARTED':
     return {

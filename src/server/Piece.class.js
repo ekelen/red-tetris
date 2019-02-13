@@ -11,10 +11,10 @@ class Piece {
     return shapes
   }
 
-  static generateLineup(currentLineup = [], nPieces = 50) {
-    for (let i = 0; i < nPieces; i++) {
-      currentLineup.push(new Piece({ shape: cloneDeep(Piece.shapes[Math.floor(Math.random() * nPieces.length)]) }))
-    }
+  static generateLineup(nPieces = 50) {
+    const _newPiece = () => new Piece({ shape: cloneDeep(Piece.shapes[Math.floor(Math.random() * Piece.shapes.length)]) })
+    const lineup = new Array(nPieces).fill(0).map((_) => _newPiece())
+    return lineup
   }
 }
 
