@@ -1,7 +1,7 @@
 import validator from 'validator';
 import debug from 'debug'
 import Piece from '../../src/server/Piece.class';
-import { ENTER_GAME_FAIL, CREATE_GAME_SUCCESS, UPDATE_GAME } from '../../common/constants';
+import { ENTER_GAME_FAIL, CREATE_GAME_SUCCESS, UPDATE_GAME, JOIN_GAME_SUCCESS } from '../../common/constants';
 const logerror = debug('tetris:error'), loginfo = debug('tetris:info')
 require('./engine.js')
 
@@ -73,7 +73,7 @@ class Game {
       player.playerName = playerName
       const game = new Game({ player, roomName })
       __games.push(game)
-      player.socket.join('roomName', () => {
+      player.socket.join(roomName, () => {
         return player.socket.emit('action', {
           type: CREATE_GAME_SUCCESS,
           ...game.gameInfo
@@ -96,20 +96,17 @@ class Game {
     this.players.push(player)
   }
 
-  joinGame({ player, playerName, roomName }) {
+  joinGame({ io, player, playerName, roomName }) {
     try {
       player.playerName = playerName
       this.addPlayer(player)
 
       player.socket.emit('action', {
-        type: 'JOIN_GAME_SUCCESS',
-        roomName,
-        nPlayers: this.nPlayers,
-        playerNames: this.playerNames,
+        type: JOIN_GAME_SUCCESS,
         playerName,
-        players: this.players.map(player => player.playerStatus)
+        ...this.gameInfo
       })
-      player.socket.join(roomName, () => {
+      player.socket.join((roomName), () => {
         player.socket.to(roomName).emit('action', {
           type: UPDATE_GAME,
           message: `Player ${playerName} joined!`,
