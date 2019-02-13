@@ -1,0 +1,45 @@
+@import './variables.scss';
+@import './board.scss';
+
+.ghostBoard {
+  @extend %board;
+  width: 90px;
+  height: 180px;
+  padding: 3px;
+  box-shadow: $shadow;
+
+  &.dead {
+    background-color: $deadred
+  }
+
+  &.alive {
+    background-color: $alivegreen;
+  }
+
+  > p {
+    text-align: center;
+  }
+
+  .ghostRow {
+    @extend %row;
+
+    .ghostCell {
+      @extend %cell;
+      border: 1px solid lighten($darkgray, 20%);
+    }
+
+    .cell8 {
+      @extend %cell;
+      visibility: hidden;
+    }
+
+    .cell0 {
+      @extend %cell;
+    }
+
+    .cell1 {
+      @extend %cell;
+      background-color: gray;
+    }
+  }
+}

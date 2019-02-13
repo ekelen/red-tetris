@@ -1,18 +1,35 @@
-.tetris {
-  width: 500px;
-  margin: auto;
+@import './variables';
+
+@mixin flex-row-wrap {
   display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
-  justify-content: space-between;
+  flex-flow: row wrap;
+}
 
-  .main {
-    flex-flow: row wrap;
-  }
+@mixin flex-center {
+  justify-content: center;
+  align-items: center;
+}
 
-  .opponents {
-    flex: initial;
-    display: flex;
-    flex-direction: column;
+.page {
+  @include flex-row-wrap;
+  @include flex-center;
+  width: 100%;
+  background-color: $lightestgray;
+
+  .app {
+    @include flex-row-wrap;
+    width: 600px;
+    justify-content: space-around;
+    box-shadow: $shadow;
+    background-color: $white;
+    min-height: 600px;
+    padding: 18px 12px 32px;
+
+    .status, .buttons {
+      flex-basis: 100%;
+      text-align: center;
+      padding: 5px;
+      margin: 5px;
+    }
   }
 }

@@ -8,10 +8,9 @@ const splitBoard = board => (
 
 const Player = ({ board }) => {
   return (
-    <div className={'board large'}>
-      <span>MY BOARD</span>
+    <div className={'playerBoard'}>
       {splitBoard(board).map((row, i) => (
-        <div key={i} className={'row'}>
+        <div key={i} className={'playerRow'}>
           {row.map((cell, i) => (
             <div key={i} className={`cell${cell}`} />
           ))}

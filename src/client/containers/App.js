@@ -1,10 +1,10 @@
 import React from 'react'
 import Game from './Game'
-import Loading from '../components/Loading'
 import { connect } from 'react-redux'
 import lifecycle from 'react-pure-lifecycle'
 import { parseURL } from '../actions/parse'
 import Message from '../components/Message';
+import '../styles/app.scss'
 
 const methods = {
   componentDidMount({ location, parseURL }) {
@@ -13,10 +13,12 @@ const methods = {
 }
 
 const App = ({ errmsg, message, urlParsed }) => (
-  <div>
-     <Message {...{ errmsg, message }} />
-    {(!errmsg && urlParsed) && <Game />}
-  </div>
+    <div className={'app'}>
+      <div className={'status'}>
+        <Message {...{ errmsg, message }} />
+        </div>
+      {(!errmsg && urlParsed) && <Game />}
+    </div>
 )
 
 const mapStateToProps = state => ({
