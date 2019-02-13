@@ -78,6 +78,7 @@ class Game {
       player.socket.join(roomName, () => {
         return player.socket.emit('action', {
           type: CREATE_GAME_SUCCESS,
+          playerName,
           ...game.gameInfo
         })
       })
