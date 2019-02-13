@@ -1,0 +1,9 @@
+@import './variables';
+@import './mixins.scss';
+
+.page {
+  @include flex-row-wrap;
+  @include flex-center;
+  width: 100%;
+  background-color: $lightestgray;
+}

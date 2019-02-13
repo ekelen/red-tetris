@@ -2,12 +2,13 @@ $gray: #68676e;
 
 $white: lighten($gray, 70%);
 $lightestgray: lighten($gray, 50%);
+$lightergray: lighten($gray, 25%);
 $lightgray: lighten($gray, 10%);
 $darkgray: darken($gray, 20%);
 $black: darken($gray, 80%);
 
-$shadow: 0 4px 6px $lightgray,
-  0 1px 2px $lightgray;
+$shadow: 0 4px 6px $lightergray,
+  0 1px 2px $lightergray;
 
 
 $deadred: #a88a8a;

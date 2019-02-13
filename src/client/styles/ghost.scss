@@ -6,14 +6,11 @@
   width: 90px;
   height: 180px;
   padding: 3px;
-  box-shadow: $shadow;
+  border-radius: 2px;
+  border: 1px solid $lightestgray;
 
   &.dead {
     background-color: $deadred
-  }
-
-  &.alive {
-    background-color: $alivegreen;
   }
 
   > p {
@@ -25,7 +22,7 @@
 
     .ghostCell {
       @extend %cell;
-      border: 1px solid lighten($darkgray, 20%);
+      border: 1px solid $lightergray;
     }
 
     .cell8 {

@@ -1,0 +1,12 @@
+@import './variables.scss';
+
+.message {
+  flex-basis: 100%;
+  text-align: center;
+  padding: 5px;
+  margin: 5px;
+
+  .errmsg {
+    color: saturate(darken($deadred, 20%), 40%);
+  }
+}

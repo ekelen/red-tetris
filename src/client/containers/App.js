@@ -14,9 +14,7 @@ const methods = {
 
 const App = ({ errmsg, message, urlParsed }) => (
     <div className={'app'}>
-      <div className={'status'}>
-        <Message {...{ errmsg, message }} />
-        </div>
+      <Message {...{ errmsg, message }} />
       {(!errmsg && urlParsed) && <Game />}
     </div>
 )
