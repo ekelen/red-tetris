@@ -106,6 +106,7 @@ class Game {
         roomName,
         nPlayers: this.nPlayers,
         playerNames: this.playerNames,
+        playerName,
         players: this.players.map(player => player.playerStatus)
       })
       player.socket.join(roomName, () => {

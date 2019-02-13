@@ -30,7 +30,6 @@ const Game = ({
         {opponents && opponents.map((opponent, i) => (<Ghost alive={opponent.alive} board={opponent.ghost} playerName={opponent.playerName} key={i} />))}
       </div>
       <Player alive={alive} board={board} pieces={pieces} />
-
     </div>
   )
 }
