@@ -96,7 +96,7 @@ class Game {
     this.players.push(player)
   }
 
-  joinGame({ io, player, playerName, roomName }) {
+  joinGame({ player, playerName, roomName }) {
     try {
       player.playerName = playerName
       this.addPlayer(player)

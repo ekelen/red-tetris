@@ -11,7 +11,6 @@ import {
 
 const initialState = {
   alive: false,
-  currNPlayers: 1,
   nPlayers: 1, // current number of players
   playerName: '',
   playerNames: [],
