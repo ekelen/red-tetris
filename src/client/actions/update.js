@@ -55,7 +55,7 @@ const move = dir => (dispatch, getState) => {
 
 const handleRotation = () => (dispatch, getState) => {
   dispatch(rotate())
-  const { currentPiece, lockedBoard } = getState() 
+  const { currentPiece, lockedBoard } = getState()
   dispatch(updateCurrentPiece(currentPiece, lockedBoard))
 }
 
@@ -78,11 +78,11 @@ const handleEvents = dispatch => e => {
   }
 }
 
-export const startGame = () => dispatch => {
+export const startGameTimer = () => dispatch => {
   requestAnimationFrame(animationHandler(dispatch, 0))
   window.addEventListener('keydown', handleEvents(dispatch))
 }
 
-export const stopGame = () => {
+export const stopGameTimer = () => {
   window.removeEventListener('keydown')
 }

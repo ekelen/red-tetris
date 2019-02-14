@@ -1,9 +1,8 @@
 import React from 'react'
 import '../styles/buttons.scss'
 
-const Buttons = ({ started, startGame, stopGame }) => (
+const Buttons = ({ started, startGame }) => (
   <div className={'buttons'}>
-    <button onClick={stopGame} disabled={!started}>Stop Timer</button>
     <button onClick={startGame} disabled={started}>Start Game</button>
   </div>
 )
