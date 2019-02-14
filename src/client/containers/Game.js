@@ -5,6 +5,7 @@ import lifecycle from 'react-pure-lifecycle'
 import { connect } from 'react-redux'
 import { startGame, stopGame } from '../actions/update'
 import '../styles/game.scss'
+import Buttons from '../components/Buttons';
 
 const methods = {
   componentDidMount({ offlineMode, startGame }) {
@@ -18,25 +19,30 @@ const Game = ({
   offlineMode,
   opponents,
   pieces,
+  playerName,
+  playerNames,
   started,
   startGame,
   stopGame
 }) => {
   return (
     <div className={'game'}>
-    <div className={'buttons'}>
-      <button onClick={stopGame} disabled={!started}>Stop Timer</button>
-        <button onClick={startGame} disabled={started}>Start Game with {opponents.length + 1} Players</button>
-      </div>
+      {(offlineMode || playerNames[0] === playerName) &&
+        <Buttons {...{ started, startGame, stopGame }} />
+      }
 
-      <div className={'player'}>
+    <div className={'player'}>
       <Player alive={alive} board={board} pieces={pieces} />
+    </div>
+      {(opponents.length > 0) && (
+        <div className={'opponents'}>
+          {opponents.map((opponent, i) => (<Ghost
+            alive={opponent.alive}
+            board={opponent.ghost}
+            key={i}
+            playerName={opponent.playerName}  />))}
       </div>
-        {(opponents.length > 0) && (
-          <div className={'opponents'}>
-          {opponents.map((opponent, i) => (<Ghost alive={opponent.alive} board={opponent.ghost} playerName={opponent.playerName} key={i} />))}
-        </div>
-        )}
+      )}
     </div>
   )
 }

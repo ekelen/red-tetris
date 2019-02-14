@@ -11,7 +11,7 @@ const _parseURL = (url) => {
 
   if (!isValid) return ({
     type: ENTER_GAME_FAIL,
-    errmsg: `BAD URL ENTERED --- ${MSG_USAGE}`
+    errmsg: `${MSG_USAGE}`
   })
 
   const alphaNum = /[a-zA-Z0-9]{1,20}/g

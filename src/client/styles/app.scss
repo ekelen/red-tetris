@@ -14,28 +14,4 @@ body {
   background-color: $white;
   min-height: 600px;
   padding: 18px 12px 32px;
-
-  .buttons {
-    flex-basis: 100%;
-    text-align: center;
-    padding: 5px;
-    margin: 5px;
-
-    button {
-      border-radius: 2px;
-      background-color: darken($alivegreen, 10%);
-      border: 1px solid darken($alivegreen, 15%);
-      min-width: 36px;
-      padding: 8px 14px;
-      margin: auto 6px;
-      cursor: pointer;
-
-      &:disabled {
-        box-shadow: none;
-        background-color: $lightestgray;
-        border-color: darken($lightestgray, 10%);
-        cursor: auto;
-      }
-    }
-  }
 }
