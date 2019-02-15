@@ -1,4 +1,4 @@
-import { SERVER_START_GAME } from '../../../common/constants';
+import { SERVER_START_GAME } from '../../common/constants';
 
 export const ping = () => {
   return {

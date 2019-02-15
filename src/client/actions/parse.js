@@ -3,7 +3,7 @@ import {
   SERVER_ENTER_GAME,
   MSG_USAGE,
   START_SINGLE_PLAYER_GAME
-} from '../../../common/constants';
+} from '../../common/constants';
 
 const _parseURL = (url) => {
   const validMultiplayerUrl = /^[\/][a-zA-Z0-9]{1,20}[\[][a-zA-Z0-9]{1,20}[\]]$/g

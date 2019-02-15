@@ -3,7 +3,7 @@ import debug from 'debug'
 const logerror = debug('tetris:error'), loginfo = debug('tetris:info')
 import Game from './Game.class'
 import Player from './Player.class';
-import { SERVER_ENTER_GAME } from '../../common/constants';
+import { SERVER_ENTER_GAME } from '../common/constants';
 
 global.__games = []
 

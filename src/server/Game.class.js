@@ -1,7 +1,7 @@
 import validator from 'validator';
 import debug from 'debug'
 import Piece from '../../src/server/Piece.class';
-import { ENTER_GAME_FAIL, CREATE_GAME_SUCCESS, UPDATE_GAME, JOIN_GAME_SUCCESS } from '../../common/constants';
+import { ENTER_GAME_FAIL, CREATE_GAME_SUCCESS, UPDATE_GAME, JOIN_GAME_SUCCESS } from '../common/constants';
 const logerror = debug('tetris:error'), loginfo = debug('tetris:info')
 require('./engine.js')
 

@@ -4,7 +4,7 @@ import { initEngine } from './engine';
 
 const logerror = debug('tetris:error'), loginfo = debug('tetris:info')
 
-export function create(params) {
+export const create = (params) => {
   const promise = new Promise((resolve, reject) => {
     const app = require('http').createServer()
 

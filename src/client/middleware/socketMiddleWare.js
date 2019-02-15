@@ -7,7 +7,7 @@ export const socketMiddleWare = socket => () => next => action => {
 
   // Continue dispatching normal UI-triggered event
   // console.log('Passing through socket middleware with action : ', action)
-  if (action.type.startsWith('server/') || action.type.startsWith('SERVER'))
+  if (socket && action.type && (action.type.startsWith('server/') || action.type.startsWith('SERVER')))
     socket.emit('action', action)
   else
     return next(action)

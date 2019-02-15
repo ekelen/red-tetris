@@ -7,7 +7,7 @@ import {
   CREATE_GAME_SUCCESS,
   JOIN_GAME_SUCCESS,
   UPDATE_GAME
-} from '../../../common/constants';
+} from '../../common/constants';
 
 // TODO: Split this file? e.g. with a Player reducer (for my status) ?
 const initialState = {

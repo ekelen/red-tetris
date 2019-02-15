@@ -1,4 +1,4 @@
-import { ALERT_POP, ALERT_ERROR } from '../../../common/constants';
+import { ALERT_POP, ALERT_ERROR } from '../../common/constants';
 
 export const alert = (message) => {
   return {
