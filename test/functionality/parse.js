@@ -12,9 +12,10 @@ chai.should()
 
 describe('Game creation based on URL', () => {
   let tetrisServer = null
+  let games = []
 
   before(done => {
-    server.create(params.serverTest)
+    server.create(params.serverTest, games)
       .then(
         server => { tetrisServer = server; done(); },
         err => { done(err) })
@@ -57,6 +58,6 @@ describe('Game creation based on URL', () => {
   })
 
   it('should have added game to global games variable', () => {
-    __games.map(game => game.roomName).should.include('testroom')
+    games.map(game => game.roomName).should.include('testroom')
   })
 })

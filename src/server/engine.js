@@ -5,9 +5,7 @@ import Game from './Game.class'
 import Player from './Player.class';
 import { SERVER_ENTER_GAME } from '../common/constants';
 
-global.__games = []
-
-export const initEngine = io => {
+export const initEngine = (io, games) => {
   io.on('connection', socket => {
     loginfo(`Socket connected: ${socket.id}`)
     const player = new Player({ socket })
@@ -19,11 +17,11 @@ export const initEngine = io => {
         return socket.emit('action', { type: 'pong' })
       case SERVER_ENTER_GAME:
         const { playerName, roomName } = action
-        if (Game.doesRoomExist(roomName)) {
-          const game = Game.getRoomFromName(roomName)
+        if (Game.doesRoomExist(games, roomName)) {
+          const game = Game.getRoomFromName(games, roomName)
           game.joinGame({ io, player, playerName, roomName })
         } else {
-          Game.createGame({ player, playerName, roomName })
+          Game.createGame({ games, player, playerName, roomName })
         }
         return
       default:
@@ -35,9 +33,9 @@ export const initEngine = io => {
       loginfo('Player disconnected', player.socket.id)
       if (player.playerName) {
         const { playerName } = player
-        const game = __games.find(game => game.playerNames.includes(playerName))
+        const game = games.find(game => game.playerNames.includes(playerName))
         if (game) {
-          game.playerLeavesGame({ player })
+          game.playerLeavesGame({ games, player })
         }
       }
     })

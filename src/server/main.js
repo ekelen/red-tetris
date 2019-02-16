@@ -1,4 +1,6 @@
 import params from '../../params'
 import * as server from './index'
-server.create(params.server)
+global.__games = []
+
+server.create(params.server, __games)
   .then(() => console.log('Server created...'))

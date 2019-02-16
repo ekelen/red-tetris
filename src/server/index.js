@@ -2,9 +2,10 @@ import fs from 'fs'
 import debug from 'debug'
 import { initEngine } from './engine';
 
-const logerror = debug('tetris:error'), loginfo = debug('tetris:info')
+export const logerror = debug('tetris:error'), loginfo = debug('tetris:info')
+global.__games = []
 
-export const create = (params) => {
+export const create = (params, games) => {
   const promise = new Promise((resolve, reject) => {
     const app = require('http').createServer()
 
@@ -37,7 +38,7 @@ export const create = (params) => {
         if (onStop)
           onStop()
       }
-      initEngine(io)
+      initEngine(io, games)
       resolve({ io, stop })
     })
     .on('error', (err) => {

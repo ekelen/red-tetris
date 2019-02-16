@@ -3,7 +3,6 @@ import debug from 'debug'
 import Piece from '../../src/server/Piece.class';
 import { ENTER_GAME_FAIL, CREATE_GAME_SUCCESS, UPDATE_GAME, JOIN_GAME_SUCCESS } from '../common/constants';
 const logerror = debug('tetris:error'), loginfo = debug('tetris:info')
-require('./engine.js')
 
 const maxPlayers = 5
 const minPieces = 10
@@ -55,26 +54,26 @@ class Game {
     })
   }
 
-  static doesRoomExist(roomName) {
-    return Boolean(__games.find((game) => game.roomName === roomName))
+  static doesRoomExist(games, roomName) {
+    return Boolean(games.find((game) => game.roomName === roomName))
   }
 
-  static getRoomFromName(roomName) {
-    return Game.doesRoomExist(roomName) ?
-      __games.find((game) => game.roomName === roomName) :
+  static getRoomFromName(games, roomName) {
+    return Game.doesRoomExist(games, roomName) ?
+      games.find((game) => game.roomName === roomName) :
       null
   }
 
-  static deleteGame(game) {
-    const gameIndex = __games.findIndex(g => g === game)
-    if (gameIndex > -1) __games.splice(gameIndex, 1)
+  static deleteGame(games, game) {
+    const gameIndex = games.findIndex(g => g === game)
+    if (gameIndex > -1) games.splice(gameIndex, 1)
   }
 
-  static createGame({ player, playerName, roomName }) {
+  static createGame({ games, player, playerName, roomName }) {
     try {
       player.playerName = playerName
       const game = new Game({ player, roomName })
-      __games.push(game)
+      games.push(game)
       player.socket.join(roomName, () => {
         return player.socket.emit('action', {
           type: CREATE_GAME_SUCCESS,
@@ -157,7 +156,7 @@ class Game {
     })
   }
 
-  playerLeavesGame({ player }) {
+  playerLeavesGame({ games, player }) {
     const { playerName } = player
     this.players = this.players.filter(player => player.playerName !== playerName)
 
@@ -168,7 +167,7 @@ class Game {
     })
 
     if (!this.players.length) {
-      Game.deleteGame(this)
+      Game.deleteGame(games, this)
     }
   }
 }
