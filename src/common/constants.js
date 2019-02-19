@@ -23,6 +23,8 @@ export const CREATE_GAME_SUCCESS = 'CREATE_GAME_SUCCESS'
 export const ENTER_GAME_FAIL = 'ENTER_GAME_FAIL'
 export const JOIN_GAME_SUCCESS = 'JOIN_GAME_SUCCESS'
 export const START_SINGLE_PLAYER_GAME = 'START_SINGLE_PLAYER_GAME'
+export const START_GAME = 'START_GAME'
+export const END_GAME = 'END_GAME'
 export const UPDATE_GAME = 'UPDATE_GAME'
 
 // Player status management - socket will emit 'UPDATE_GAME' above
@@ -30,7 +32,6 @@ export const SERVER_START_GAME = 'SERVER_START_GAME'
 export const SERVER_PLAYER_DIES = 'SERVER_PLAYER_DIES'
 export const SERVER_PLAYER_LOCKS_PIECE = 'SERVER_PLAYER_LOCKS_PIECE'
 export const SERVER_PLAYER_DESTROYS_LINE = 'SERVER_PLAYER_DESTROYS_LINE'
-export const SERVER_PLAYER_STARTS_GAME = 'SERVER_PLAYER_DESTROYS_LINE'
 
 /**
 |--------------------------------------------------

@@ -17,7 +17,7 @@ describe('Game creation based on URL', () => {
   before(done => {
     server.create(params.serverTest, games)
       .then(
-        server => { tetrisServer = server; done(); },
+        server => { tetrisServer = server; done() },
         err => { done(err) })
   })
 

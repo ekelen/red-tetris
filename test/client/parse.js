@@ -11,7 +11,7 @@ describe('URL parser', () => {
     const store = configureStore(rootReducer, null, initialState, {
       START_SINGLE_PLAYER_GAME: ({ getState }) => {
         const state = getState()
-        state.game.started.should.equal(true)
+        state.game.inProgress.should.equal(true)
         done()
       }
     })

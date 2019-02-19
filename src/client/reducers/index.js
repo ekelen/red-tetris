@@ -1,16 +1,18 @@
 import alert from './alert'
-import game from './game'
 import board from './board'
 import currentPiece from './currentPiece'
+import game from './game'
 import lockedBoard from './lockedBoard'
+import player from './player'
 import { combineReducers } from 'redux'
 
 const reducers = combineReducers({
   alert,
-  game,
+  board,
   currentPiece,
+  game,
   lockedBoard,
-  board
+  player,
 })
 
 export default reducers

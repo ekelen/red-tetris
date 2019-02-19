@@ -3,7 +3,6 @@ import debug from 'debug'
 import { initEngine } from './engine';
 
 export const logerror = debug('tetris:error'), loginfo = debug('tetris:info')
-global.__games = []
 
 export const create = (params, games) => {
   const promise = new Promise((resolve, reject) => {
@@ -43,6 +42,9 @@ export const create = (params, games) => {
     })
     .on('error', (err) => {
       logerror(`Engine error: ${err.message}`)
+      app.close(() => {
+        app.unref()
+      })
       reject(err)
     })
   })

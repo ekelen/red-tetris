@@ -1,11 +1,14 @@
 import validator from 'validator';
-import debug from 'debug'
 import Piece from '../../src/server/Piece.class';
-import { ENTER_GAME_FAIL, CREATE_GAME_SUCCESS, UPDATE_GAME, JOIN_GAME_SUCCESS } from '../common/constants';
-const logerror = debug('tetris:error'), loginfo = debug('tetris:info')
+import { ENTER_GAME_FAIL, CREATE_GAME_SUCCESS, UPDATE_GAME, JOIN_GAME_SUCCESS, END_GAME, START_GAME } from '../common/constants';
+import { logerror, loginfo } from '.';
 
 const maxPlayers = 5
 const minPieces = 10
+
+// TODO: When game ends, add waiting players if there is room
+// TODO: Async issues everywhar
+// TODO: Refresh/new tab in browser issues
 
 class Game {
   constructor(params) {
@@ -28,27 +31,35 @@ class Game {
     this._pieceLineup = Piece.generateLineup()
   }
 
+  // players who aren't waiting
+  get activePlayers() {
+    return this.players.filter(p => !p.waiting)
+  }
+
   get playerNames() {
     return this.players.map(player => player.playerName)
   }
 
-  get nPlayers() {
-    return this.players.length
+  get alivePlayers() {
+    return this.activePlayers.filter(p => p.alive)
   }
 
   get pieceLineup() {
-    const nRemainingPieces = this._pieceLineup.length - Math.max(...this.players.map(player => player.pieceIndex))
+    const nRemainingPieces = this._pieceLineup.length - Math.max(...this.activePlayers.map(player => player.pieceIndex))
     if (nRemainingPieces < minPieces) {
       this._pieceLineup = [...this._pieceLineup, ...Piece.generateLineup()]
     }
     return this._pieceLineup
   }
 
+  set pieceLineup(pieces) {
+    this._pieceLineup = [...pieces]
+  }
+
   get gameInfo() {
     return ({
+      inProgress: this.inProgress,
       roomName: this.roomName,
-      nPlayers: this.nPlayers,
-      playerNames: this.playerNames,
       players: this.players.map(player => player.playerStatus),
       pieceLineup: this.pieceLineup
     })
@@ -58,7 +69,7 @@ class Game {
     return Boolean(games.find((game) => game.roomName === roomName))
   }
 
-  static getRoomFromName(games, roomName) {
+  static getGameFromName(games, roomName) {
     return Game.doesRoomExist(games, roomName) ?
       games.find((game) => game.roomName === roomName) :
       null
@@ -74,97 +85,91 @@ class Game {
       player.playerName = playerName
       const game = new Game({ player, roomName })
       games.push(game)
-      player.socket.join(roomName, () => {
-        return player.socket.emit('action', {
-          type: CREATE_GAME_SUCCESS,
-          playerName,
-          ...game.gameInfo
-        })
-      })
+      player.socket.join(roomName, () =>
+        player.actionToClient({ type: CREATE_GAME_SUCCESS, ...player.playerStatus, ...game.gameInfo }))
     } catch (error) {
-      player.socket.emit('action', {
-        type: ENTER_GAME_FAIL,
-        errmsg: `Error creating game: ${error.message}` })
+      player.actionToClient({ type: ENTER_GAME_FAIL, errmsg: `Error creating room: ${error.message}` })
     }
-  }
-
-  addPlayer(player) {
-    if (!player.playerName || !player.socket || !player.socket.id)
-      throw new Error('Invalid new player.')
-    if (this.inProgress) throw new Error('Game is in progress, please return later.')
-    if (this.nPlayers >= maxPlayers) throw new Error('Room is full.')
-    if (this.playerNames.includes(player.playerName))
-      throw new Error(`Username ${player.playerName} is not unique.`)
-    this.players.push(player)
   }
 
   joinGame({ player, playerName, roomName }) {
     try {
       player.playerName = playerName
-      this.addPlayer(player)
-
-      player.socket.emit('action', {
-        type: JOIN_GAME_SUCCESS,
-        playerName,
-        ...this.gameInfo
-      })
-      player.socket.join((roomName), () => {
-        player.socket.to(roomName).emit('action', {
-          type: UPDATE_GAME,
-          message: `Player ${playerName} joined!`,
-          ...this.gameInfo
-        })
-      })
+      this._addPlayer({ player })
     } catch (error) {
-      player.socket.emit('action', {
-        type: ENTER_GAME_FAIL,
-        errmsg: `Error joining ${roomName}: ${error.message}`
-      })
+      player.actionToClient({ type: ENTER_GAME_FAIL, errmsg: `Error joining ${roomName}: ${error.message}` })
     }
   }
 
+  _addPlayer({ player }) {
+    if (!player.playerName || !player.socket || !player.socket.id)
+      throw new Error('Invalid new player.')
+    if (this.playerNames.includes(player.playerName))
+      throw new Error(`Username ${player.playerName} is not unique.`)
+    player.waiting = Boolean(this.activePlayers.length >= maxPlayers || this.inProgress)
+    this.players.push(player)
+    player.actionToClient({ type: JOIN_GAME_SUCCESS, ...player.playerStatus, ...this.gameInfo })
+    player.socket.join(this.roomName, () =>
+        player.actionToRoom(this.roomName,
+        { type: UPDATE_GAME, message: `Player ${player.playerName} joined!`, ...this.gameInfo }
+      )
+    )
+  }
+
+  startGame({ io }) {
+    this.players.forEach(p => { p.resetPlayer() })
+    this.inProgress = true
+    this._informRoom(io, { type: START_GAME, ...this.gameInfo })
+  }
+
+  _informRoom(io, action) {
+    if (io && io.in)
+      io.in(this.roomName).emit('action', action)
+  }
+
   playerDies({ playerName }) {
-    const player = this.players.find(player => player.playerName === playerName)
+    const player = this.activePlayers.find(player => player.playerName === playerName)
     const { roomName } = this
     player.dies({ roomName })
-    player.socket.to(roomName).emit('action', {
-      type: UPDATE_GAME,
-      message: `Player ${playerName} is dead!`,
-      ...this.gameInfo
-    })
+    if (this.activePlayers.length > 1 && this.alivePlayers.length === 1)
+    {
+      this.pieceLineup = []
+      this.inProgress = false
+      const winner = this.activePlayers.findOne(p => p.alive)
+      player.actionToRoom(roomName, { type: END_GAME, message: `Player ${winner.playerName} wins!`, ...this.gameInfo })
+    } else {
+      player.actionToRoom(roomName, { type: UPDATE_GAME, message: `Player ${playerName} is dead!`, ...this.gameInfo })
+    }
   }
 
   playerDestroysLine({ playerName, ghost }) {
-    const player = this.players.find(player => player.playerName === playerName)
+    const player = this.activePlayers.find(player => player.playerName === playerName)
     const { roomName } = this
     player.destroysLine({ ghost })
-    player.socket.to(roomName).emit('action', {
-      type: UPDATE_GAME,
-      message: 'I got a malus, alas',
+    player.actionToRoom({ roomName, action: { type: UPDATE_GAME, message: 'I got a malus, alas',
       ...this.gameInfo
+      }
     })
   }
 
   playerLocksPiece({ playerName, ghost }) {
-    const player = this.players.find(player => player.playerName === playerName)
+    const player = this.activePlayers.find(player => player.playerName === playerName)
     const { roomName } = this
     player.lockPieceLine({ ghost })
-
-    player.socket.to(roomName).emit('action', {
-      type: UPDATE_GAME,
-      ...this.gameInfo
-    })
+    player.actionToRoom(roomName, { type: UPDATE_GAME, ...this.gameInfo })
   }
 
   playerLeavesGame({ games, player }) {
     const { playerName } = player
+    const { playerNames, roomName } = this
     this.players = this.players.filter(player => player.playerName !== playerName)
 
-    player.socket.to(this.roomName).emit('action', {
-      type: UPDATE_GAME,
-      message: `Player ${playerName} left!`,
-      ...this.gameInfo
-    })
+    player.actionToRoom(roomName, { type: UPDATE_GAME, message: `Player ${playerName} left!`, ...this.gameInfo })
+    if (this.alivePlayers.length === 1) {
+      this.pieceLineup = []
+      this.inProgress = false
+      player.actionToRoom(roomName, { type: END_GAME, message: `Player ${playerNames[0]} wins!`, ...this.gameInfo })
+    }
 
     if (!this.players.length) {
       Game.deleteGame(games, this)

@@ -1,7 +1,7 @@
 /* eslint-env node, mocha */
 import chai from "chai"
 import Game from "../../src/server/Game.class";
-import { START_N_PIECES, N_PIECES_TO_APPEND } from '../../common/constants';
+import { START_N_PIECES, N_PIECES_TO_APPEND } from '../../src/common/constants';
 
 chai.should()
 
@@ -14,9 +14,13 @@ class MockPlayer {
     this.pieceIndex = 0
     this.alive = null
     this.socket = {
-      id: socketId
+      id: socketId,
+      join: (...params) => {}
     }
     this.ghost = new Array(20).fill(new Array(10).fill(0))
+    this.waiting = false
+    this.actionToRoom = (roomName, action) => {}
+    this.actionToClient = (roomName, action) => {}
   }
 }
 
@@ -49,13 +53,12 @@ const jillParams = {
   socketId: '14'
 }
 
-describe('Game creation', () => {
-  let game, player, roomName, janeParams, fredsGame
-  let fred, jim, george, amy, clara, jill
+describe('Game constructor', () => {
+  let games, game, janeParams, fredsGame
+  let fred
 
   before(() => {
-    [fred, jim, george, amy, clara, jill] = [fredParams, jimParams, georgeParams, amyParams, claraParams, jillParams]
-      .map(params => new MockPlayer(params))
+    fred = new MockPlayer(fredParams)
     fredsGame = new Game({
       player: fred,
       roomName: 'fredsroom'
@@ -63,9 +66,8 @@ describe('Game creation', () => {
   })
 
   beforeEach(() => {
-    roomName = ''
-    player = null
     game = null
+    games = []
 
     janeParams = {
       playerName: 'jane',
@@ -83,35 +85,37 @@ describe('Game creation', () => {
   it('throws if roomName is not unique')
 
   it('throws if roomName is not alphanumeric', () => {
-    player = new MockPlayer(janeParams)
-    roomName = '!@#$'
+    const player = new MockPlayer(janeParams)
+    const roomName = '!@#$'
     const res = (player, roomName) => new Game({ player, roomName })
     chai.expect(res.bind(res, player, roomName)).to.throw(/room/i)
   })
 
   it('throws if player has no name', () => {
     janeParams.playerName = ''
-    player = new MockPlayer(janeParams)
-    roomName = 'janesroom'
+    const player = new MockPlayer(janeParams)
+    const roomName = 'janesroom'
     const res = (player, roomName) => new Game({ player, roomName })
     chai.expect(res.bind(res, player, roomName)).to.throw(/invalid/i)
   })
 
-  it('creates a new game with valid params', () => {
-    roomName = 'janesroom'
-    player = new MockPlayer(janeParams)
+  it('creates a new game when given valid player object and roomName', () => {
+    const roomName = 'janesroom'
+    const player = new MockPlayer(janeParams)
     const res = new Game({ player, roomName })
     res.should.be.instanceOf(Game)
   })
 
   it('has 50 (START_N_PIECES) tetraminos', () => {
-    fredsGame.pieceLineup.length.should.equal(START_N_PIECES).and.equal(50)
+    fredsGame.pieceLineup.length.should.equal(START_N_PIECES)
+    START_N_PIECES.should.equal(50)
   })
 })
 
-describe('add player', () => {
+describe('joinGame method', () => {
   let fredsGame
   let fred, jim, george, amy, clara, jill
+  let games = []
 
   before(() => {
     [fred, jim, george, amy, clara, jill] = [fredParams, jimParams, georgeParams, amyParams, claraParams, jillParams]
@@ -126,24 +130,20 @@ describe('add player', () => {
   })
 
   it('has players fred, jim, george, amy', () => {
-    fredsGame.addPlayer(jim)
-    fredsGame.addPlayer(george)
-    fredsGame.addPlayer(amy)
-    fredsGame.playerNames.should.include.members(['fred', 'george', 'jim', 'amy'])
+    fredsGame.joinGame({ player: jim, playerName: 'jim', roomName: 'fredsroom' })
+    fredsGame.joinGame({ player: george, playerName: 'george', roomName: 'fredsroom' })
+    fredsGame.joinGame({ player: amy, playerName: 'amy', roomName: 'fredsroom' })
+    fredsGame.players.should.include.members([fred, george, jim, amy])
+    fredsGame.players.map(p => p.playerName).should.include.members(['fred', 'george', 'jim', 'amy'])
   })
 
-  it('has 4 players', () => {
-    fredsGame.addPlayer(jim)
-    fredsGame.addPlayer(george)
-    fredsGame.addPlayer(amy)
-    fredsGame.nPlayers.should.equal(4)
-  })
-
-  it('has 4 players but fred still is at index 0', () => {
-    fredsGame.addPlayer(jim)
-    fredsGame.addPlayer(george)
-    fredsGame.addPlayer(amy)
-    fredsGame.playerNames[0].should.equal('fred')
+  it('has 4 players, all active, and player[0] is fred', () => {
+    fredsGame.joinGame({ player: jim, playerName: 'jim', roomName: 'fredsroom' })
+    fredsGame.joinGame({ player: george, playerName: 'george', roomName: 'fredsroom' })
+    fredsGame.joinGame({ player: amy, playerName: 'amy', roomName: 'fredsroom' })
+    fredsGame.players.length.should.equal(4)
+    fredsGame.players[0].should.equal(fred)
+    fredsGame.activePlayers.should.include.members([fred, george, jim, amy])
   })
 
   it('has not started', () => {
@@ -152,36 +152,36 @@ describe('add player', () => {
 
   it('throws if player name is not unique', () => {
     const anotherFred = new MockPlayer({ playerName: 'fred', socketId: '200' })
-    const res = (fredsGame) => fredsGame.addPlayer(anotherFred)
+    const res = (fredsGame) => fredsGame._addPlayer({ player: anotherFred })
     chai.expect(res.bind(res, fredsGame)).to.throw(/not unique/)
   })
 
-  it('accepts valid playername if room not full', () => {
-    fredsGame.addPlayer(jim)
-    fredsGame.addPlayer(george)
-    fredsGame.addPlayer(amy)
-    fredsGame.addPlayer(jill)
-    fredsGame.players.should.include(jill)
+  it('adds player but sets to waiting if room is full', () => {
+    fredsGame.joinGame({ player: jim, playerName: 'jim', roomName: 'fredsroom' })
+    fredsGame.joinGame({ player: george, playerName: 'george', roomName: 'fredsroom' })
+    fredsGame.joinGame({ player: amy, playerName: 'amy', roomName: 'fredsroom' })
+    fredsGame.joinGame({ player: jill, playerName: 'jill', roomName: 'fredsroom' })
+    const res = (fredsGame) => fredsGame.joinGame({ player: clara, playerName: 'clara', roomName: 'fredsroom' })
+    chai.expect(res.bind(res, fredsGame)).to.not.throw()
+    fredsGame.players.should.include(clara)
+    fredsGame.activePlayers.should.not.include(clara)
+    clara.waiting.should.equal(true)
   })
 
-  it('rejects valid playerName if room is full', () => {
-    fredsGame.addPlayer(jim)
-    fredsGame.addPlayer(george)
-    fredsGame.addPlayer(amy)
-    fredsGame.addPlayer(jill)
-    const res = (fredsGame) => fredsGame.addPlayer(clara)
-    chai.expect(res.bind(res, fredsGame)).to.throw(/full/)
-  })
-
-  it('rejects valid player if game is in progress', () => {
+  it('adds player but sets to waiting if room is in progress', () => {
+    fredsGame.joinGame({ player: jim, playerName: 'jim', roomName: 'fredsroom' })
+    fredsGame.joinGame({ player: george, playerName: 'george', roomName: 'fredsroom' })
     fredsGame.inProgress = true
-    const res = (fredsGame) => fredsGame.addPlayer(clara)
-    chai.expect(res.bind(res, fredsGame)).to.throw(/progress/)
+    const res = (fredsGame) => fredsGame.joinGame({ player: clara, playerName: 'clara', roomName: 'fredsroom' })
+    chai.expect(res.bind(res, fredsGame)).to.not.throw()
+    fredsGame.players.should.include(clara)
+    fredsGame.activePlayers.should.not.include(clara)
+    clara.waiting.should.equal(true)
   })
 })
 
 describe('Game action', () => {
-  let game, player, roomName, fredsGame
+  let fredsGame
   let fred, jim, george, amy, clara, jill
 
   beforeEach(() => {
@@ -191,19 +191,38 @@ describe('Game action', () => {
       player: fred,
       roomName: 'fredsroom'
     })
-    fredsGame.addPlayer(jim)
-    fredsGame.addPlayer(george)
+    fredsGame.joinGame({ player: jim, playerName: 'jim', roomName: 'fredsroom' })
+    fredsGame.joinGame({ player: george, playerName: 'george', roomName: 'fredsroom' })
   })
 
-  it('has 50 pieces at the beginning', () => {
-    const nRemainingPieces = fredsGame.pieceLineup.length
-    nRemainingPieces.should.equal(START_N_PIECES)
-  })
-
-  it('get pieceLineup: uses player with highest piece index to get more pieces', () => {
+  it('does not let any player have < 10 pieces', () => {
     jim.pieceIndex = 45
     fred.pieceIndex = 9
     const nRemainingPieces = fredsGame.pieceLineup.length
     nRemainingPieces.should.equal(START_N_PIECES + N_PIECES_TO_APPEND)
   })
 })
+
+
+
+
+
+// describe('Game action', () => {
+//   let fredsGame
+//   let fred, jim, george, amy, clara, jill
+
+//   beforeEach(() => {
+//     [fred, jim, george, amy, clara, jill] = [fredParams, jimParams, georgeParams, amyParams, claraParams, jillParams]
+//       .map(params => new MockPlayer(params))
+//     fredsGame = new Game({
+//       player: fred,
+//       roomName: 'fredsroom'
+//     })
+//     fredsGame.addPlayer(jim)
+//     fredsGame.addPlayer(george)
+//   })
+
+
+
+
+// })

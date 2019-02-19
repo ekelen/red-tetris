@@ -16,24 +16,25 @@ const methods = {
 
 const Game = ({
   alive,
+  activePlayers,
   board,
   offlineMode,
   opponents,
   pieces,
   playerName,
-  playerNames,
-  started,
-  startGame
+  inProgress,
+  startGame,
+  waiting
 }) => {
   return (
     <div className={'game'}>
-      {(offlineMode || playerNames[0] === playerName) &&
-        <Buttons {...{ started, startGame }} />
+      {(offlineMode || activePlayers[0].playerName === playerName) &&
+        <Buttons {...{ inProgress, startGame }} />
       }
 
-    <div className={'player'}>
+    {!waiting && <div className={'player'}>
       <Player alive={alive} board={board} pieces={pieces} />
-    </div>
+    </div>}
       {(opponents.length > 0) && (
         <div className={'opponents'}>
           {opponents.map((opponent, i) => (<Ghost
@@ -51,7 +52,12 @@ const Game = ({
 
 const mapStateToProps = state => ({
   ...state.game,
-  board: state.board
+  ...state.player,
+  alive: state.player.alive,
+  activePlayers: state.game.activePlayers,
+  board: state.board,
+  playerName: state.player.playerName,
+  roomName: state.game.roomName
 })
 
 const mapDispatchToProps = {

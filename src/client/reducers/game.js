@@ -6,25 +6,22 @@ import {
   ENTER_GAME_FAIL,
   CREATE_GAME_SUCCESS,
   JOIN_GAME_SUCCESS,
-  UPDATE_GAME
+  UPDATE_GAME,
+  END_GAME,
+  START_GAME
 } from '../../common/constants';
 
-// TODO: Split this file? e.g. with a Player reducer (for my status) ?
 const initialState = {
-  alive: false,
-  nPlayers: 1,
-  playerName: '',
-  playerNames: [],
+  activePlayers: [],
+  inProgress: false,
+  offlineMode: false,
+  pieces: [],
   players: [],
   roomName: '',
-  started: false,
-  opponents: [], // { alive, ghost, pieceIndex, playerName }
-  pieces: [],
-  offlineMode: false, // TODO: Decide if keeping or what
   urlParsed: false
 }
 
-const getOpponents = (players, myName) => cloneDeep(players.filter(p => p.playerName !== myName))
+const getActivePlayers = (players) => cloneDeep(players.filter(p => !p.waiting))
 
 const reducer = (state = initialState, action) => {
   switch (action.type) {
@@ -33,7 +30,7 @@ const reducer = (state = initialState, action) => {
       ...state,
       alive: true,
       offlineMode: true,
-      started: true,
+      inProgress: true,
       urlParsed: true
     }
   case ENTER_GAME_FAIL:
@@ -44,37 +41,46 @@ const reducer = (state = initialState, action) => {
   case CREATE_GAME_SUCCESS:
     return {
       ...state,
-      playerName: action.playerName,
-      playerNames: [...action.playerNames],
+      activePlayers: cloneDeep(getActivePlayers(action.players)),
+      pieces: cloneDeep(action.pieceLineup),
       players: cloneDeep(action.players),
       roomName: action.roomName,
       urlParsed: true,
-      pieces: cloneDeep(action.pieceLineup)
     }
   case JOIN_GAME_SUCCESS:
     return {
       ...state,
-      nPlayers: action.nPlayers,
-      playerName: action.playerName,
-      players: cloneDeep(action.players),
-      opponents: getOpponents(action.players, action.playerName),
-      roomName: action.roomName,
+      activePlayers: getActivePlayers(action.players),
       pieces: cloneDeep(action.pieceLineup),
+      players: cloneDeep(action.players),
+      roomName: action.roomName,
       urlParsed: true
+    }
+  case START_GAME:
+    return {
+      ...state,
+      inProgress: true
     }
   case UPDATE_GAME:
     return {
       ...state,
-      nPlayers: action.nPlayers,
-      opponents: getOpponents(action.players, state.playerName),
-      playerNames: [...action.playerNames],
+      activePlayers: getActivePlayers(action.players),
+      inProgress: action.inProgress,
+      pieces: cloneDeep(action.pieceLineup),
       players: cloneDeep(action.players),
-      pieces: cloneDeep(action.pieceLineup)
+    }
+  case END_GAME:
+    return {
+      ...state,
+      activePlayers: getActivePlayers(action.players),
+      inProgress: action.inProgress,
+      pieces: cloneDeep(action.pieceLineup),
+      players: cloneDeep(action.players)
     }
   case 'GAME_LOOP_STARTED':
     return {
       ...state,
-      started: true
+      inProgress: true
     }
   default:
     return state

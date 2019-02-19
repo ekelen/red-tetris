@@ -1,7 +1,7 @@
 import {
   ALERT_POP
 } from '../actions/alert'
-import { ENTER_GAME_FAIL, START_SINGLE_PLAYER_GAME, JOIN_GAME_SUCCESS, CREATE_GAME_SUCCESS, UPDATE_GAME } from '../../common/constants';
+import { ENTER_GAME_FAIL, START_SINGLE_PLAYER_GAME, JOIN_GAME_SUCCESS, CREATE_GAME_SUCCESS, UPDATE_GAME, END_GAME, START_GAME } from '../../common/constants';
 
 const initialState = {
   message: '',
@@ -64,6 +64,20 @@ const reducer = (state = initialState, action) => {
       ...state,
       errmsg: '',
       message: action.message || '',
+      history: updateMessageHistory(state.errmsg, state.message, state.history)
+    }
+  case END_GAME:
+    return {
+      ...state,
+      errmsg: '',
+      message: action.message || 'Game has ended!',
+      history: updateMessageHistory(state.errmsg, state.message, state.history)
+    }
+  case START_GAME:
+    return {
+      ...state,
+      errmsg: '',
+      message: action.message || 'Game has started!',
       history: updateMessageHistory(state.errmsg, state.message, state.history)
     }
   default:

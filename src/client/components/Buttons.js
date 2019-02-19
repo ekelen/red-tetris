@@ -1,9 +1,9 @@
 import React from 'react'
 import '../styles/buttons.scss'
 
-const Buttons = ({ started, startGame }) => (
+const Buttons = ({ inProgress, startGame }) => (
   <div className={'buttons'}>
-    <button onClick={startGame} disabled={started}>Start Game</button>
+    <button onClick={startGame} disabled={inProgress}>Start Game</button>
   </div>
 )
 

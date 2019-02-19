@@ -8,6 +8,6 @@ export const ping = () => {
 
 export const startGame = () => {
   return ({
-    type: SERVER_START_GAME
+    type: SERVER_START_GAME,
   })
 }

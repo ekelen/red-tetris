@@ -1,16 +1,13 @@
 import validator from 'validator';
 import { cloneDeep } from 'lodash'
-import debug from 'debug'
-const logerror = debug('tetris:error'), loginfo = debug('tetris:info')
+import { N_PIECES_TO_APPEND } from '../common/constants';
 
 class Player {
   constructor(params) {
-    this.board = [
-      []
-    ] // TODO: Get rid of
     this.ghost = new Array(20).fill(0).map((_) => new Array(10).fill(0))
     this.alive = true
     this.pieceIndex = 0
+    this.waiting = false
     this._playerName = ''
 
     // if (!params.socket || !params.socket instanceof Socket) throw 'Invalid socket.'
@@ -26,6 +23,12 @@ class Player {
     return this._playerName
   }
 
+  get nRemainingPieces() {
+    return this.pieceIndex > 0 ?
+      N_PIECES_TO_APPEND - (this.pieceIndex % N_PIECES_TO_APPEND) :
+        N_PIECES_TO_APPEND
+  }
+
   set playerName(playerName) {
     if (
       !validator.isAlphanumeric(playerName) ||
@@ -39,8 +42,16 @@ class Player {
       playerName: this.playerName,
       alive: this.alive,
       ghost: this.ghost,
-      pieceIndex: this.pieceIndex
+      pieceIndex: this.pieceIndex,
+      waiting: this.waiting
     })
+  }
+
+  resetPlayer() {
+    this.pieceIndex = 0
+    this.alive = true
+    this.ghost = new Array(20).fill(0).map((_) => new Array(10).fill(0))
+    this.waiting = false
   }
 
   destroysLine({ ghost }) { // TODO: Possibly redundant with lockPiece
@@ -55,6 +66,18 @@ class Player {
   lockPiece({ ghost }) {
     this.ghost = cloneDeep(ghost)
     this.pieceIndex++
+  }
+
+  // TODO: Decide if keeping
+  actionToRoom(roomName, action) {
+    // console.log('action: ', action);
+    if (this.socket.emit && this.socket.to)
+      this.socket.to(roomName).emit('action', action)
+  }
+
+  actionToClient(action) {
+    if (this.socket.emit)
+      this.socket.emit('action', action)
   }
 }
 
