@@ -7,7 +7,8 @@ import {
   CREATE_GAME_SUCCESS,
   JOIN_GAME_SUCCESS,
   UPDATE_GAME,
-  END_GAME
+  END_GAME,
+  START_GAME
 } from '../../common/constants';
 
 const initialState = {
@@ -20,7 +21,6 @@ const initialState = {
 
 const getOpponents = (players, myName) => cloneDeep(players.filter(p => p.playerName !== myName))
 const getPlayer = (players, myName) => cloneDeep(players.find(p => p.playerName === myName))
-const getProp = (source) => (prop, defaut) => source.hasOwnProperty(prop) ? cloneDeep(source.prop) : defaut
 
 const reducer = (state = initialState, action) => {
   switch (action.type) {
@@ -45,6 +45,12 @@ const reducer = (state = initialState, action) => {
       playerName: action.playerName,
       opponents: getOpponents(action.players, action.playerName),
       waiting: action.waiting,
+    }
+  case START_GAME:
+    return {
+      ...state,
+      opponents: getOpponents(action.players, state.playerName),
+      ...getPlayer(action.players, state.playerName)
     }
   case UPDATE_GAME:
     return {

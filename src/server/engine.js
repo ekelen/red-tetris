@@ -1,16 +1,18 @@
 import Game from './Game.class'
 import Player from './Player.class';
 import { SERVER_ENTER_GAME, SERVER_START_GAME, SERVER_PLAYER_DESTROYS_LINE, SERVER_PLAYER_LOCKS_PIECE, SERVER_PLAYER_DIES } from '../common/constants';
-import { loginfo } from '.';
+import { loginfo, logerror } from '.';
 
+// TODO: Totally untested also kind of gangly
 export const initEngine = (io, games) => {
-  let player, game = null
+  let player, currentGame, game = null
   io.on('connection', socket => {
     loginfo(`Socket connected: ${socket.id}`)
     player = new Player({ socket })
 
     socket.on('action', (action) => {
       loginfo('action received : ', action)
+      currentGame = games.find(g => g.players.find(p => p.id === socket.id)) || null
       switch (action.type) {
       case 'server/ping':
         return socket.emit('action', { type: 'pong' })
@@ -23,16 +25,13 @@ export const initEngine = (io, games) => {
           Game.createGame({ games, player, playerName, roomName })
         return
       case SERVER_START_GAME:
-        game = Game.getGameFromName(games, roomName)
-        if (game)
-          game.startGame({ io })
-        return
+        return (currentGame) ? currentGame.startGame({ io }) : logerror('current game for this socket id not found.')
       case SERVER_PLAYER_DESTROYS_LINE:
-        return
+        return (currentGame) ? currentGame.playerDestroysLine({ playerName: player.playerName, ghost: player.ghost }) : logerror('current game for this socket id not found.')
       case SERVER_PLAYER_LOCKS_PIECE:
-        return
+        return (currentGame) ? currentGame.playerLocksPiece({ playerName: player.playerName, ghost: player.ghost }) : logerror('current game for this socket id not found.')
       case SERVER_PLAYER_DIES:
-        return
+        return currentGame ? game.playerDies({ io, playerName: player.playerName }) : logerror('current game for this socket id not found.')
       default:
         break;
       }
@@ -40,13 +39,7 @@ export const initEngine = (io, games) => {
 
     socket.on('disconnect', () => {
       loginfo('Player disconnected', player.socket.id)
-      if (player.playerName) {
-        const { playerName } = player
-        const game = games.find(game => game.playerNames.includes(playerName))
-        if (game) {
-          game.playerLeavesGame({ games, player })
-        }
-      }
+      return (currentGame && player.playerName) ? game.playerLeavesGame({ io, games, player }) : {}
     })
   })
 }

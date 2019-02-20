@@ -51,6 +51,7 @@ const reducer = (state = initialState, action) => {
     return {
       ...state,
       activePlayers: getActivePlayers(action.players),
+      inProgress: action.inProgress,
       pieces: cloneDeep(action.pieceLineup),
       players: cloneDeep(action.players),
       roomName: action.roomName,
@@ -59,7 +60,8 @@ const reducer = (state = initialState, action) => {
   case START_GAME:
     return {
       ...state,
-      inProgress: true
+      inProgress: true,
+      pieceLineup: cloneDeep(action.pieceLineup)
     }
   case UPDATE_GAME:
     return {
@@ -68,6 +70,8 @@ const reducer = (state = initialState, action) => {
       inProgress: action.inProgress,
       pieces: cloneDeep(action.pieceLineup),
       players: cloneDeep(action.players),
+      roomName: action.roomName,
+      urlParsed: true
     }
   case END_GAME:
     return {

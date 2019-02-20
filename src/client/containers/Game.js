@@ -1,18 +1,11 @@
 import React from 'react'
 import Player from '../components/Player'
 import Ghost from '../components/Ghost'
-import lifecycle from 'react-pure-lifecycle'
 import { connect } from 'react-redux'
 import { startGameTimer, stopGameTimer } from '../actions/update'
 import { startGame } from '../actions/server'
 import '../styles/game.scss'
 import Buttons from '../components/Buttons';
-
-const methods = {
-  componentDidMount({ offlineMode, startGameTimer }) {
-    if (offlineMode) startGameTimer()
-  }
-}
 
 const Game = ({
   alive,
@@ -32,9 +25,14 @@ const Game = ({
         <Buttons {...{ inProgress, startGame }} />
       }
 
-    {!waiting && <div className={'player'}>
-      <Player alive={alive} board={board} pieces={pieces} />
+    {(!waiting && inProgress) &&
+      <div className={'player'}>
+      <Player startGameTimer={startGameTimer} alive={alive} board={board} offlineMode={offlineMode} pieces={pieces} />
     </div>}
+    {waiting && (inProgress ?
+       (<div>Waiting for game to end, then maybe you can join...</div>) :
+        (<div>Game is full (or should be), waiting for other players to leave...</div>))
+    }
       {(opponents.length > 0) && (
         <div className={'opponents'}>
           {opponents.map((opponent, i) => (<Ghost
@@ -66,5 +64,4 @@ const mapDispatchToProps = {
   stopGameTimer
 }
 
-const withLifecycleHooks = lifecycle(methods)(Game)
-export default connect(mapStateToProps, mapDispatchToProps)(withLifecycleHooks)
+export default connect(mapStateToProps, mapDispatchToProps)(Game)

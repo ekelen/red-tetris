@@ -156,7 +156,7 @@ describe('joinGame method', () => {
     chai.expect(res.bind(res, fredsGame)).to.throw(/not unique/)
   })
 
-  it('adds player but sets to waiting if room is full', () => {
+  it('adds player Clara but sets to waiting if room is full', () => {
     fredsGame.joinGame({ player: jim, playerName: 'jim', roomName: 'fredsroom' })
     fredsGame.joinGame({ player: george, playerName: 'george', roomName: 'fredsroom' })
     fredsGame.joinGame({ player: amy, playerName: 'amy', roomName: 'fredsroom' })
@@ -168,7 +168,7 @@ describe('joinGame method', () => {
     clara.waiting.should.equal(true)
   })
 
-  it('adds player but sets to waiting if room is in progress', () => {
+  it('adds player Clara but sets to waiting if room is in progress', () => {
     fredsGame.joinGame({ player: jim, playerName: 'jim', roomName: 'fredsroom' })
     fredsGame.joinGame({ player: george, playerName: 'george', roomName: 'fredsroom' })
     fredsGame.inProgress = true
@@ -195,34 +195,10 @@ describe('Game action', () => {
     fredsGame.joinGame({ player: george, playerName: 'george', roomName: 'fredsroom' })
   })
 
-  it('does not let any player have < 10 pieces', () => {
+  it('pieceLineup getter makes sure no player has < 10 pieces', () => {
     jim.pieceIndex = 45
     fred.pieceIndex = 9
     const nRemainingPieces = fredsGame.pieceLineup.length
     nRemainingPieces.should.equal(START_N_PIECES + N_PIECES_TO_APPEND)
   })
 })
-
-
-
-
-
-// describe('Game action', () => {
-//   let fredsGame
-//   let fred, jim, george, amy, clara, jill
-
-//   beforeEach(() => {
-//     [fred, jim, george, amy, clara, jill] = [fredParams, jimParams, georgeParams, amyParams, claraParams, jillParams]
-//       .map(params => new MockPlayer(params))
-//     fredsGame = new Game({
-//       player: fred,
-//       roomName: 'fredsroom'
-//     })
-//     fredsGame.addPlayer(jim)
-//     fredsGame.addPlayer(george)
-//   })
-
-
-
-
-// })

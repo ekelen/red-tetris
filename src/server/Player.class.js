@@ -49,9 +49,7 @@ class Player {
 
   resetPlayer() {
     this.pieceIndex = 0
-    this.alive = true
     this.ghost = new Array(20).fill(0).map((_) => new Array(10).fill(0))
-    this.waiting = false
   }
 
   destroysLine({ ghost }) { // TODO: Possibly redundant with lockPiece
@@ -75,6 +73,7 @@ class Player {
       this.socket.to(roomName).emit('action', action)
   }
 
+  // TODO: Maybe a dumb abstraction, was trying to keep socket.emit out of Game class
   actionToClient(action) {
     if (this.socket.emit)
       this.socket.emit('action', action)

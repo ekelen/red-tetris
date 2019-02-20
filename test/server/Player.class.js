@@ -1,7 +1,6 @@
 /* eslint-env node, mocha */
 import chai from "chai"
 import Player from "../../src/server/Player.class";
-import { N_PIECES_TO_APPEND } from '../../src/common/constants';
 
 chai.should()
 
@@ -66,7 +65,7 @@ describe('Player properties', () => {
     player.pieceIndex.should.equal(0)
   })
 
-  it('playerStatus getter should return alive, ghost, pieceIndex, and playerName', () => {
+  it('playerStatus getter should return alive, ghost, pieceIndex, playerName, waiting', () => {
     const player = new Player(playerParams)
     const playerStatus = player.playerStatus
     playerStatus.should.have.all.keys('alive', 'ghost', 'playerName', 'pieceIndex', 'waiting')
@@ -96,6 +95,5 @@ describe('Player properties', () => {
     player.lockPiece({ ghost: [[]] })
     const newPlayerPieceIndex = player.pieceIndex
     newPlayerPieceIndex.should.equal(initialIndex + 1).and.equal(1)
-    player.nRemainingPieces.should.equal(N_PIECES_TO_APPEND - 1).and.equal(49)
   })
 })

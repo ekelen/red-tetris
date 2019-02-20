@@ -1,10 +1,17 @@
 // my board
 import React from 'react'
+import lifecycle from 'react-pure-lifecycle'
 import '../styles/board.scss'
 
 const splitBoard = board => (
   board.filter((row, i) => i > 3)
 )
+
+const methods = {
+  componentDidMount({ offlineMode, startGameTimer }) {
+    if (offlineMode) startGameTimer()
+  }
+}
 
 const Player = ({ board }) => {
   return (
@@ -21,4 +28,5 @@ const Player = ({ board }) => {
   )
 }
 
-export default Player
+const withLifecycleHooks = lifecycle(methods)(Player)
+export default withLifecycleHooks
