@@ -1,26 +1,25 @@
 import chai from "chai"
-import { merge, isColliding, checkclearedLines } from '../../../src/client/actions/physics'
-import { EMPTY_BOARD } from "../../../src/client/reducers/board"
+import { merge, isColliding, checkclearedLines, rotate } from '../../src/client/actions/physics'
+import { EMPTY_BOARD } from "../../src/client/reducers/board"
 import { cloneDeep } from 'lodash'
 
 chai.should()
 
-const pieceMock = {
-  pos: {x: 0, y: 0},
-  shape: [
-    [1, 0, 0],
-    [1, 1, 1],
-    [0, 0, 0]
-  ]
-}
+const shape = [
+  [0,-1],[0,0],[0,1],[0,2] //Array of vectors
+]
 
 describe('Physics test', () => {
   it('Merge piece with board', done => {
     const board = cloneDeep(EMPTY_BOARD)
-    const piece = cloneDeep(pieceMock)
+    const piece = cloneDeep({
+      shape,
+      color: 1,
+      pos: [0, 1]
+    })
     const expected = [
-      [1, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-      [1, 1, 1, 0, 0, 0, 0, 0, 0, 0],
+      [1, 1, 1, 1, 0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
       [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
       [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
       [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -49,17 +48,31 @@ describe('Physics test', () => {
     done()
   }),
   it('Should collide', done => {
-    const board = cloneDeep(EMPTY_BOARD)
-    const piece = {...cloneDeep(pieceMock), pos: {x: 0, y: 24}}
+    const board = EMPTY_BOARD
+    const piece = {shape, pos: [24, 5]}
     const colliding = isColliding(board, piece)
     colliding.should.equal(true)
     done()
-  })
-  it('should remove line', done => {
-    const board = cloneDeep(EMPTY_BOARD)
-    board[board.length - 1].fill(1)
-    const newBoard = checkclearedLines(board)
-    newBoard.should.deep.equal(EMPTY_BOARD)
+  }),
+  it('Should collide with right border', done => {
+    const board = EMPTY_BOARD
+    const piece = {shape, pos: [5, 12]}
+    const colliding = isColliding(board, piece)
+    colliding.should.equal(true)
+    done()
+  }),
+  it('Should collide with left border', done => {
+    const board = EMPTY_BOARD
+    const piece = {shape, pos: [5, 0]}
+    const colliding = isColliding(board, piece)
+    colliding.should.equal(true)
+    done()
+  }),
+  it ('Should not collide', done => {
+    const board = EMPTY_BOARD
+    const piece = {shape, pos: [10, 5]}
+    const colliding = isColliding(board, piece)
+    colliding.should.equal(false)
     done()
   })
 })

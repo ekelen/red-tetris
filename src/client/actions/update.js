@@ -53,6 +53,8 @@ const move = dir => (dispatch, getState) => {
   dispatch(updateCurrentPiece(getState().currentPiece, lockedBoard))
 }
 
+// TODO: find a way to test this
+// TODO: handle offsets
 const handleRotation = () => (dispatch, getState) => {
   dispatch(rotate())
   const { currentPiece, lockedBoard } = getState()

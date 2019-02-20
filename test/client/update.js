@@ -6,7 +6,7 @@ import chai from "chai"
 
 const INITIAL_STATE = {
   currentPiece: {
-    pos: {x:0, y:0}
+    pos: [0,0]
   }
 }
 
@@ -19,7 +19,7 @@ describe('Redux update test', () => {
     const store =  configureStore(rootReducer, null, initialState, {
       PIECE_FALL: ({dispatch, getState}) =>  {
         const state = getState()
-        state.currentPiece.pos.y.should.equal(1)
+        state.currentPiece.pos[0].should.equal(1)
         done()
       }
     })

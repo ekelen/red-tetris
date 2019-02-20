@@ -15,45 +15,29 @@ export const checkclearedLines = board => {
   return newBoard
 }
 
-
-//TODO: to be tested
 export const merge = (board, piece) => {
+  const worldShape = piece.shape.map(tile => sumMatrix(tile, piece.pos))
   const newBoard = cloneDeep(board)
-  piece.shape.forEach((row, y) => {
-    row.forEach((cell, x) => {
-      if (cell !== 0) {
-        const yOff = piece.pos.y + y
-        const xOff = piece.pos.x + x
-        newBoard[yOff][xOff] = cell;
-      }
-    })
+  worldShape.forEach(([y, x]) => {
+    newBoard[y][x] = piece.color //TODO: add color system
   })
   return newBoard
 }
 
-
-//TODO: to be tested
-export const isColliding = (board, currentPiece) => {
-  const len = currentPiece.shape.length;
-  for (let y = 0; y < len; y++) {
-    for (let x = 0; x < len; x++) {
-      if (currentPiece.shape[y][x] !== 0) {
-        const xOff = x + currentPiece.pos.x 
-        const yOff = y + currentPiece.pos.y
-        if (
-          board[yOff] == undefined || 
-          board[yOff][xOff] != 0
-        ) {
-          return true;
-        }
-      }
-    }
-  }
-  return false;
+export const isColliding = (board, piece) => {
+  const worldShape = piece.shape.map(tile => sumMatrix(tile, piece.pos))
+  const colliding = worldShape.some(([y, x]) => {
+    return (
+      board[y] === undefined ||
+      board[y][x] === undefined || 
+      board[y][x] !== 0
+    )
+  })
+  return colliding
 }
 
-const subMatrix = (a,b = [1,1]) => a.map((e, i) => e - b[i])
-const addMatrix = (a,b = [1,1]) => a.map((e, i) => e + b[i])
+const subMatrix = (a,b) => a.map((e, i) => e - b[i])
+const sumMatrix = (a,b) => a.map((e, i) => e + b[i])
 
 //Clockwise rotation
 const rotateMatrix = ([y, x]) => {
@@ -62,16 +46,4 @@ const rotateMatrix = ([y, x]) => {
   return [newY, newX]
 }
 
-//TODO: to be tested
-export const rotate = (shape, pivot) => {
-  const newPiece = cloneDeep(shape)
-  for (let y = 0; y < shape.length; y++) {
-    for (let x = 0; x < shape[y].length; x++) {
-      const relCoords = subMatrix([y, x], pivot)
-      const [ny, nx] = rotateMatrix(relCoords)
-      const [yy, xx] = addMatrix([ny, nx], pivot)
-      newPiece[yy][xx] = shape[y][x]
-    }
-  }
-  return newPiece
-}
+export const rotate = shape => shape.map(rotateMatrix)
