@@ -17,6 +17,7 @@ const Game = ({
   playerName,
   inProgress,
   startGame,
+  startGameTimer,
   waiting
 }) => {
   return (
