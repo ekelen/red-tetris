@@ -1,9 +1,8 @@
 import validator from 'validator';
 import Piece from '../../src/server/Piece.class';
-import { ENTER_GAME_FAIL, CREATE_GAME_SUCCESS, UPDATE_GAME, JOIN_GAME_SUCCESS, END_GAME, START_GAME, MIN_N_PIECES_REMAINING, MAX_ACTIVE_PLAYERS } from '../common/constants';
+import { ENTER_GAME_FAIL, CREATE_GAME_SUCCESS, UPDATE_GAME, MIN_N_PIECES_REMAINING, MAX_ACTIVE_PLAYERS } from '../common/constants';
 import { logerror, loginfo } from '.';
 
-// TODO: When game ends, add waiting players if there is room
 // TODO: Async issues everywhar
 // TODO: Refresh/new tab in browser issues
 // TODO: So many tests
@@ -27,24 +26,15 @@ class Game {
     if (!params.player || !params.player.playerName)
       throw new Error('Invalid lead player type.')
 
-    this.roomName = params.roomName
-    this.players = [params.player]
-    this.inProgress = false
     this._pieceLineup = []
+    this.inProgress = false
+    this.players = [params.player]
+    this.roomName = params.roomName
   }
 
   // players who aren't waiting
   get activePlayers() {
     return this.players.filter(p => !p.waiting)
-  }
-
-  // players who aren't waiting
-  get activePlayers() {
-    return this.players.filter(p => !p.waiting)
-  }
-
-  get playerNames() {
-    return this.players.map(player => player.playerName)
   }
 
   get alivePlayers() {
@@ -102,26 +92,26 @@ class Game {
     }
   }
 
-  joinGame({ player, playerName, roomName }) {
+  joinGame({ io, player, playerName, roomName }) {
     try {
       player.playerName = playerName
-      this._addPlayer({ player })
+      this._addPlayer({ io, player })
     } catch (error) {
       player.actionToClient({ type: ENTER_GAME_FAIL, errmsg: `Error joining ${roomName}: ${error.message}` })
     }
   }
 
-  _addPlayer({ player }) {
+  _addPlayer({ io, player }) {
     if (!player.playerName || !player.socket || !player.socket.id)
       throw new Error('Invalid new player.')
-    if (this.playerNames.includes(player.playerName))
+    if (this.players.map(p => p.playerName).includes(player.playerName))
       throw new Error(`Username ${player.playerName} is not unique.`)
     player.waiting = Boolean(this.activePlayers.length >= MAX_ACTIVE_PLAYERS || this.inProgress)
     this.players.push(player)
-    player.actionToClient({ type: JOIN_GAME_SUCCESS, ...player.playerStatus, ...this.gameInfo })
     player.socket.join(this.roomName, () =>
-        player.actionToRoom(this.roomName,
-        { type: UPDATE_GAME, message: `Player ${player.playerName} joined!`, ...this.gameInfo }
+        this._informRoom(io, { type: UPDATE_GAME,
+          message: `Player ${player.playerName} joined!`,
+          ...this.gameInfo }
       )
     )
   }
@@ -129,7 +119,7 @@ class Game {
   startGame({ io }) {
     // TODO: Other game reset stuff ?
     this.inProgress = true
-    this._informRoom(io, { type: START_GAME, ...this.gameInfo })
+    this._informRoom(io, { type: UPDATE_GAME, ...this.gameInfo, message: 'Game has started!' })
   }
 
   _informRoom(io, action) {
@@ -141,16 +131,10 @@ class Game {
     const player = this.activePlayers.find(player => player.playerName === playerName)
     const { roomName } = this
     player.dies({ roomName })
-    if (this.activePlayers.length > 1 && this.alivePlayers.length === 1)
-    {
-      this.pieceLineup = []
-      this.inProgress = false
-      const winner = this.activePlayers.find(p => p.alive)
-      // TODO: Move up waiting players
-      this._informRoom(io, { type: END_GAME, message: `Player ${winner.playerName} wins!`, ...this.gameInfo })
-    } else {
-      player.actionToRoom(roomName, { type: UPDATE_GAME, message: `Player ${playerName} is dead!`, ...this.gameInfo })
-    }
+    if (this.alivePlayers.length <= 1)
+      this._endGame(io)
+    else
+      this._informRoom(io, { type: UPDATE_GAME, message: `Player ${playerName} is dead!`, ...this.gameInfo })
   }
 
   playerDestroysLine({ playerName, ghost }) {
@@ -172,20 +156,33 @@ class Game {
 
   playerLeavesGame({ io, games, player }) {
     const { playerName } = player
-    const { playerNames, roomName } = this
     this.players = this.players.filter(player => player.playerName !== playerName)
-
-    player.actionToRoom(roomName, { type: UPDATE_GAME, message: `Player ${playerName} left!`, ...this.gameInfo })
-    if (this.alivePlayers.length === 1) {
-      this.pieceLineup = []
-      this.inProgress = false
-      // TODO: Move up waiting players
-      this._informRoom(io, { type: END_GAME, message: `Player ${playerNames[0]} wins!`, ...this.gameInfo })
-    }
 
     if (!this.players.length) {
       Game.deleteGame(games, this)
     }
+
+    player.actionToRoom(this.roomName, { type: UPDATE_GAME, message: `Player ${playerName} left!`, ...this.gameInfo })
+    if (this.alivePlayers.length === 1) this._endGame(io)
+  }
+
+  _endGame(io) {
+    this.pieceLineup = []
+    this.inProgress = false
+
+    const winner = this.activePlayers.find(p => p.alive)
+
+    const spacesRemaining = MAX_ACTIVE_PLAYERS - this.activePlayers.length
+    const waitingPlayers = this.players.filter(p => p.waiting)
+    for (let i = 0; i < spacesRemaining && i < waitingPlayers.length; i += 1) {
+      waitingPlayers[i].waiting = false
+    }
+    this.players.forEach(p => {
+      p.alive = true;
+      p.pieceIndex = 0;
+      p.ghost = new Array(20).fill(0).map((_) => new Array(10).fill(0))
+    })
+    this._informRoom(io, { type: UPDATE_GAME, message: `Player ${winner.playerName} wins!`, ...this.gameInfo })
   }
 }
 

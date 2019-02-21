@@ -5,10 +5,8 @@ import {
   START_SINGLE_PLAYER_GAME,
   ENTER_GAME_FAIL,
   CREATE_GAME_SUCCESS,
-  JOIN_GAME_SUCCESS,
   UPDATE_GAME,
-  END_GAME,
-  START_GAME
+  SERVER_ENTER_GAME
 } from '../../common/constants';
 
 const initialState = {
@@ -39,26 +37,19 @@ const reducer = (state = initialState, action) => {
       roomName: action.roomName,
       waiting: false
     }
-  case JOIN_GAME_SUCCESS:
+  case SERVER_ENTER_GAME:
     return {
       ...state,
       playerName: action.playerName,
-      opponents: getOpponents(action.players, action.playerName),
-      waiting: action.waiting,
+      roomName: action.roomName
     }
-  case START_GAME:
-    return {
-      ...state,
-      opponents: getOpponents(action.players, state.playerName),
-      ...getPlayer(action.players, state.playerName)
-    }
+  // case START_GAME:
+  //   return {
+  //     ...state,
+  //     opponents: getOpponents(action.players, state.playerName),
+  //     ...getPlayer(action.players, state.playerName)
+  //   }
   case UPDATE_GAME:
-    return {
-      ...state,
-      opponents: getOpponents(action.players, state.playerName),
-      ...getPlayer(action.players, state.playerName) // playerName, alive, ghost, pieceIndex, waiting
-    }
-  case END_GAME:
     return {
       ...state,
       opponents: getOpponents(action.players, state.playerName),

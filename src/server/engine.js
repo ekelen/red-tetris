@@ -5,10 +5,11 @@ import { loginfo, logerror } from '.';
 
 // TODO: Totally untested also kind of gangly
 export const initEngine = (io, games) => {
-  let player, currentGame, game = null
   io.on('connection', socket => {
     loginfo(`Socket connected: ${socket.id}`)
-    player = new Player({ socket })
+    const player = new Player({ socket })
+    let currentGame = null,
+      game = null
 
     socket.on('action', (action) => {
       loginfo('action received : ', action)
@@ -20,12 +21,12 @@ export const initEngine = (io, games) => {
         const { playerName, roomName } = action
         game = Game.getGameFromName(games, roomName)
         if (game)
-          game.joinGame({ player, playerName, roomName })
+          game.joinGame({ io, player, playerName, roomName })
         else
           Game.createGame({ games, player, playerName, roomName })
         return
       case SERVER_START_GAME:
-        return (currentGame) ? currentGame.startGame({ io }) : logerror('current game for this socket id not found.')
+        return (currentGame) ? (currentGame.startGame({ io })) : console.log('current game for this socket id not found.')
       case SERVER_PLAYER_DESTROYS_LINE:
         return (currentGame) ? currentGame.playerDestroysLine({ playerName: player.playerName, ghost: player.ghost }) : logerror('current game for this socket id not found.')
       case SERVER_PLAYER_LOCKS_PIECE:
@@ -38,7 +39,8 @@ export const initEngine = (io, games) => {
     })
 
     socket.on('disconnect', () => {
-      loginfo('Player disconnected', player.socket.id)
+      currentGame = games.find(g => g.players.find(p => p.id === socket.id)) || null
+      loginfo(`${socket.id} (${player.playerName}) disconnected!`)
       return (currentGame && player.playerName) ? currentGame.playerLeavesGame({ io, games, player }) : {}
     })
   })

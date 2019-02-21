@@ -47,11 +47,6 @@ class Player {
     })
   }
 
-  resetPlayer() {
-    this.pieceIndex = 0
-    this.ghost = new Array(20).fill(0).map((_) => new Array(10).fill(0))
-  }
-
   destroysLine({ ghost }) { // TODO: Possibly redundant with lockPiece
     this.ghost = cloneDeep(ghost)
   }
