@@ -10,6 +10,9 @@ const splitBoard = board => (
 const methods = {
   componentDidMount({ startGameTimer }) {
     startGameTimer()
+  },
+  componentWillUnmount({ stopGameTimer }) {
+    stopGameTimer()
   }
 }
 

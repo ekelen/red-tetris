@@ -18,6 +18,7 @@ const Game = ({
   inProgress,
   startGame,
   startGameTimer,
+  stopGameTimer,
   waiting
 }) => {
   return (
@@ -28,7 +29,13 @@ const Game = ({
 
     {(!waiting && inProgress) &&
       <div className={'player'}>
-      <Player startGameTimer={startGameTimer} alive={alive} board={board} offlineMode={offlineMode} pieces={pieces} />
+      <Player
+        alive={alive}
+        board={board}
+        offlineMode={offlineMode}
+        pieces={pieces}
+        startGameTimer={startGameTimer}
+        stopGameTimer={stopGameTimer} />
     </div>}
     {waiting && (inProgress ?
        (<div>Waiting for game to end, then maybe you can join...</div>) :
