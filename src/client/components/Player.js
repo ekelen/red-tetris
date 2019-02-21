@@ -8,8 +8,8 @@ const splitBoard = board => (
 )
 
 const methods = {
-  componentDidMount({ offlineMode, startGameTimer }) {
-    if (offlineMode) startGameTimer()
+  componentDidMount({ startGameTimer }) {
+    startGameTimer()
   }
 }
 
