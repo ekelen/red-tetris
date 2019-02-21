@@ -31,7 +31,7 @@ export const initEngine = (io, games) => {
       case SERVER_PLAYER_LOCKS_PIECE:
         return (currentGame) ? currentGame.playerLocksPiece({ playerName: player.playerName, ghost: player.ghost }) : logerror('current game for this socket id not found.')
       case SERVER_PLAYER_DIES:
-        return currentGame ? game.playerDies({ io, playerName: player.playerName }) : logerror('current game for this socket id not found.')
+        return currentGame ? currentGame.playerDies({ io, playerName: player.playerName }) : logerror('current game for this socket id not found.')
       default:
         break;
       }
@@ -39,7 +39,7 @@ export const initEngine = (io, games) => {
 
     socket.on('disconnect', () => {
       loginfo('Player disconnected', player.socket.id)
-      return (currentGame && player.playerName) ? game.playerLeavesGame({ io, games, player }) : {}
+      return (currentGame && player.playerName) ? currentGame.playerLeavesGame({ io, games, player }) : {}
     })
   })
 }
