@@ -12,14 +12,14 @@ import { SERVER_START_GAME, SERVER_PLAYER_DIES } from '../../src/common/constant
 
 chai.should()
 
-describe('Game creation based on URL', () => {
+describe('Integration tests: multiplayer game', () => {
   let tetrisServer = null
   const games = []
   const sockets = {
-    user1: null, user2: null, user3: null, user4: null, user5: null, user6: null
+    user1: null, user2: null, user3: null, user4: null, user5: null, user6: null, user7: null
   }
   const stores = {
-    user1: null, user2: null, user3: null, user4: null, user5: null, user6: null
+    user1: null, user2: null, user3: null, user4: null, user5: null, user6: null, user7: null
   }
 
   before(done => {
@@ -58,6 +58,38 @@ describe('Game creation based on URL', () => {
       }
     );
     stores.user1.dispatch(parseURL('/testroom[user1]'))
+  })
+
+  it('does not create multiplayer game if given bad URL', done => {
+    const initialState = {}
+    const socket = io(params.serverTest.url)
+    const store = configureStore(rootReducer, socket, initialState,
+      {
+        CREATE_GAME_SUCCESS: () => done(new Error('Should not be able to make game.')),
+        UPDATE_GAME: () => done(new Error('Should not be able to join game.')),
+        ENTER_GAME_FAIL: ({ action }) => {
+          action.errmsg.should.match(/name/)
+          done()
+        }
+      }
+    );
+    store.dispatch(parseURL('/!@#$[user1]'))
+  })
+
+  it('does not let another player join room with duplicate username', done => {
+    const initialState = {}
+    const socket = io(params.serverTest.url)
+    const store = configureStore(rootReducer, socket, initialState,
+      {
+        CREATE_GAME_SUCCESS: () => done(new Error('Should not be able to make game.')),
+        UPDATE_GAME: () => done(new Error('Should not be able to join game.')),
+        ENTER_GAME_FAIL: ({ action }) => {
+          action.errmsg.should.match(/unique/)
+          done()
+        }
+      }
+    );
+    store.dispatch(parseURL('/testroom[user1]'))
   })
 
   it('lets another player join if given good existing game URL', done => {
@@ -114,7 +146,7 @@ describe('Game creation based on URL', () => {
   })
 
   it('has 6 players', () => {
-    chai.expect(stores.user1.getState()).to.include.keys(['game', 'player'])
+    chai.expect(stores.user1.getState()).to.include.keys(['game', 'player', 'alert'])
     chai.expect(stores.user1.getState().game.players).to.have.lengthOf(6)
     chai.expect(stores.user2.getState().game.players).to.have.lengthOf(6)
     chai.expect(stores.user3.getState().game.players).to.have.lengthOf(6)
@@ -166,11 +198,71 @@ describe('Game creation based on URL', () => {
     }, 300)
   })
 
+  it('non-lead player cannot start game', (done) => {
+    stores.user4.dispatch({ type: SERVER_START_GAME })
+    setTimeout(() => {
+      stores.user4.getState().game.inProgress.should.equal(false)
+      done()
+    }, 300)
+  })
+
+  it('lead player (user3) CAN start game', (done) => {
+    stores.user3.dispatch({ type: SERVER_START_GAME })
+    setTimeout(() => {
+      stores.user4.getState().game.inProgress.should.equal(true)
+      stores.user3.getState().game.inProgress.should.equal(true)
+      stores.user5.getState().game.inProgress.should.equal(true)
+      stores.user6.getState().game.inProgress.should.equal(true)
+      done()
+    }, 300)
+  })
+
+  it('user 6 dies, so there are still 4 active players, only 3 alive', (done) => {
+    stores.user6.dispatch({ type: SERVER_PLAYER_DIES })
+    setTimeout(() => {
+      stores.user6.getState().player.alive.should.equal(false)
+      stores.user6.getState().game.activePlayers.length.should.equal(4)
+      stores.user6.getState().game.activePlayers.filter(p => p.alive).length.should.equal(3)
+      done()
+    }, 300)
+  })
+
+  it('new user7 can join game in progress but will be waiting', (done) => {
+    sockets.user7 = io(params.serverTest.url)
+    stores.user7 = configureStore(rootReducer, sockets.user7, {}, {
+      UPDATE_GAME: ({ getState }) =>
+      {
+        const state = getState()
+        state.game.players.length.should.equal(5)
+        state.game.activePlayers.length.should.equal(4)
+        state.game.players.map(p => p.playerName).should.include('user7')
+        state.player.waiting.should.equal(true)
+        done()
+      }
+    })
+    stores.user7.dispatch(parseURL('/testroom[user7]'))
+  })
+
+  it(`user4 and user3 die; message contains user5 (winner's) name and game should be over`, (done) => {
+    stores.user4.dispatch({ type: SERVER_PLAYER_DIES })
+    stores.user3.dispatch({ type: SERVER_PLAYER_DIES })
+    setTimeout(() => {
+      stores.user6.getState().alert.message.should.match(/user5/)
+      stores.user6.getState().game.inProgress.should.equal(false)
+      done()
+    }, 300)
+  })
+
+  it(`user7 is now active`, () => {
+    stores.user7.getState().player.waiting.should.equal(false)
+  })
+
   it('removes game from global games array when all players leave', done => {
     sockets.user3.disconnect()
     sockets.user4.disconnect()
     sockets.user5.disconnect()
     sockets.user6.disconnect()
+    sockets.user7.disconnect()
     setTimeout(() => { games.length.should.equal(0); done() }, 300);
   })
 })

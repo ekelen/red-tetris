@@ -96,7 +96,7 @@ describe('Game constructor', () => {
     const player = new MockPlayer(janeParams)
     const roomName = 'janesroom'
     const res = (player, roomName) => new Game({ player, roomName })
-    chai.expect(res.bind(res, player, roomName)).to.throw(/invalid/i)
+    chai.expect(res.bind(res, player, roomName)).to.throw(/missing/i)
   })
 
   it('creates a new game when given valid player object and roomName', () => {

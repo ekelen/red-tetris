@@ -3,17 +3,12 @@ import Piece from '../../src/server/Piece.class';
 import { ENTER_GAME_FAIL, CREATE_GAME_SUCCESS, UPDATE_GAME, MIN_N_PIECES_REMAINING, MAX_ACTIVE_PLAYERS } from '../common/constants';
 import { logerror, loginfo } from '.';
 
-// TODO: Async issues everywhar
-// TODO: Refresh/new tab in browser issues
 // TODO: So many tests
-
-// TODO: When game ends, add waiting players if there is room
 // TODO: Async issues everywhar
-// TODO: Refresh/new tab in browser issues
 
 class Game {
   constructor(params) {
-    if (!params.player || !params.roomName)
+    if (!params.player || !params.roomName || !params.player.playerName)
       throw new Error('Missing some parameters.')
 
     if (!validator.isAlphanumeric(params.roomName) ||
@@ -22,9 +17,6 @@ class Game {
       max: 20
     }))
       throw new Error('Invalid room name.')
-
-    if (!params.player || !params.player.playerName)
-      throw new Error('Invalid lead player type.')
 
     this._pieceLineup = []
     this.inProgress = false
@@ -116,8 +108,9 @@ class Game {
     )
   }
 
-  startGame({ io }) {
-    // TODO: Other game reset stuff ?
+  startGame({ io, player }) {
+    if (player.playerName !== this.players[0].playerName)
+      return
     this.inProgress = true
     this._informRoom(io, { type: UPDATE_GAME, ...this.gameInfo, message: 'Game has started!' })
   }
@@ -159,11 +152,12 @@ class Game {
     this.players = this.players.filter(player => player.playerName !== playerName)
 
     if (!this.players.length) {
-      Game.deleteGame(games, this)
+      return Game.deleteGame(games, this)
     }
 
-    player.actionToRoom(this.roomName, { type: UPDATE_GAME, message: `Player ${playerName} left!`, ...this.gameInfo })
-    if (this.alivePlayers.length === 1) this._endGame(io)
+    return (this.alivePlayers.length === 1) ?
+     this._endGame(io) :
+      player.actionToRoom(this.roomName, { type: UPDATE_GAME, message: `Player ${playerName} left!`, ...this.gameInfo })
   }
 
   _endGame(io) {
