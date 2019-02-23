@@ -1,8 +1,8 @@
-import { SERVER_START_GAME } from '../../common/constants';
+import { SERVER_START_GAME, SERVER_PING } from '../../common/constants';
 
 export const ping = () => {
   return {
-    type: 'server/ping'
+    type: SERVER_PING
   }
 }
 

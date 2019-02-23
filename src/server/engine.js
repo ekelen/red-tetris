@@ -1,6 +1,6 @@
 import Game from './Game.class'
 import Player from './Player.class';
-import { SERVER_ENTER_GAME, SERVER_START_GAME, SERVER_PLAYER_DESTROYS_LINE, SERVER_PLAYER_LOCKS_PIECE, SERVER_PLAYER_DIES } from '../common/constants';
+import { SERVER_ENTER_GAME, SERVER_START_GAME, SERVER_PLAYER_DESTROYS_LINE, SERVER_PLAYER_LOCKS_PIECE, SERVER_PLAYER_DIES, SERVER_PING, PONG } from '../common/constants';
 import { loginfo, logerror } from '.';
 
 const inGameActionHandler = ({ action, io, currentGame, player }) => {
@@ -34,8 +34,8 @@ export const initEngine = (io, games) => {
         return inGameActionHandler({ action, io, games, currentGame, player, socket })
 
       switch (action.type) {
-      case 'server/ping':
-        return socket.emit('action', { type: 'pong' })
+      case SERVER_PING:
+        return socket.emit('action', { type: PONG })
       case SERVER_ENTER_GAME:
         const { playerName, roomName } = action
         game = Game.getGameFromName(games, roomName)

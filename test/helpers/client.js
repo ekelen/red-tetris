@@ -5,13 +5,13 @@ export const configureStore = (reducer, socket, initialState, types) => createSt
   reducer,
   initialState,
   applyMiddleware(
+    thunk,
     myMiddleware(types),
-    socketIoMiddleWare(socket),
-    thunk
+    socketIoMiddleWare(socket)
   )
 )
 
-const isFunction = arg => { return typeof arg === 'function' }
+const isFunction = arg => (typeof arg === 'function')
 
 const myMiddleware = (types = {}) => {
   const fired = {}
@@ -27,11 +27,11 @@ const myMiddleware = (types = {}) => {
   }
 }
 
-const socketIoMiddleWare = socket => ({ dispatch, getState }) => {
+const socketIoMiddleWare = socket => ({ dispatch }) => {
   if (socket)
     socket.on('action', dispatch)
   return next => action => {
-    if (socket && action.type && (action.type.startsWith('server/') || action.type.startsWith('SERVER')))
+    if (socket && action.type && action.type.startsWith('SERVER'))
       socket.emit('action', action)
     return next(action)
   }
