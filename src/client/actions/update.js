@@ -1,4 +1,4 @@
-import { pieceFall, resetPiece, movePiece, rotate } from './piece'
+import { pieceFall, resetPiece, movePiece, rotate, offset } from './piece'
 import { updateCurrentPiece, pieceLand, checkLine } from './board'
 import { isColliding } from './physics'
 const LEFT = 37
@@ -20,7 +20,8 @@ const pieceDown = () => (dispatch, getState) => {
   dispatch(updateCurrentPiece(getState().currentPiece, lockedBoard))
 }
 
-const update = () => (dispatch, getState) => {
+//TODO: test this
+export const update = () => (dispatch, getState) => {
   const { currentPiece, lockedBoard } = getState()
   dispatch(pieceFall())
   const { currentPiece: pieceMaybe } = getState()
@@ -53,12 +54,25 @@ const move = dir => (dispatch, getState) => {
   dispatch(updateCurrentPiece(getState().currentPiece, lockedBoard))
 }
 
-// TODO: find a way to test this
-// TODO: handle offsets
-const handleRotation = () => (dispatch, getState) => {
-  dispatch(rotate())
-  const { currentPiece, lockedBoard } = getState()
-  dispatch(updateCurrentPiece(currentPiece, lockedBoard))
+//TODO: to be tested ?
+const handleOffset = tryIndex => (dispatch, getState) => {
+  if (tryIndex < 5) {
+    const { currentPiece: beforeRotation, lockedBoard } = getState()
+    dispatch(rotate())
+    dispatch(offset(tryIndex, beforeRotation.rotationIndex))
+    const { currentPiece: rotatedPiece } = getState()
+    if (isColliding(lockedBoard, rotatedPiece)) {
+      debugger
+      dispatch(resetPiece(beforeRotation))
+      dispatch(handleOffset(tryIndex + 1))
+    }
+  }
+}
+
+export const handleRotation = () => (dispatch, getState) => {
+  dispatch(handleOffset(0))
+  const { currentPiece: offsetPiece, lockedBoard } = getState()
+  dispatch(updateCurrentPiece(offsetPiece, lockedBoard))
 }
 
 const handleEvents = dispatch => e => {

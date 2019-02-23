@@ -41,9 +41,19 @@ const sumMatrix = (a,b) => a.map((e, i) => e + b[i])
 
 //Clockwise rotation
 const rotateMatrix = ([y, x]) => {
-  const newX = x * 0 + y * 1
-  const newY = x * -1 + y * 0
+  const newY = x
+  const newX = -1 * y
   return [newY, newX]
+}
+
+export const computeOffset = (offsets, tryIndex, rotationIndex, fromIndex) => {
+  const a = offsets[tryIndex][rotationIndex]
+  const b = offsets[tryIndex][fromIndex]
+  return subMatrix(b,a)
+}
+
+export const getOffsetPos = (pos, offset) => {
+  return sumMatrix(pos, offset)
 }
 
 export const rotate = shape => shape.map(rotateMatrix)

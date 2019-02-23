@@ -1,6 +1,6 @@
-import { PIECE_FALL, RESET_PIECE, MOVE_PIECE, ROTATE } from '../actions/piece'
+import { PIECE_FALL, RESET_PIECE, MOVE_PIECE, ROTATE, OFFSET } from '../actions/piece'
 import { pieces } from '../../pieces'
-import { rotate } from '../actions/physics'
+import { rotate, getOffsetPos, computeOffset } from '../actions/physics'
 
 const getRandomValue = max => Math.round(Math.random() * Math.floor(max))
 const getRandomPiece = () => pieces[getRandomValue(pieces.length - 1)]
@@ -17,7 +17,19 @@ const currentPiece = (state=initialState, action) => {
     case MOVE_PIECE:
       return {...state, pos: [state.pos[0], state.pos[1] + action.dir]}
     case ROTATE:
-      return {...state, shape: rotate(state.shape, state.pivot)}
+      return {
+        ...state,
+        shape: rotate(state.shape, state.pivot),
+        rotationIndex: state.rotationIndex == 3 ? 0 : state.rotationIndex + 1
+      }
+    case OFFSET:
+      const { rotationIndex, offsets, pos } = state
+      const { tryIndex, fromIndex } = action 
+      const offset = computeOffset(offsets, tryIndex, rotationIndex, fromIndex)
+      return {
+        ...state,
+        pos: getOffsetPos(pos, offset)
+      }
     default:
       return state
   }
