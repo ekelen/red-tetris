@@ -24,6 +24,10 @@ class Game {
     this.roomName = params.roomName
   }
 
+  /**
+   * Getters/setters
+   */
+
   // players who aren't waiting
   get activePlayers() {
     return this.players.filter(p => !p.waiting)
@@ -57,6 +61,10 @@ class Game {
     })
   }
 
+  /**
+   * Static methods
+   */
+
   static doesRoomExist(games, roomName) {
     return Boolean(games.find((game) => game.roomName === roomName))
   }
@@ -78,18 +86,23 @@ class Game {
       const game = new Game({ player, roomName })
       games.push(game)
       player.socket.join(roomName, () =>
-        player.actionToClient({ type: CREATE_GAME_SUCCESS, ...player.playerStatus, ...game.gameInfo }))
+        player.socket.emit('action', { type: CREATE_GAME_SUCCESS, ...player.playerStatus, ...game.gameInfo })
+      )
     } catch (error) {
-      player.actionToClient({ type: ENTER_GAME_FAIL, errmsg: `Error creating room: ${error.message}` })
+      player.socket.emit('action', { type: ENTER_GAME_FAIL, errmsg: `Error creating room: ${error.message}` })
     }
   }
+
+  /**
+   * Normal methods
+   */
 
   joinGame({ io, player, playerName, roomName }) {
     try {
       player.playerName = playerName
       this._addPlayer({ io, player })
     } catch (error) {
-      player.actionToClient({ type: ENTER_GAME_FAIL, errmsg: `Error joining ${roomName}: ${error.message}` })
+      this._informPlayerOnly({ player, action: { type: ENTER_GAME_FAIL, errmsg: `Error joining ${roomName}: ${error.message}` }})
     }
   }
 
@@ -101,9 +114,9 @@ class Game {
     player.waiting = Boolean(this.activePlayers.length >= MAX_ACTIVE_PLAYERS || this.inProgress)
     this.players.push(player)
     player.socket.join(this.roomName, () =>
-        this._informRoom(io, { type: UPDATE_GAME,
-          message: `Player ${player.playerName} joined!`,
-          ...this.gameInfo }
+      this._informRoom({ io, action: { type: UPDATE_GAME,
+        message: `Player ${player.playerName} joined!`,
+        ...this.gameInfo }}
       )
     )
   }
@@ -112,12 +125,7 @@ class Game {
     if (player.playerName !== this.players[0].playerName)
       return
     this.inProgress = true
-    this._informRoom(io, { type: UPDATE_GAME, ...this.gameInfo, message: 'Game has started!' })
-  }
-
-  _informRoom(io, action) {
-    if (io && io.in)
-      io.in(this.roomName).emit('action', action)
+    this._informRoom({ io, action: { type: UPDATE_GAME, ...this.gameInfo, message: 'Game has started!' }} )
   }
 
   playerDies({ io, playerName }) {
@@ -127,14 +135,13 @@ class Game {
     if (this.alivePlayers.length <= 1)
       this._endGame(io)
     else
-      this._informRoom(io, { type: UPDATE_GAME, message: `Player ${playerName} is dead!`, ...this.gameInfo })
+      this._informRoom({ io, action: { type: UPDATE_GAME, message: `Player ${playerName} is dead!`, ...this.gameInfo } })
   }
 
   playerDestroysLine({ playerName, ghost }) {
     const player = this.activePlayers.find(player => player.playerName === playerName)
-    const { roomName } = this
     player.destroysLine({ ghost })
-    player.actionToRoom({ roomName, action: { type: UPDATE_GAME, message: 'I got a malus, alas',
+    this._informEveryoneExceptPlayer({ player, action: { type: UPDATE_GAME, message: 'I got a malus, alas',
       ...this.gameInfo
       }
     })
@@ -142,9 +149,8 @@ class Game {
 
   playerLocksPiece({ playerName, ghost }) {
     const player = this.activePlayers.find(player => player.playerName === playerName)
-    const { roomName } = this
     player.lockPieceLine({ ghost })
-    player.actionToRoom(roomName, { type: UPDATE_GAME, ...this.gameInfo })
+    this._informEveryoneExceptPlayer({ player, action: { type: UPDATE_GAME, ...this.gameInfo } })
   }
 
   playerLeavesGame({ io, games, player }) {
@@ -157,7 +163,7 @@ class Game {
 
     return (this.alivePlayers.length === 1) ?
      this._endGame(io) :
-      player.actionToRoom(this.roomName, { type: UPDATE_GAME, message: `Player ${playerName} left!`, ...this.gameInfo })
+     this._informEveryoneExceptPlayer({ player, action: { type: UPDATE_GAME, message: `Player ${playerName} left!`, ...this.gameInfo } })
   }
 
   _endGame(io) {
@@ -176,7 +182,30 @@ class Game {
       p.pieceIndex = 0;
       p.ghost = new Array(20).fill(0).map((_) => new Array(10).fill(0))
     })
-    this._informRoom(io, { type: UPDATE_GAME, message: `Player ${winner.playerName} wins!`, ...this.gameInfo })
+    this._informRoom({ io, action: { type: UPDATE_GAME, message: `Player ${winner.playerName} wins!`, ...this.gameInfo }})
+  }
+
+  /**
+   * Socket utils
+   */
+
+  _informRoom({ io, action }) {
+    if (io && io.in)
+      io.in(this.roomName).emit('action', action)
+  }
+
+  _informEveryoneExceptPlayer({ player, action }) {
+    if (player && player.socket && player.socket.to && player.socket.emit &&
+      action && action.type) {
+      player.socket.to(this.roomName).emit('action', action)
+    }
+  }
+
+  _informPlayerOnly({ player, action }) {
+    if (player && player.socket && player.socket.emit &&
+      action && action.type) {
+      player.socket.emit('action', action)
+    }
   }
 }
 

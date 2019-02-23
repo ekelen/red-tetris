@@ -10,7 +10,6 @@ class Player {
     this.waiting = false
     this._playerName = ''
 
-    // if (!params.socket || !params.socket instanceof Socket) throw 'Invalid socket.'
     if (!params.socket || !params.socket.id) throw new Error('Invalid socket.')
     this.socket = params.socket
   }
@@ -59,19 +58,6 @@ class Player {
   lockPiece({ ghost }) {
     this.ghost = cloneDeep(ghost)
     this.pieceIndex++
-  }
-
-  // TODO: Decide if keeping
-  actionToRoom(roomName, action) {
-    // console.log('action: ', action);
-    if (this.socket.emit && this.socket.to)
-      this.socket.to(roomName).emit('action', action)
-  }
-
-  // TODO: Maybe a dumb abstraction, was trying to keep socket.emit out of Game class
-  actionToClient(action) {
-    if (this.socket.emit)
-      this.socket.emit('action', action)
   }
 }
 
