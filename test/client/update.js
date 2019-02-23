@@ -1,10 +1,12 @@
 import { configureStore } from '../helpers/client'
 import rootReducer from '../../src/client/reducers'
 import { EMPTY_BOARD } from '../../src/client/reducers/board'
+import { PIECE_FALL, MOVE_PIECE } from '../../src/client/reducers/currentPiece'
 import chai from "chai"
-import { update, handleRotation } from '../../src/client/actions/update'
+import { frameUpdate, handleRotation, handlePieceDown, handleMovement } from '../../src/client/actions/update'
 import { offO } from '../../src/offsets'
 import { pieces } from '../../src/pieces'
+import { merge } from '../../src/client/actions/physics';
 
 const currentPiece = {
   pos: [4,4],
@@ -58,7 +60,63 @@ describe('Redux update test', () => {
         done()
       }
     })
-    store.dispatch(update())
+    store.dispatch(frameUpdate())
+  }),
+  it ('should move the piece down', done => {
+    const initialPos = currentPiece.pos
+    const store = configureStore(rootReducer, null, initialState, {
+      PIECE_FALL: ({getState}) => {
+        const { currentPiece: fallenPiece } = getState()
+        fallenPiece.pos.should.deep.equal([initialPos[0] + 1, initialPos[1]])
+        done()
+      }
+    })
+    store.dispatch(handlePieceDown())
+  }),
+  it ('Should update the board with the new piece position', done => {
+    const initialPos = currentPiece.pos
+    const store = configureStore(rootReducer, null, initialState, {
+      UPDATE_CURRENT_PIECE: ({getState}) => {
+        const { board: updatedBoard, currentPiece: fallenPiece } = getState()
+        const expected = merge(initialState.lockedBoard, fallenPiece)
+        updatedBoard.should.deep.equal(expected)
+        done()
+      }
+    })
+    store.dispatch(handlePieceDown())
+  }),
+  it ('should move the piece to the right', done => {
+    const initialPos = currentPiece.pos
+    const store = configureStore(rootReducer, null, initialState, {
+      MOVE_PIECE: ({getState}) => {
+        const { currentPiece: movedPiece } = getState()
+        movedPiece.pos.should.deep.equal([initialPos[0], initialPos[1] + 1])
+        done()
+      }
+    })
+    store.dispatch(handleMovement(1))
+  }),
+  it ('should move the piece to the left', done => {
+    const initialPos = currentPiece.pos
+    const store = configureStore(rootReducer, null, initialState, {
+      MOVE_PIECE: ({getState}) => {
+        const { currentPiece: movedPiece } = getState()
+        movedPiece.pos.should.deep.equal([initialPos[0], initialPos[1] - 1])
+        done()
+      }
+    })
+    store.dispatch(handleMovement(-1))
+  }),
+  it ('should update the board with moved piece', done => {
+    const store = configureStore(rootReducer, null, initialState, {
+      UPDATE_CURRENT_PIECE: ({getState}) => {
+        const { board: updatedBoard, currentPiece: movedPiece } = getState()
+        const expected = merge(initialState.lockedBoard, movedPiece)
+        updatedBoard.should.deep.equal(expected)
+        done()
+      }
+    })
+    store.dispatch(handleMovement(-1))
   }),
   it('Should do nothing (O piece shouldn\'t rotate)', done => {
     const store = configureStore(rootReducer, null, initialState, {
@@ -159,7 +217,7 @@ describe('Redux update test', () => {
       }
       const store = configureStore(rootReducer, null, initialState, {
         UPDATE_CURRENT_PIECE: ({getState}) => {
-          getState().board.should.deep.equal(expected)
+          // getState().board.should.deep.equal(expected)
           done()
         }
       })

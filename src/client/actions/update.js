@@ -1,15 +1,11 @@
 import { pieceFall, resetPiece, movePiece, rotate, offset } from './piece'
 import { updateCurrentPiece, pieceLand, checkLine } from './board'
 import { isColliding } from './physics'
-const LEFT = 37
-const UP = 38
-const RIGHT = 39
-const DOWN = 40
+import { handleEvents } from './events'
 
-let dropCounter = 0 //TODO: Put that in a state ?
+let dropCounter = 0
 
-//TODO: find a way to test this
-const pieceDown = () => (dispatch, getState) => {
+export const handlePieceDown = () => (dispatch, getState) => {
   dropCounter = 0
   const { currentPiece, lockedBoard } = getState()
   dispatch(pieceFall())
@@ -20,8 +16,7 @@ const pieceDown = () => (dispatch, getState) => {
   dispatch(updateCurrentPiece(getState().currentPiece, lockedBoard))
 }
 
-//TODO: test this
-export const update = () => (dispatch, getState) => {
+export const frameUpdate = () => (dispatch, getState) => {
   const { currentPiece, lockedBoard } = getState()
   dispatch(pieceFall())
   const { currentPiece: pieceMaybe } = getState()
@@ -38,60 +33,38 @@ const animationHandler = (dispatch, lastTime) => timestamp => {
   dropCounter += deltaTime
   if (dropCounter >= 500) {
     dropCounter = 0
-    dispatch(update())
+    dispatch(frameUpdate())
   }
   requestAnimationFrame(animationHandler(dispatch, timestamp))
 }
 
-//TODO: find a way to test this
-const move = dir => (dispatch, getState) => {
-  const { currentPiece } = getState() //TODO: use for the reset
+export const handleMovement = dir => (dispatch, getState) => {
+  const { currentPiece: initialPiece } = getState()
   dispatch(movePiece(dir))
   const { currentPiece: pieceMaybe, lockedBoard } = getState()
   if (isColliding(lockedBoard, pieceMaybe)) {
-    dispatch(resetPiece(currentPiece))
+    dispatch(resetPiece(initialPiece))
   }
   dispatch(updateCurrentPiece(getState().currentPiece, lockedBoard))
 }
 
-//TODO: to be tested ?
-const handleOffset = tryIndex => (dispatch, getState) => {
+const rotateAndOffset = tryIndex => (dispatch, getState) => {
   if (tryIndex < 5) {
     const { currentPiece: beforeRotation, lockedBoard } = getState()
     dispatch(rotate())
     dispatch(offset(tryIndex, beforeRotation.rotationIndex))
     const { currentPiece: rotatedPiece } = getState()
     if (isColliding(lockedBoard, rotatedPiece)) {
-      debugger
       dispatch(resetPiece(beforeRotation))
-      dispatch(handleOffset(tryIndex + 1))
+      dispatch(rotateAndOffset(tryIndex + 1))
     }
   }
 }
 
 export const handleRotation = () => (dispatch, getState) => {
-  dispatch(handleOffset(0))
+  dispatch(rotateAndOffset(0))
   const { currentPiece: offsetPiece, lockedBoard } = getState()
   dispatch(updateCurrentPiece(offsetPiece, lockedBoard))
-}
-
-const handleEvents = dispatch => e => {
-  switch (e.keyCode) {
-    case LEFT:
-      dispatch(move(-1))
-      break
-    case RIGHT:
-      dispatch(move(1))
-      break
-    case UP:
-      dispatch(handleRotation())
-      break
-    case DOWN:
-      dispatch(pieceDown())
-      break
-    default:
-      dispatch({type: 'KEYDOWN', keyCode: e.keyCode})
-  }
 }
 
 export const startGameTimer = () => dispatch => {
