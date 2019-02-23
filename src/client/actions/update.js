@@ -69,7 +69,7 @@ export const handleRotation = () => (dispatch, getState) => {
 
 export const startGameTimer = () => dispatch => {
   requestAnimationFrame(animationHandler(dispatch, 0))
-  window.addEventListener('keydown', handleEvents(dispatch))
+  window.addEventListener('keydown', dispatch(handleEvents))
 }
 
 export const stopGameTimer = () => {

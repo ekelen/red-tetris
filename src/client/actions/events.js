@@ -1,11 +1,12 @@
 import { handleMovement, handleRotation, handlePieceDown } from './update'
 
-const LEFT = 37
-const UP = 38
-const RIGHT = 39
-const DOWN = 40
+export const LEFT = 37
+export const UP = 38
+export const RIGHT = 39
+export const DOWN = 40
 
 export const handleEvents = dispatch => e => {
+  console.log(e)
   switch (e.keyCode) {
     case LEFT:
       e.preventDefault()
