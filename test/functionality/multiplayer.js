@@ -37,7 +37,7 @@ describe('Integration tests: multiplayer game', () => {
     const initialState = {}
     const socket = io(params.serverTest.url)
     const store = configureStore(rootReducer, socket, initialState, {
-      'pong': () => done()
+      PONG: () => done()
     })
     store.dispatch(ping())
   });
