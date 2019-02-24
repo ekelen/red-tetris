@@ -1,9 +1,15 @@
 import { pieceFall, resetPiece, movePiece, rotate, offset } from './piece'
 import { updateCurrentPiece, pieceLand, checkLine } from './board'
-import { isColliding } from './physics'
+import { isColliding, isPlayerDead } from './physics'
 import { handleEvents } from './events'
+import { playerDies, serverPlayerDies } from './player'
 
 let dropCounter = 0
+
+export const handlePlayerDies = () => dispatch => {
+  dispatch(playerDies())
+  dispatch(serverPlayerDies())
+}
 
 export const handlePieceDown = () => (dispatch, getState) => {
   dropCounter = 0
@@ -18,24 +24,31 @@ export const handlePieceDown = () => (dispatch, getState) => {
 
 export const frameUpdate = () => (dispatch, getState) => {
   const { currentPiece, lockedBoard } = getState()
-  dispatch(pieceFall())
-  const { currentPiece: pieceMaybe } = getState()
-  if (isColliding(lockedBoard, pieceMaybe)) {
-    dispatch(pieceLand(currentPiece))
-    dispatch(resetPiece())
-    dispatch(checkLine())
+  if (isPlayerDead(lockedBoard)) {
+    dispatch(handlePlayerDies())
+    stopGameTimer()
+  } else {
+    dispatch(pieceFall())
+    const { currentPiece: fallenPiece } = getState()
+    if (isColliding(lockedBoard, fallenPiece)) {
+      dispatch(pieceLand(currentPiece))
+      dispatch(resetPiece())
+      dispatch(checkLine())
+    }
+    dispatch(updateCurrentPiece(currentPiece, lockedBoard))
   }
-  dispatch(updateCurrentPiece(currentPiece, lockedBoard))
 }
 
-const animationHandler = (dispatch, lastTime) => timestamp => {
+const animationHandler = lastTime => (dispatch, getState) => timestamp => {
   const deltaTime = timestamp - lastTime
   dropCounter += deltaTime
   if (dropCounter >= 500) {
     dropCounter = 0
     dispatch(frameUpdate())
   }
-  requestAnimationFrame(animationHandler(dispatch, timestamp))
+  if (getState().player.alive) {
+    requestAnimationFrame(dispatch(animationHandler(timestamp)))
+  }
 }
 
 export const handleMovement = dir => (dispatch, getState) => {
@@ -67,11 +80,13 @@ export const handleRotation = () => (dispatch, getState) => {
   dispatch(updateCurrentPiece(offsetPiece, lockedBoard))
 }
 
+
 export const startGameTimer = () => dispatch => {
-  requestAnimationFrame(animationHandler(dispatch, 0))
+  requestAnimationFrame(dispatch(animationHandler(0)))
   window.addEventListener('keydown', dispatch(handleEvents))
 }
 
 export const stopGameTimer = () => {
-  window.removeEventListener('keydown')
+  //Not working
+  window.removeEventListener('keydown', handleEvents)
 }

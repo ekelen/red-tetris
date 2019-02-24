@@ -6,7 +6,7 @@ export const RIGHT = 39
 export const DOWN = 40
 
 export const handleEvents = dispatch => e => {
-  console.log(e)
+  console.log('event!')
   switch (e.keyCode) {
     case LEFT:
       e.preventDefault()

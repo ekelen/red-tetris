@@ -6,7 +6,7 @@ import {
   ENTER_GAME_FAIL,
   CREATE_GAME_SUCCESS,
   UPDATE_GAME
-} from '../../common/constants';
+} from '../../common/constants'
 
 const initialState = {
   activePlayers: [],
@@ -15,7 +15,7 @@ const initialState = {
   pieces: [],
   players: [],
   roomName: '',
-  urlParsed: false
+  urlParsed: false,
 }
 
 const getActivePlayers = (players) => cloneDeep(players.filter(p => !p.waiting))

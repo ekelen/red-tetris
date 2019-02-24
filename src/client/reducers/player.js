@@ -7,7 +7,8 @@ import {
   CREATE_GAME_SUCCESS,
   UPDATE_GAME,
   SERVER_ENTER_GAME
-} from '../../common/constants';
+} from '../../common/constants'
+import { PLAYER_DIES } from '../actions/player'
 
 const initialState = {
   alive: false,
@@ -54,6 +55,11 @@ const reducer = (state = initialState, action) => {
       ...state,
       opponents: getOpponents(action.players, state.playerName),
       ...getPlayer(action.players, state.playerName) // playerName, alive, ghost, pieceIndex, waiting
+    }
+  case PLAYER_DIES:
+    return {
+      ...state,
+      alive: false
     }
   default:
     return state

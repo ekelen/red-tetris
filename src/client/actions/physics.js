@@ -56,4 +56,11 @@ export const getOffsetPos = (pos, offset) => {
   return sumMatrix(pos, offset)
 }
 
+export const isPlayerDead = board => {
+  const hiddenRows = board.slice(0,4)
+  const flatten = hiddenRows.reduce((acc, val) => acc.concat(val), [])
+  const count = flatten.reduce((acc, val) => acc + val, 0)
+  return count > 0
+}
+
 export const rotate = shape => shape.map(rotateMatrix)

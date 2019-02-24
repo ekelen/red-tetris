@@ -1,5 +1,5 @@
 import chai from "chai"
-import { merge, isColliding, checkclearedLines, rotate } from '../../src/client/actions/physics'
+import { merge, isColliding, checkclearedLines, rotate, isPlayerDead } from '../../src/client/actions/physics'
 import { EMPTY_BOARD } from "../../src/client/reducers/board"
 import { cloneDeep } from 'lodash'
 
@@ -73,6 +73,18 @@ describe('Physics test', () => {
     const piece = {shape, pos: [10, 5]}
     const colliding = isColliding(board, piece)
     colliding.should.equal(false)
+    done()
+  }),
+  it ('Should notify that player died', done => {
+    const board = EMPTY_BOARD.map(() => 1)
+    const dead = isPlayerDead(board)
+    dead.should.equal(true)
+    done()
+  }),
+  it ('Shouldn\'t notify that player died', done => {
+    const board = EMPTY_BOARD
+    const dead = isPlayerDead(board)
+    dead.should.equal(false)
     done()
   })
 })

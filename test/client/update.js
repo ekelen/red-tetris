@@ -3,10 +3,12 @@ import rootReducer from '../../src/client/reducers'
 import { EMPTY_BOARD } from '../../src/client/reducers/board'
 import { PIECE_FALL, MOVE_PIECE } from '../../src/client/reducers/currentPiece'
 import chai from "chai"
-import { frameUpdate, handleRotation, handlePieceDown, handleMovement } from '../../src/client/actions/update'
+import { frameUpdate, handleRotation, handlePieceDown, handleMovement, handlePlayerDies } from '../../src/client/actions/update'
 import { offO } from '../../src/offsets'
 import { pieces } from '../../src/pieces'
-import { merge } from '../../src/client/actions/physics';
+import { merge } from '../../src/client/actions/physics'
+import { PLAYER_DIES } from '../../src/client/actions/player'
+import { SERVER_PLAYER_DIES } from '../../src/common/constants'
 
 const currentPiece = {
   pos: [4,4],
@@ -61,6 +63,14 @@ describe('Redux update test', () => {
       }
     })
     store.dispatch(frameUpdate())
+  }),
+  it ('should notify reducer that the player died', done => {
+    const store = configureStore(rootReducer, null, {}, {
+      PLAYER_DIES: () => {0
+        done()
+      }
+    })
+    store.dispatch(handlePlayerDies())
   }),
   it ('should move the piece down', done => {
     const initialPos = currentPiece.pos
