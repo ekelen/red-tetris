@@ -2,7 +2,7 @@ import { pieceFall, resetPiece, movePiece, rotate, offset } from './piece'
 import { updateCurrentPiece, pieceLand, checkLine } from './board'
 import { isColliding, isPlayerDead } from './physics'
 import { handleEvents } from './events'
-import { playerDies, serverPlayerDies } from './player'
+import { playerDies, serverPlayerDies, serverPlayerLocksPiece } from './player'
 
 let dropCounter = 0
 
@@ -22,20 +22,30 @@ export const handlePieceDown = () => (dispatch, getState) => {
   dispatch(updateCurrentPiece(getState().currentPiece, lockedBoard))
 }
 
+//TODO: maybe test this
+const handlePieceFall = (dispatch, getState) => {
+  const { currentPiece: pieceBeforeFall, lockedBoard } = getState()
+  dispatch(pieceFall())
+  const { currentPiece: fallenPiece } = getState()
+  if (isColliding(lockedBoard, fallenPiece)) {
+    dispatch(pieceLand(pieceBeforeFall))
+    dispatch(resetPiece())
+    dispatch(checkLine())
+    const slicedBoard = getState().lockedBoard.slice(4)
+    const formatedBoard = slicedBoard.map(row => row.map(e => e > 1 ? 1 : 0))
+    dispatch(serverPlayerLocksPiece(formatedBoard))
+  } else {
+    dispatch(updateCurrentPiece(fallenPiece, lockedBoard))
+  }
+} 
+
 export const frameUpdate = () => (dispatch, getState) => {
-  const { currentPiece, lockedBoard } = getState()
+  const { lockedBoard } = getState()
   if (isPlayerDead(lockedBoard)) {
     dispatch(handlePlayerDies())
     stopGameTimer()
   } else {
-    dispatch(pieceFall())
-    const { currentPiece: fallenPiece } = getState()
-    if (isColliding(lockedBoard, fallenPiece)) {
-      dispatch(pieceLand(currentPiece))
-      dispatch(resetPiece())
-      dispatch(checkLine())
-    }
-    dispatch(updateCurrentPiece(currentPiece, lockedBoard))
+    dispatch(handlePieceFall)
   }
 }
 

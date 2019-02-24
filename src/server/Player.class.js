@@ -46,6 +46,10 @@ class Player {
     })
   }
 
+  updateGhost(ghost) {
+    this.ghost = cloneDeep(ghost)
+  }
+
   destroysLine({ ghost }) { // TODO: Possibly redundant with lockPiece
     this.ghost = cloneDeep(ghost)
   }
@@ -56,7 +60,7 @@ class Player {
   }
 
   lockPiece({ ghost }) {
-    this.ghost = cloneDeep(ghost)
+    this.updateGhost(ghost)
     this.pieceIndex++
   }
 }

@@ -59,11 +59,7 @@ const Game = ({
 const mapStateToProps = state => ({
   ...state.game,
   ...state.player,
-  alive: state.player.alive,
-  activePlayers: state.game.activePlayers,
   board: state.board,
-  playerName: state.player.playerName,
-  roomName: state.game.roomName
 })
 
 const mapDispatchToProps = {

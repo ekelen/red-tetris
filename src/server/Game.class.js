@@ -149,7 +149,7 @@ class Game {
 
   playerLocksPiece({ playerName, ghost }) {
     const player = this.activePlayers.find(player => player.playerName === playerName)
-    player.lockPieceLine({ ghost })
+    player.lockPiece({ ghost })
     this._informEveryoneExceptPlayer({ player, action: { type: UPDATE_GAME, ...this.gameInfo } })
   }
 
