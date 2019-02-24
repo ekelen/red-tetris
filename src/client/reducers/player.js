@@ -44,12 +44,6 @@ const reducer = (state = initialState, action) => {
       playerName: action.playerName,
       roomName: action.roomName
     }
-  // case START_GAME:
-  //   return {
-  //     ...state,
-  //     opponents: getOpponents(action.players, state.playerName),
-  //     ...getPlayer(action.players, state.playerName)
-  //   }
   case UPDATE_GAME:
     return {
       ...state,

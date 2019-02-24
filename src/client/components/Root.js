@@ -7,7 +7,6 @@ const Root = () => (
   <Router hashType='noslash'>
     <div className={'page'}>
       <Route component={App} path='/' />
-      {/* TODO bonus: Menu on landing page*/}
     </div>
   </Router>
 )

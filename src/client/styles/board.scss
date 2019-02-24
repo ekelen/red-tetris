@@ -1,9 +1,9 @@
-@import './variables.scss';
+@import './variables_dark.scss';
 
 %cell {
   flex: 1;
   margin: 1px;
-  border: solid 1px $lightgray;
+  border: solid 1px black;
 }
 
 %row {

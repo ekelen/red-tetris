@@ -1,0 +1,15 @@
+$gray: #2e2e30;
+
+$white: lighten($gray, 90%);
+// $lightestgray: lighten($gray, 50%);
+// $lightergray: lighten($gray, 25%);
+// $lightgray: lighten($gray, 10%);
+
+$black: darken($gray, 80%);
+
+$shadow: 0 4px 6px lighten($black, 4%),
+  0 1px 2px lighten($black, 4%);
+
+
+$deadred: #a88a8a;
+$alivegreen: #d3ebd3;

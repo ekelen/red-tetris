@@ -23,7 +23,7 @@ const Game = ({
 }) => {
   return (
     <div className={'game'}>
-      {(offlineMode || activePlayers[0].playerName === playerName) &&
+      {(!inProgress && (offlineMode || activePlayers[0].playerName === playerName)) &&
         <Buttons {...{ inProgress, startGame }} />
       }
 
@@ -38,8 +38,8 @@ const Game = ({
         stopGameTimer={stopGameTimer} />
     </div>}
     {waiting && (inProgress ?
-       (<div>Waiting for game to end, then maybe you can join...</div>) :
-        (<div>Game is full (or should be), waiting for other players to leave...</div>))
+       (<div className={'playerBoardReplacementMessage'}>Waiting for game to end, then maybe you can join...</div>) :
+        (<div className={'playerBoardReplacementMessage'}>Game is full (or should be), waiting for other players to leave...</div>))
     }
       {(opponents.length > 0) && (
         <div className={'opponents'}>

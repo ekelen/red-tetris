@@ -92,6 +92,8 @@ describe('Integration tests: multiplayer game', () => {
     store.dispatch(parseURL('/testroom[user1]'))
   })
 
+  it ('todo: if game has remaining players but they are all waiting, set inProgress = false')
+
   it('lets another player join if given good existing game URL', done => {
     const initialState = {}
     sockets.user2 = io(params.serverTest.url)
@@ -257,7 +259,28 @@ describe('Integration tests: multiplayer game', () => {
     stores.user7.getState().player.waiting.should.equal(false)
   })
 
+  it('multiple games can happen simultaneously', done => {
+    const initialState = {}
+    sockets.user2 = io(params.serverTest.url)
+    stores.user2 = configureStore(rootReducer, sockets.user2, initialState,
+      {
+        CREATE_GAME_SUCCESS: ({ getState }) =>
+        {
+          const state = getState()
+          state.game.roomName.should.equal('testroom2')
+          state.game.players.map(p => p.playerName).should.include('user2')
+          games.map(g => g.roomName).should.have.members(['testroom', 'testroom2'])
+          games.length.should.equal(2)
+          done()
+        },
+        ENTER_GAME_FAIL: (action) => done(new Error(action.error))
+      }
+    );
+    stores.user2.dispatch(parseURL('/testroom2[user2]'))
+  })
+
   it('removes game from global games array when all players leave', done => {
+    sockets.user2.disconnect()
     sockets.user3.disconnect()
     sockets.user4.disconnect()
     sockets.user5.disconnect()

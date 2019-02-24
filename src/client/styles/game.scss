@@ -1,11 +1,15 @@
-@import './variables.scss';
+@import './variables_dark.scss';
 @import './app.scss';
 
 .game {
   @include flex-row-wrap;
   flex-basis: 100%;
-  color: $darkgray;
+  color: orange;
   justify-content: space-around;
+
+  .playerBoardReplacementMessage {
+    flex-basis: 40%;
+  }
 
   .opponents {
     @include flex-row-wrap;
@@ -19,5 +23,6 @@
     flex: initial;
     display: flex;
     flex-direction: column;
+
   }
 }
