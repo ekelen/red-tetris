@@ -32,12 +32,12 @@ const handlePieceFall = (dispatch, getState) => {
     dispatch(resetPiece())
     dispatch(checkLine())
     const slicedBoard = getState().lockedBoard.slice(4)
-    const formatedBoard = slicedBoard.map(row => row.map(e => e > 1 ? 1 : 0))
+    const formatedBoard = slicedBoard.map(row => row.map(e => e > 0 ? 1 : 0))
     dispatch(serverPlayerLocksPiece(formatedBoard))
   } else {
     dispatch(updateCurrentPiece(fallenPiece, lockedBoard))
   }
-} 
+}
 
 export const frameUpdate = () => (dispatch, getState) => {
   const { lockedBoard } = getState()
