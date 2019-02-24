@@ -31,7 +31,7 @@ chai.should()
 describe('Redux update test', () => {
   it('let the piece fall every 0.5s', done => {
     const store = configureStore(rootReducer, null, initialState, {
-      UPDATE_CURRENT_PIECE: ({getState}) => {
+      UPDATE_ACTIVE_BOARD: ({getState}) => {
       const expected = [
         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -86,7 +86,7 @@ describe('Redux update test', () => {
   it ('Should update the board with the new piece position', done => {
     const initialPos = currentPiece.pos
     const store = configureStore(rootReducer, null, initialState, {
-      UPDATE_CURRENT_PIECE: ({getState}) => {
+      UPDATE_ACTIVE_BOARD: ({getState}) => {
         const { board: updatedBoard, currentPiece: fallenPiece } = getState()
         const expected = merge(initialState.lockedBoard, fallenPiece)
         updatedBoard.should.deep.equal(expected)
@@ -119,7 +119,7 @@ describe('Redux update test', () => {
   }),
   it ('should update the board with moved piece', done => {
     const store = configureStore(rootReducer, null, initialState, {
-      UPDATE_CURRENT_PIECE: ({getState}) => {
+      UPDATE_ACTIVE_BOARD: ({getState}) => {
         const { board: updatedBoard, currentPiece: movedPiece } = getState()
         const expected = merge(initialState.lockedBoard, movedPiece)
         updatedBoard.should.deep.equal(expected)
@@ -130,7 +130,7 @@ describe('Redux update test', () => {
   }),
   it('Should do nothing (O piece shouldn\'t rotate)', done => {
     const store = configureStore(rootReducer, null, initialState, {
-      UPDATE_CURRENT_PIECE: ({getState}) => {
+      UPDATE_ACTIVE_BOARD: ({getState}) => {
       const expected = [
         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -226,7 +226,7 @@ describe('Redux update test', () => {
         lockedBoard: board
       }
       const store = configureStore(rootReducer, null, initialState, {
-        UPDATE_CURRENT_PIECE: ({getState}) => {
+        UPDATE_ACTIVE_BOARD: ({getState}) => {
           // getState().board.should.deep.equal(expected)
           done()
         }

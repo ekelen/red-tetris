@@ -1,5 +1,5 @@
 import { pieceFall, resetPiece, movePiece, rotate, offset } from './piece'
-import { updateCurrentPiece, pieceLand, checkLine } from './board'
+import { updateActiveBoard, pieceLand, checkLine } from './board'
 import { isColliding, isPlayerDead } from './physics'
 import { handleEvents } from './events'
 import { playerDies, serverPlayerDies, serverPlayerLocksPiece } from './player'
@@ -19,7 +19,7 @@ export const handlePieceDown = () => (dispatch, getState) => {
   if (isColliding(lockedBoard, pieceMaybe)) {
     dispatch(resetPiece(currentPiece))
   }
-  dispatch(updateCurrentPiece(getState().currentPiece, lockedBoard))
+  dispatch(updateActiveBoard(getState().currentPiece, lockedBoard))
 }
 
 //TODO: maybe test this
@@ -35,7 +35,7 @@ const handlePieceFall = (dispatch, getState) => {
     const formatedBoard = slicedBoard.map(row => row.map(e => e > 0 ? 1 : 0))
     dispatch(serverPlayerLocksPiece(formatedBoard))
   } else {
-    dispatch(updateCurrentPiece(fallenPiece, lockedBoard))
+    dispatch(updateActiveBoard(fallenPiece, lockedBoard))
   }
 }
 
@@ -68,7 +68,7 @@ export const handleMovement = dir => (dispatch, getState) => {
   if (isColliding(lockedBoard, pieceMaybe)) {
     dispatch(resetPiece(initialPiece))
   }
-  dispatch(updateCurrentPiece(getState().currentPiece, lockedBoard))
+  dispatch(updateActiveBoard(getState().currentPiece, lockedBoard))
 }
 
 const rotateAndOffset = tryIndex => (dispatch, getState) => {
@@ -87,7 +87,7 @@ const rotateAndOffset = tryIndex => (dispatch, getState) => {
 export const handleRotation = () => (dispatch, getState) => {
   dispatch(rotateAndOffset(0))
   const { currentPiece: offsetPiece, lockedBoard } = getState()
-  dispatch(updateCurrentPiece(offsetPiece, lockedBoard))
+  dispatch(updateActiveBoard(offsetPiece, lockedBoard))
 }
 
 

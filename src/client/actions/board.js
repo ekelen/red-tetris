@@ -1,9 +1,9 @@
-export const UPDATE_CURRENT_PIECE = 'UPDATE_CURRENT_PIECE'
+export const UPDATE_ACTIVE_BOARD = 'UPDATE_ACTIVE_BOARD'
 export const PIECE_LAND = 'PIECE_LAND'
 export const CHECK_LINES = 'CHECK_LINES'
 
-export const updateCurrentPiece = (currentPiece, lockedBoard) => {
-  return { type: UPDATE_CURRENT_PIECE, currentPiece, lockedBoard }
+export const updateActiveBoard = (currentPiece, lockedBoard) => {
+  return { type: UPDATE_ACTIVE_BOARD, currentPiece, lockedBoard }
 }
 
 export const pieceLand = piece => {

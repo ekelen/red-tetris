@@ -1,4 +1,4 @@
-import { UPDATE_CURRENT_PIECE } from '../actions/board'
+import { UPDATE_ACTIVE_BOARD } from '../actions/board'
 import { merge } from '../actions/physics'
 
 export const EMPTY_BOARD = [
@@ -32,7 +32,7 @@ const initialState = EMPTY_BOARD
 
 const board = (state=initialState, action) => {
   switch(action.type) {
-    case UPDATE_CURRENT_PIECE:
+    case UPDATE_ACTIVE_BOARD:
       return merge(action.lockedBoard, action.currentPiece)
     default:
       return state
