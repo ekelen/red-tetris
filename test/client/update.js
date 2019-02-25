@@ -3,12 +3,23 @@ import rootReducer from '../../src/client/reducers'
 import { EMPTY_BOARD } from '../../src/client/reducers/board'
 import { PIECE_FALL, MOVE_PIECE } from '../../src/client/reducers/currentPiece'
 import chai from "chai"
-import { frameUpdate, handleRotation, handlePieceDown, handleMovement, handlePlayerDies } from '../../src/client/actions/update'
+import {
+  gameUpdate,
+  handleRotation,
+  handlePieceDown,
+  handleMovement,
+  handlePlayerDies,
+  handlePieceLock
+} from '../../src/client/actions/update'
 import { offO } from '../../src/offsets'
 import { pieces } from '../../src/pieces'
 import { merge } from '../../src/client/actions/physics'
-import { PLAYER_DIES } from '../../src/client/actions/player'
-import { SERVER_PLAYER_DIES } from '../../src/common/constants'
+import { PLAYER_DIES, UPDATE_PLAYER_GHOST } from '../../src/client/actions/player'
+import { 
+  SERVER_PLAYER_DIES, 
+  SERVER_SEND_LINE_PENALTIES,
+  SERVER_UPDATES_PLAYER
+} from '../../src/common/constants'
 
 const currentPiece = {
   pos: [4,4],
@@ -23,7 +34,9 @@ const currentPiece = {
 const initialState = {
   currentPiece,
   board: EMPTY_BOARD,
-  lockedBoard: EMPTY_BOARD
+  player: {
+    ghost: EMPTY_BOARD
+  }
 }
 
 chai.should()
@@ -36,9 +49,9 @@ describe('Redux update test', () => {
         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 1, 1, 0, 0, 0, 0],
-        [0, 0, 0, 0, 1, 1, 0, 0, 0, 0],
         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 1, 1, 0, 0, 0, 0],
+        [0, 0, 0, 0, 1, 1, 0, 0, 0, 0],
         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -62,7 +75,7 @@ describe('Redux update test', () => {
         done()
       }
     })
-    store.dispatch(frameUpdate())
+    store.dispatch(gameUpdate())
   }),
   it ('should notify reducer that the player died', done => {
     const store = configureStore(rootReducer, null, {}, {
@@ -88,7 +101,7 @@ describe('Redux update test', () => {
     const store = configureStore(rootReducer, null, initialState, {
       UPDATE_ACTIVE_BOARD: ({getState}) => {
         const { board: updatedBoard, currentPiece: fallenPiece } = getState()
-        const expected = merge(initialState.lockedBoard, fallenPiece)
+        const expected = merge(initialState.player.ghost, fallenPiece)
         updatedBoard.should.deep.equal(expected)
         done()
       }
@@ -121,7 +134,7 @@ describe('Redux update test', () => {
     const store = configureStore(rootReducer, null, initialState, {
       UPDATE_ACTIVE_BOARD: ({getState}) => {
         const { board: updatedBoard, currentPiece: movedPiece } = getState()
-        const expected = merge(initialState.lockedBoard, movedPiece)
+        const expected = merge(initialState.player.ghost, movedPiece)
         updatedBoard.should.deep.equal(expected)
         done()
       }
@@ -223,7 +236,7 @@ describe('Redux update test', () => {
       const initialState = {
         currentPiece: piece,
         board,
-        lockedBoard: board
+        player: { ghost: board }
       }
       const store = configureStore(rootReducer, null, initialState, {
         UPDATE_ACTIVE_BOARD: ({getState}) => {
@@ -232,5 +245,45 @@ describe('Redux update test', () => {
         }
       })
       store.dispatch(handleRotation())
+  })
+})
+
+describe("Redux locking piece test", () => {
+  const currentPiece = {
+    ...pieces[1],
+    pos: [20, 4]
+  }
+  const initialState = {
+    currentPiece,
+    player: {
+      ghost: EMPTY_BOARD
+    }
+  }
+  const expected = merge(EMPTY_BOARD, currentPiece)
+  it ("Should update the player's ghost", done => {
+    const store = configureStore(rootReducer, null, initialState, {
+      UPDATE_PLAYER_GHOST: ({getState}) => {
+        const { player } = getState()
+        player.ghost.should.deep.equal(expected)
+        done()
+      }
+    })
+    store.dispatch(handlePieceLock(currentPiece))
+  }),
+  it ("Should send line penalties to other players", done => {
+    const store = configureStore(rootReducer, null, initialState, {
+      SERVER_SEND_LINE_PENALTIES: () => {
+        done()
+      }
+    })
+    store.dispatch(handlePieceLock(currentPiece))
+  }),
+  it ("Should notify the server that the player has changed", done => {
+    const store = configureStore(rootReducer, null, initialState, {
+      SERVER_UPDATES_PLAYER: () => {
+        done()
+      }
+    })
+    store.dispatch(handlePieceLock(currentPiece))
   })
 })

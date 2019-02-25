@@ -1,5 +1,5 @@
 import chai from "chai"
-import { merge, isColliding, checkclearedLines, rotate, isPlayerDead } from '../../src/client/actions/physics'
+import { merge, isColliding, isPlayerDead, getClearedLines, clearLines } from '../../src/client/actions/physics'
 import { EMPTY_BOARD } from "../../src/client/reducers/board"
 import { cloneDeep } from 'lodash'
 
@@ -86,5 +86,41 @@ describe('Physics test', () => {
     const dead = isPlayerDead(board)
     dead.should.equal(false)
     done()
+  })
+})
+
+describe('Clear lines', () => {
+  it('getClearedLines returns row indexes who all have value > 0', () => {
+    const board = cloneDeep(EMPTY_BOARD)
+    board[23] = new Array(10).fill(2)
+    board[22] = new Array(10).fill(2)
+    board[21] = new Array(10).fill(2).map((el, i) => i % 2)
+    const linesToClear = getClearedLines(board)
+    linesToClear.should.have.members([22, 23]).and.have.lengthOf(2)
+  })
+
+  it('returns new board with 24 rows when lines cleared', () => {
+    const board = cloneDeep(EMPTY_BOARD)
+    board[23] = new Array(10).fill(2)
+    board[22] = new Array(10).fill(2)
+    board[21] = new Array(10).fill(2).map((el, i) => i % 2)
+    const linesToClear = getClearedLines(board)
+    const updatedBoard = clearLines(board, linesToClear)
+    updatedBoard.length.should.equal(24)
+    updatedBoard.slice(0, 22).should.eql(EMPTY_BOARD.slice(0, 22))
+    updatedBoard[23].should.eql(board[21])
+  })
+
+  it('works if no lines cleared', () => {
+    const board = cloneDeep(EMPTY_BOARD)
+    board[23] = new Array(10).fill(2).map((el, i) => i % 2)
+    board[22] = new Array(10).fill(2).map((el, i) => i % 2)
+    board[21] = new Array(10).fill(2).map((el, i) => i % 2)
+    const linesToClear = getClearedLines(board)
+    linesToClear.should.have.members([])
+
+    const updatedBoard = clearLines(board, linesToClear)
+    updatedBoard.length.should.eql(24)
+    updatedBoard.should.eql(board)
   })
 })

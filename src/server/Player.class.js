@@ -36,6 +36,14 @@ class Player {
     this._playerName = playerName
   }
 
+  set playerStatus({playerName, alive, ghost, pieceIndex, waiting}) {
+    this.playerName = playerName
+    this.alive = alive
+    this.ghost = ghost
+    this.pieceIndex = pieceIndex
+    this.waiting = waiting
+  }
+
   get playerStatus() {
     return ({
       playerName: this.playerName,

@@ -1,8 +1,15 @@
 import { pieceFall, resetPiece, movePiece, rotate, offset } from './piece'
 import { updateActiveBoard, pieceLand, checkLine } from './board'
-import { isColliding, isPlayerDead } from './physics'
+import { isColliding, isPlayerDead, merge, getClearedLines, clearLines } from './physics'
 import { handleEvents } from './events'
-import { playerDies, serverPlayerDies, serverPlayerLocksPiece } from './player'
+import { 
+  playerDies,
+  serverPlayerDies,
+  serverPlayerLocksPiece,
+  updatePlayerGhost,
+  serverSendLinePenalities,
+  serverUpdatesPlayer
+} from './player'
 
 let dropCounter = 0
 
@@ -12,36 +19,47 @@ export const handlePlayerDies = () => dispatch => {
 }
 
 export const handlePieceDown = () => (dispatch, getState) => {
-  dropCounter = 0
-  const { currentPiece, lockedBoard } = getState()
+  const { currentPiece, player } = getState()
   dispatch(pieceFall())
   const { currentPiece: pieceMaybe } = getState()
-  if (isColliding(lockedBoard, pieceMaybe)) {
+  if (isColliding(player.ghost, pieceMaybe)) {
     dispatch(resetPiece(currentPiece))
   }
-  dispatch(updateActiveBoard(getState().currentPiece, lockedBoard))
+  dispatch(updateActiveBoard(getState().currentPiece, player.ghost))
+}
+
+// handle events when a piece is locked: 
+// update lockedBoard
+// check for completed lines and clear them if necesary
+// send malus to other players if necessary
+// get next piece to keep playing
+export const handlePieceLock = piece => (dispatch, getState) => {
+  const { player } = getState()
+  const updatedLockedBoard = merge(player.ghost, piece)
+  const clearedLinesIndexes = getClearedLines(updatedLockedBoard)
+  const updatedLockedBoardWithLinesCleared = clearLines(updatedLockedBoard, clearedLinesIndexes)
+  dispatch(updatePlayerGhost(updatedLockedBoardWithLinesCleared))
+  const { player: updatedPlayer } = getState()
+  dispatch(serverSendLinePenalities(clearedLinesIndexes.length))
+  dispatch(serverUpdatesPlayer(updatedPlayer))
+  dispatch(resetPiece())
 }
 
 //TODO: maybe test this
 const handlePieceFall = (dispatch, getState) => {
-  const { currentPiece: pieceBeforeFall, lockedBoard } = getState()
+  const { currentPiece: pieceBeforeFall, player } = getState()
   dispatch(pieceFall())
   const { currentPiece: fallenPiece } = getState()
-  if (isColliding(lockedBoard, fallenPiece)) {
-    dispatch(pieceLand(pieceBeforeFall))
-    dispatch(resetPiece())
-    dispatch(checkLine())
-    const slicedBoard = getState().lockedBoard.slice(4)
-    const formatedBoard = slicedBoard.map(row => row.map(e => e > 0 ? 1 : 0))
-    dispatch(serverPlayerLocksPiece(formatedBoard))
+  if (isColliding(player.ghost, fallenPiece)) {
+    dispatch(handlePieceLock(pieceBeforeFall))
   } else {
-    dispatch(updateActiveBoard(fallenPiece, lockedBoard))
+    dispatch(updateActiveBoard(fallenPiece, player.ghost))
   }
 }
 
-export const frameUpdate = () => (dispatch, getState) => {
-  const { lockedBoard } = getState()
-  if (isPlayerDead(lockedBoard)) {
+export const gameUpdate = () => (dispatch, getState) => {
+  const { player } = getState()
+  if (isPlayerDead(player.ghost)) {
     dispatch(handlePlayerDies())
     stopGameTimer()
   } else {
@@ -54,7 +72,7 @@ const animationHandler = lastTime => (dispatch, getState) => timestamp => {
   dropCounter += deltaTime
   if (dropCounter >= 500) {
     dropCounter = 0
-    dispatch(frameUpdate())
+    dispatch(gameUpdate())
   }
   if (getState().player.alive) {
     requestAnimationFrame(dispatch(animationHandler(timestamp)))
@@ -64,20 +82,20 @@ const animationHandler = lastTime => (dispatch, getState) => timestamp => {
 export const handleMovement = dir => (dispatch, getState) => {
   const { currentPiece: initialPiece } = getState()
   dispatch(movePiece(dir))
-  const { currentPiece: pieceMaybe, lockedBoard } = getState()
-  if (isColliding(lockedBoard, pieceMaybe)) {
+  const { currentPiece: pieceMaybe, player } = getState()
+  if (isColliding(player.ghost, pieceMaybe)) {
     dispatch(resetPiece(initialPiece))
   }
-  dispatch(updateActiveBoard(getState().currentPiece, lockedBoard))
+  dispatch(updateActiveBoard(getState().currentPiece, player.ghost))
 }
 
 const rotateAndOffset = tryIndex => (dispatch, getState) => {
   if (tryIndex < 5) {
-    const { currentPiece: beforeRotation, lockedBoard } = getState()
+    const { currentPiece: beforeRotation, player } = getState()
     dispatch(rotate())
     dispatch(offset(tryIndex, beforeRotation.rotationIndex))
     const { currentPiece: rotatedPiece } = getState()
-    if (isColliding(lockedBoard, rotatedPiece)) {
+    if (isColliding(player.ghost, rotatedPiece)) {
       dispatch(resetPiece(beforeRotation))
       dispatch(rotateAndOffset(tryIndex + 1))
     }
@@ -86,8 +104,8 @@ const rotateAndOffset = tryIndex => (dispatch, getState) => {
 
 export const handleRotation = () => (dispatch, getState) => {
   dispatch(rotateAndOffset(0))
-  const { currentPiece: offsetPiece, lockedBoard } = getState()
-  dispatch(updateActiveBoard(offsetPiece, lockedBoard))
+  const { currentPiece: offsetPiece, player } = getState()
+  dispatch(updateActiveBoard(offsetPiece, player.ghost))
 }
 
 

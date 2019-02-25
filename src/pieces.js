@@ -21,7 +21,8 @@ export const pieces = [
     offsets: offAll,
     rotationIndex: 0,
     shape: [
-      [-1,0], [-1,1], [0,-1], [0,0]
+      [-1,-1],[-1,0],
+               [0,0],[0,1] //Z
     ]
   },
   {
@@ -29,7 +30,8 @@ export const pieces = [
     offsets: offAll,
     rotationIndex: 0,
     shape: [
-      [-1,-1], [-1,0], [0,0], [0,1] //S
+            [-1,0],[-1,1],
+     [0,-1],[0,0] //S
     ]
   },
   {
@@ -37,7 +39,8 @@ export const pieces = [
     offsets: offAll,
     rotationIndex: 0,
     shape: [
-      [-1,0],[0,0],[1,0],[1,1] //L
+                  [-1,1],
+      [0,-1],[0,0],[0,1] //L
     ]
   },
   {
@@ -45,7 +48,8 @@ export const pieces = [
     offsets: offAll,
     rotationIndex: 0,
     shape: [
-      [-1,0],[0,0],[1,0],[1,-1] //J
+      [-1,-1],
+      [0,-1],[0,0],[0,1] //J
     ]
   },
   {
@@ -53,7 +57,8 @@ export const pieces = [
     offsets: offAll,
     rotationIndex: 0,
     shape: [
-      [-1,-1], [-1,0], [-1,1], [0,0] //T
+            [-1,0],
+      [0,-1],[0,0],[0,1]//T
     ]
   }
 ]

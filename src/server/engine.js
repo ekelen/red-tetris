@@ -1,18 +1,29 @@
 import Game from './Game.class'
 import Player from './Player.class';
-import { SERVER_ENTER_GAME, SERVER_START_GAME, SERVER_PLAYER_DESTROYS_LINE, SERVER_PLAYER_LOCKS_PIECE, SERVER_PLAYER_DIES, SERVER_PING, PONG } from '../common/constants';
+import { 
+  SERVER_ENTER_GAME,
+  SERVER_START_GAME,
+  SERVER_SEND_LINE_PENALTIES,
+  SERVER_PLAYER_LOCKS_PIECE,
+  SERVER_PLAYER_DIES,
+  SERVER_PING,
+  PONG,
+  SERVER_UPDATES_PLAYER
+} from '../common/constants';
 import { loginfo, logerror } from '.';
 
 const inGameActionHandler = ({ action, io, currentGame, player }) => {
   switch (action.type) {
   case SERVER_START_GAME:
     return currentGame.startGame({ io, player })
-  case SERVER_PLAYER_DESTROYS_LINE:
-    return currentGame.playerDestroysLine({ playerName: player.playerName, ghost: player.ghost })
+  case SERVER_SEND_LINE_PENALTIES:
+    return currentGame.playerDestroysLine({ playerName: player.playerName })
   case SERVER_PLAYER_LOCKS_PIECE:
     return currentGame.playerLocksPiece({ playerName: player.playerName, ghost: action.ghost })
   case SERVER_PLAYER_DIES:
     return currentGame.playerDies({ io, playerName: player.playerName })
+  case SERVER_UPDATES_PLAYER:
+    return currentGame.playerUpdates(io, player.playerName, action.player)
   default:
     logerror(`Unrecognized or unauthorized action ${action.type}`)
     break;

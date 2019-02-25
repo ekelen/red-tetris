@@ -8,14 +8,16 @@ import {
   UPDATE_GAME,
   SERVER_ENTER_GAME
 } from '../../common/constants'
-import { PLAYER_DIES } from '../actions/player'
+import { PLAYER_DIES, UPDATE_PLAYER_GHOST } from '../actions/player'
+import { EMPTY_BOARD } from './board';
 
 const initialState = {
   alive: false,
   opponents: [], // { alive, ghost, pieceIndex, playerName, waiting }
   playerName: '',
   pieceIndex: 0,
-  waiting: null
+  waiting: null,
+  ghost: EMPTY_BOARD
 }
 
 const getOpponents = (players, myName) => cloneDeep(players.filter(p => p.playerName !== myName))
@@ -54,6 +56,11 @@ const reducer = (state = initialState, action) => {
     return {
       ...state,
       alive: false
+    }
+  case UPDATE_PLAYER_GHOST:
+    return {
+      ...state,
+      ghost: action.ghost
     }
   default:
     return state

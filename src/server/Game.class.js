@@ -128,6 +128,19 @@ class Game {
     this._informRoom({ io, action: { type: UPDATE_GAME, ...this.gameInfo, message: 'Game has started!' }} )
   }
 
+  playerUpdates(io, playerName, playerStatus) {
+    const player = this.activePlayers.find(player => player.playerName === playerName)
+    player.playerStatus = playerStatus
+    this._informRoom({
+      io,
+      action: {
+        type: UPDATE_GAME,
+        message: `Player ${playerName} changed`,
+        ...this.gameInfo
+      }
+    })
+  }
+
   playerDies({ io, playerName }) {
     const player = this.activePlayers.find(player => player.playerName === playerName)
     const { roomName } = this
@@ -138,9 +151,8 @@ class Game {
       this._informRoom({ io, action: { type: UPDATE_GAME, message: `Player ${playerName} is dead!`, ...this.gameInfo } })
   }
 
-  playerDestroysLine({ playerName, ghost }) {
+  playerDestroysLine({ playerName }) {
     const player = this.activePlayers.find(player => player.playerName === playerName)
-    player.destroysLine({ ghost })
     this._informEveryoneExceptPlayer({ player, action: { type: UPDATE_GAME, message: 'I got a malus, alas',
       ...this.gameInfo
       }

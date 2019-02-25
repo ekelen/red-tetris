@@ -1,6 +1,7 @@
 /* eslint-env node, mocha */
 import chai from "chai"
 import Player from "../../src/server/Player.class";
+import { EMPTY_BOARD } from "../../src/client/reducers/board";
 
 chai.should()
 
@@ -89,11 +90,25 @@ describe('Player properties', () => {
 
   it('has a lockpiece method that updates ghost')
 
-  it('lockPiece advances player.pieceIndex by 1', () => {
+  // TODO: let the client handle this part
+  // it('lockPiece advances player.pieceIndex by 1', () => {
+  //   const player = new Player(playerParams)
+  //   const initialIndex = player.pieceIndex
+  //   player.lockPiece({ ghost: [[]] })
+  //   const newPlayerPieceIndex = player.pieceIndex
+  //   newPlayerPieceIndex.should.equal(initialIndex + 1).and.equal(1)
+  // })
+
+  it('Updates the player status with new informations', () => {
     const player = new Player(playerParams)
-    const initialIndex = player.pieceIndex
-    player.lockPiece({ ghost: [[]] })
-    const newPlayerPieceIndex = player.pieceIndex
-    newPlayerPieceIndex.should.equal(initialIndex + 1).and.equal(1)
+    const newStatus = {
+      playerName: 'jean',
+      alive: true,
+      ghost: EMPTY_BOARD,
+      pieceIndex: 0,
+      waiting: false
+    }
+    player.playerStatus = newStatus
+    player.playerStatus.should.deep.equal(newStatus)
   })
 })

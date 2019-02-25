@@ -1,4 +1,5 @@
 import { cloneDeep } from 'lodash'
+import { EMPTY_BOARD } from '../reducers/board'
 
 // TODO: make it cleaner
 export const checkclearedLines = board => {
@@ -19,7 +20,7 @@ export const merge = (board, piece) => {
   const worldShape = piece.shape.map(tile => sumMatrix(tile, piece.pos))
   const newBoard = cloneDeep(board)
   worldShape.forEach(([y, x]) => {
-    newBoard[y][x] = piece.color //TODO: add color system
+    newBoard[y][x] = piece.color
   })
   return newBoard
 }
@@ -64,3 +65,21 @@ export const isPlayerDead = board => {
 }
 
 export const rotate = shape => shape.map(rotateMatrix)
+
+// Return new board with lines cleared (if any)
+export const clearLines = (board, indexes) => {
+  const nLines = indexes.length
+  if (!nLines) return board
+  const remainingLines = cloneDeep(board).filter((_, y) => !indexes.includes(y))
+  const newBoard = EMPTY_BOARD.slice(0, nLines).concat(remainingLines)
+  return newBoard
+}
+
+// Returns row indexes of lines to clear
+export const getClearedLines = board => {
+  const indexes = board
+    .map((row, y) => ({ y, row }))
+    .filter((r) => r.row.every(x => x !== 0))
+    .map((r) => r.y)
+  return indexes
+}
