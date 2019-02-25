@@ -2,6 +2,7 @@
 import chai from "chai"
 import Player from "../../src/server/Player.class";
 import { EMPTY_BOARD } from "../../src/client/reducers/board";
+import { cloneDeep } from 'lodash'
 
 chai.should()
 
@@ -72,12 +73,6 @@ describe('Player properties', () => {
     playerStatus.should.have.all.keys('alive', 'ghost', 'playerName', 'pieceIndex', 'waiting')
   })
 
-  it('has a destroysLine method', () => {
-    chai.expect(new Player(playerParams)).to.respondTo('destroysLine')
-  })
-
-  it('has a destroysLine method that updates ghost')
-
   it('has a dies method', () => {
     chai.expect(new Player(playerParams)).to.respondTo('dies')
   })
@@ -110,5 +105,19 @@ describe('Player properties', () => {
     }
     player.playerStatus = newStatus
     player.playerStatus.should.deep.equal(newStatus)
+  })
+
+})
+
+describe('player.applyPenaltyLines', () => {
+  it('return the ghost with locked lines', () => {
+    const player = new Player({ socket: { id: '123' }} )
+    player.applyPenaltyLines(3)
+    const expected = cloneDeep(EMPTY_BOARD)
+    const len = expected.length
+    expected[len - 1] = Array(10).fill(8)
+    expected[len - 2] = Array(10).fill(8)
+    expected[len - 3] = Array(10).fill(8)
+    player.ghost.should.deep.equal(expected)
   })
 })

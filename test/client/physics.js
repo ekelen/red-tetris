@@ -123,4 +123,28 @@ describe('Clear lines', () => {
     updatedBoard.length.should.eql(24)
     updatedBoard.should.eql(board)
   })
+
+  it("Should't destroy penaltie lines", () => {
+    const board = cloneDeep(EMPTY_BOARD)
+    board[23] = new Array(10).fill(2)
+    board[22] = new Array(10).fill(2)
+    const linesToClear = getClearedLines(board)
+
+    const updatedBoard = clearLines(board, linesToClear)
+    updatedBoard.length.should.eql(24)
+    updatedBoard.should.eql(EMPTY_BOARD)
+  })
 })
+
+// describe('penaltie lines', () => {
+//   it('return the ghost with locked lines', () => {
+//     const ghost = cloneDeep(EMPTY_BOARD)
+//     const ghostWhithPenaltieLines = getGhostWithPenaltieLines(ghost, 3)
+//     const expected = cloneDeep(EMPTY_BOARD)
+//     const len = expected.length
+//     expected[len - 1] = Array(10).fill(8)
+//     expected[len - 2] = Array(10).fill(8)
+//     expected[len - 3] = Array(10).fill(8)
+//     ghostWhithPenaltieLines.should.deep.equal(expected)
+//   })
+// })

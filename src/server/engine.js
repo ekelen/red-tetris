@@ -1,6 +1,6 @@
 import Game from './Game.class'
 import Player from './Player.class';
-import { 
+import {
   SERVER_ENTER_GAME,
   SERVER_START_GAME,
   SERVER_SEND_LINE_PENALTIES,
@@ -17,7 +17,7 @@ const inGameActionHandler = ({ action, io, currentGame, player }) => {
   case SERVER_START_GAME:
     return currentGame.startGame({ io, player })
   case SERVER_SEND_LINE_PENALTIES:
-    return currentGame.playerDestroysLine({ playerName: player.playerName })
+    return currentGame.playerDestroysLines({ io, player, nLines: action.nLines })
   case SERVER_PLAYER_LOCKS_PIECE:
     return currentGame.playerLocksPiece({ playerName: player.playerName, ghost: action.ghost })
   case SERVER_PLAYER_DIES:

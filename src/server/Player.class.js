@@ -4,7 +4,7 @@ import { N_PIECES_TO_APPEND } from '../common/constants';
 
 class Player {
   constructor(params) {
-    this.ghost = new Array(20).fill(0).map((_) => new Array(10).fill(0))
+    this.ghost = new Array(24).fill(0).map((_) => new Array(10).fill(0))
     this.alive = true
     this.pieceIndex = 0
     this.waiting = false
@@ -36,7 +36,7 @@ class Player {
     this._playerName = playerName
   }
 
-  set playerStatus({playerName, alive, ghost, pieceIndex, waiting}) {
+  set playerStatus({ playerName, alive, ghost, pieceIndex, waiting }) {
     this.playerName = playerName
     this.alive = alive
     this.ghost = ghost
@@ -70,6 +70,11 @@ class Player {
   lockPiece({ ghost }) {
     this.updateGhost(ghost)
     this.pieceIndex++
+  }
+
+  applyPenaltyLines = (nLines) => {
+    const penaltyLines = Array(nLines).fill(Array(10).fill(8))
+    this.ghost = [...this.ghost, ...penaltyLines].slice(nLines)
   }
 }
 

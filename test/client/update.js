@@ -44,7 +44,7 @@ chai.should()
 describe('Redux update test', () => {
   it('let the piece fall every 0.5s', done => {
     const store = configureStore(rootReducer, null, initialState, {
-      UPDATE_ACTIVE_BOARD: ({getState}) => {
+      UPDATE_ACTIVE_BOARD: ({ getState }) => {
       const expected = [
         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],

@@ -1,7 +1,12 @@
-import validator from 'validator';
-import Piece from '../../src/server/Piece.class';
-import { ENTER_GAME_FAIL, CREATE_GAME_SUCCESS, UPDATE_GAME, MIN_N_PIECES_REMAINING, MAX_ACTIVE_PLAYERS } from '../common/constants';
-import { logerror, loginfo } from '.';
+import validator from 'validator'
+import Piece from '../../src/server/Piece.class'
+import {
+  ENTER_GAME_FAIL,
+  CREATE_GAME_SUCCESS,
+  UPDATE_GAME, MIN_N_PIECES_REMAINING,
+  MAX_ACTIVE_PLAYERS,
+} from '../common/constants'
+import { logerror, loginfo } from '.'
 
 // TODO: So many tests
 // TODO: Async issues everywhar
@@ -151,9 +156,12 @@ class Game {
       this._informRoom({ io, action: { type: UPDATE_GAME, message: `Player ${playerName} is dead!`, ...this.gameInfo } })
   }
 
-  playerDestroysLine({ playerName }) {
-    const player = this.activePlayers.find(player => player.playerName === playerName)
-    this._informEveryoneExceptPlayer({ player, action: { type: UPDATE_GAME, message: 'I got a malus, alas',
+  playerDestroysLines({ io, player, nLines }) {
+    this.activePlayers
+      .filter(p => p.playerName !== player.playerName)
+      .forEach(p => { p.applyPenaltyLines(nLines) })
+
+    this._informRoom({ io, action: { type: UPDATE_GAME, message: `${player.playerName} destroys ${nLines}`,
       ...this.gameInfo
       }
     })

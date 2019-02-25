@@ -64,5 +64,10 @@
       @extend %cell;
       background-color: pink;
     };
+
+    .cell8 {
+      @extend %cell;
+      background-color: black;
+    };
   }
 }

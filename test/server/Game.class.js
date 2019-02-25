@@ -2,6 +2,8 @@
 import chai from "chai"
 import Game from "../../src/server/Game.class";
 import { START_N_PIECES, N_PIECES_TO_APPEND } from '../../src/common/constants';
+import { EMPTY_BOARD } from '../../src/client/reducers/board';
+import { cloneDeep } from 'lodash'
 
 chai.should()
 
@@ -17,10 +19,16 @@ class MockPlayer {
       id: socketId,
       join: (...params) => {}
     }
-    this.ghost = new Array(20).fill(new Array(10).fill(0))
+    this.ghost = new Array(24).fill(new Array(10).fill(0))
     this.waiting = false
     this.actionToRoom = (roomName, action) => {}
     this.actionToClient = (roomName, action) => {}
+    this.applyPenaltyLines = (nLines) =>
+    {
+      // should match Player.applyPenaltyLines to actually test
+      const penaltyLines = Array(nLines).fill(Array(10).fill(8))
+      this.ghost = [...this.ghost, ...penaltyLines].slice(nLines)
+    }
   }
 }
 
@@ -73,13 +81,6 @@ describe('Game constructor', () => {
       playerName: 'jane',
       socketId: '13'
     }
-  })
-
-  it('has methods playerDies, playerDestroysLine, playerLocksPiece, playerLeavesGame', () => {
-    chai.expect(fredsGame).to.respondTo('playerDies')
-    .and.respondTo('playerDestroysLine')
-    .and.respondTo('playerLeavesGame')
-    .and.respondTo('playerLocksPiece')
   })
 
   it('throws if roomName is not unique')
@@ -201,5 +202,17 @@ describe('Game action', () => {
     fred.pieceIndex = 9
     const nRemainingPieces = fredsGame.pieceLineup.length
     nRemainingPieces.should.equal(START_N_PIECES + N_PIECES_TO_APPEND)
+  })
+
+  it('playerDestroysLines gives malus of nLines to all players except line destroyer', () => {
+    fredsGame.playerDestroysLines({ io, player: jim, nLines: 3 })
+    const expected = cloneDeep(EMPTY_BOARD)
+    const len = expected.length
+    expected[len - 1] = Array(10).fill(8)
+    expected[len - 2] = Array(10).fill(8)
+    expected[len - 3] = Array(10).fill(8)
+    george.ghost.should.deep.equal(expected)
+    fred.ghost.should.deep.equal(expected)
+    jim.ghost.should.deep.equal(EMPTY_BOARD)
   })
 })
