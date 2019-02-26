@@ -1,18 +1,13 @@
 import validator from 'validator';
 import { cloneDeep } from 'lodash'
-import { shapes } from '../../src/shapes';
+import { START_N_PIECES } from '../common/constants';
+import { pieces } from '../pieces';
 
 class Piece {
-  constructor({ shape }) {
-    this.shape = cloneDeep(shape)
-  }
+  constructor() {}
 
-  static get shapes() {
-    return shapes
-  }
-
-  static generateLineup(nPieces = 50) {
-    const _newPiece = () => new Piece({ shape: cloneDeep(Piece.shapes[Math.floor(Math.random() * Piece.shapes.length)]) })
+  static generateLineup(nPieces = START_N_PIECES) {
+    const _newPiece = () => Math.floor(Math.random() * pieces.length)
     const lineup = new Array(nPieces).fill(0).map((_) => _newPiece())
     return lineup
   }

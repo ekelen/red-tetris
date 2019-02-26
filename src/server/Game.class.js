@@ -7,6 +7,7 @@ import {
   MAX_ACTIVE_PLAYERS,
 } from '../common/constants'
 import { logerror, loginfo } from '.'
+import { EMPTY_BOARD } from '../client/reducers/board';
 
 // TODO: So many tests
 // TODO: Async issues everywhar
@@ -53,8 +54,8 @@ class Game {
     return this._pieceLineup
   }
 
-  set pieceLineup(pieces) {
-    this._pieceLineup = [...pieces]
+  set pieceLineup(pieceLineup) {
+    this._pieceLineup = [...pieceLineup]
   }
 
   get gameInfo() {
@@ -133,14 +134,14 @@ class Game {
     this._informRoom({ io, action: { type: UPDATE_GAME, ...this.gameInfo, message: 'Game has started!' }} )
   }
 
-  playerUpdates(io, playerName, playerStatus) {
+  playerUpdates(io, playerName, playerStatus, message = '') {
     const player = this.activePlayers.find(player => player.playerName === playerName)
     player.playerStatus = playerStatus
     this._informRoom({
       io,
       action: {
         type: UPDATE_GAME,
-        message: `Player ${playerName} changed`,
+        message: message || `Player ${playerName} changed`,
         ...this.gameInfo
       }
     })
@@ -167,12 +168,6 @@ class Game {
     })
   }
 
-  playerLocksPiece({ playerName, ghost }) {
-    const player = this.activePlayers.find(player => player.playerName === playerName)
-    player.lockPiece({ ghost })
-    this._informEveryoneExceptPlayer({ player, action: { type: UPDATE_GAME, ...this.gameInfo } })
-  }
-
   playerLeavesGame({ io, games, player }) {
     const { playerName } = player
     this.players = this.players.filter(player => player.playerName !== playerName)
@@ -190,7 +185,7 @@ class Game {
     this.pieceLineup = []
     this.inProgress = false
 
-    const winner = this.activePlayers.find(p => p.alive)
+    const winner = this.activePlayers.find(p => p.alive) || null
 
     const spacesRemaining = MAX_ACTIVE_PLAYERS - this.activePlayers.length
     const waitingPlayers = this.players.filter(p => p.waiting)
@@ -200,9 +195,10 @@ class Game {
     this.players.forEach(p => {
       p.alive = true;
       p.pieceIndex = 0;
-      p.ghost = new Array(20).fill(0).map((_) => new Array(10).fill(0))
+      p.ghost = EMPTY_BOARD;
     })
-    this._informRoom({ io, action: { type: UPDATE_GAME, message: `Player ${winner.playerName} wins!`, ...this.gameInfo }})
+
+    this._informRoom({ io, action: { type: UPDATE_GAME, message: winner ? `Player ${winner.playerName} wins!` : 'GAME OVER', ...this.gameInfo } })
   }
 
   /**

@@ -1,4 +1,4 @@
-import { pieceFall, resetPiece, movePiece, rotate, offset } from './piece'
+import { pieceFall, resetPiece, movePiece, rotate, offset, getNextPiece } from './piece'
 import { updateActiveBoard, pieceLand, checkLine } from './board'
 import { isColliding, isPlayerDead, merge, getClearedLines, clearLines, getPieceToLock } from './physics'
 import { handleEvents } from './events'
@@ -11,6 +11,7 @@ import {
   serverSendLinePenalities,
   serverUpdatesPlayer
 } from './player'
+import { pieces } from '../../pieces'
 
 let dropCounter = 0
 
@@ -35,7 +36,7 @@ export const handlePieceDown = () => (dispatch, getState) => {
   dispatch(updateActiveBoard(getState().currentPiece, player.ghost))
 }
 
-// handle events when a piece is locked: 
+// handle events when a piece is locked:
 // update lockedBoard
 // check for completed lines and clear them if necesary
 // send malus to other players if necessary
@@ -46,10 +47,13 @@ export const handlePieceLock = piece => (dispatch, getState) => {
   const clearedLinesIndexes = getClearedLines(updatedLockedBoard)
   const updatedLockedBoardWithLinesCleared = clearLines(updatedLockedBoard, clearedLinesIndexes)
   dispatch(updatePlayerGhost(updatedLockedBoardWithLinesCleared))
-  const { player: updatedPlayer } = getState()
-  dispatch(serverSendLinePenalities(clearedLinesIndexes.length))
+
+  if (clearedLinesIndexes.length)
+    dispatch(serverSendLinePenalities(clearedLinesIndexes.length))
+  const { player: updatedPlayer, game } = getState()
   dispatch(serverUpdatesPlayer(updatedPlayer))
-  dispatch(resetPiece())
+  const index = game.pieceLineup[updatedPlayer.pieceIndex]
+  dispatch(getNextPiece(pieces[index]))
 }
 
 //TODO: maybe test this
@@ -65,7 +69,7 @@ const handlePieceFall = (dispatch, getState) => {
 }
 
 export const gameUpdate = () => (dispatch, getState) => {
-  const { player } = getState()
+  const { game, player } = getState()
   if (isPlayerDead(player.ghost)) {
     dispatch(handlePlayerDies())
     stopGameTimer()

@@ -67,11 +67,6 @@ class Player {
     this.ghost = cloneDeep(ghost)
   }
 
-  lockPiece({ ghost }) {
-    this.updateGhost(ghost)
-    this.pieceIndex++
-  }
-
   applyPenaltyLines = (nLines) => {
     const penaltyLines = Array(nLines).fill(Array(10).fill(8))
     this.ghost = [...this.ghost, ...penaltyLines].slice(nLines)

@@ -1,9 +1,10 @@
 import chai from "chai"
 import { configureStore } from '../helpers/client'
 import rootReducer from '../../src/client/reducers'
+import { offO } from '../../src/offsets'
 import { LEFT, RIGHT, UP, DOWN, handleEvents } from '../../src/client/actions/events'
-import { 
-  PIECE_FALL, 
+import {
+  PIECE_FALL,
   RESET_PIECE,
   MOVE_PIECE,
   ROTATE,
@@ -12,6 +13,18 @@ import {
 
 chai.should()
 
+const initialState = {
+  currentPiece: {
+    pos: [4,4],
+    color: 1,
+    rotationIndex: 0,
+    offsets: offO,
+    shape: [
+      [-1,0], [-1, 1], [0, 0], [0, 1]
+    ]
+  }
+}
+
 describe('Redux events test', () => {
   const E = {
     keyCode: null,
@@ -19,7 +32,7 @@ describe('Redux events test', () => {
   }
   it('should trigger movement on left key pressed', done => {
     const e = {...E, keyCode: LEFT}
-    const store = configureStore(rootReducer, null, {}, {
+    const store = configureStore(rootReducer, null, initialState, {
       MOVE_PIECE: () => {
         done()
       }
@@ -28,7 +41,7 @@ describe('Redux events test', () => {
   }),
   it('should trigger movement on right key pressed', done => {
     const e = {...E, keyCode: RIGHT}
-    const store = configureStore(rootReducer, null, {}, {
+    const store = configureStore(rootReducer, null, initialState, {
       MOVE_PIECE: () => {
         done()
       }
@@ -37,7 +50,7 @@ describe('Redux events test', () => {
   }),
   it('should trigger rotation on up key pressed', done => {
     const e = {...E, keyCode: UP}
-    const store = configureStore(rootReducer, null, {}, {
+    const store = configureStore(rootReducer, null, initialState, {
       ROTATE: () => {
         done()
       }
@@ -46,7 +59,7 @@ describe('Redux events test', () => {
   }),
   it('should trigger piece fall on down key pressed', done => {
     const e = {...E, keyCode: DOWN}
-    const store = configureStore(rootReducer, null, {}, {
+    const store = configureStore(rootReducer, null, initialState, {
       PIECE_FALL: () => {
         done()
       }

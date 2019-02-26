@@ -12,7 +12,7 @@ const initialState = {
   activePlayers: [],
   inProgress: false,
   offlineMode: false,
-  pieces: [],
+  pieceLineup: [],
   players: [],
   roomName: '',
   urlParsed: false,
@@ -38,8 +38,8 @@ const reducer = (state = initialState, action) => {
   case CREATE_GAME_SUCCESS:
     return {
       ...state,
-      activePlayers: cloneDeep(getActivePlayers(action.players)),
-      pieces: cloneDeep(action.pieceLineup),
+      activePlayers: getActivePlayers(action.players),
+      pieceLineup: cloneDeep(action.pieceLineup),
       players: cloneDeep(action.players),
       roomName: action.roomName,
       urlParsed: true,
@@ -49,15 +49,10 @@ const reducer = (state = initialState, action) => {
       ...state,
       activePlayers: getActivePlayers(action.players),
       inProgress: action.inProgress,
-      pieces: cloneDeep(action.pieceLineup),
+      pieceLineup: cloneDeep(action.pieceLineup),
       players: cloneDeep(action.players),
       roomName: action.roomName,
       urlParsed: true
-    }
-  case 'GAME_LOOP_STARTED':
-    return {
-      ...state,
-      inProgress: true
     }
   default:
     return state

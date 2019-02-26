@@ -18,8 +18,6 @@ const inGameActionHandler = ({ action, io, currentGame, player }) => {
     return currentGame.startGame({ io, player })
   case SERVER_SEND_LINE_PENALTIES:
     return currentGame.playerDestroysLines({ io, player, nLines: action.nLines })
-  case SERVER_PLAYER_LOCKS_PIECE:
-    return currentGame.playerLocksPiece({ playerName: player.playerName, ghost: action.ghost })
   case SERVER_PLAYER_DIES:
     return currentGame.playerDies({ io, playerName: player.playerName })
   case SERVER_UPDATES_PLAYER:

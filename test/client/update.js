@@ -15,8 +15,8 @@ import { offO } from '../../src/offsets'
 import { pieces } from '../../src/pieces'
 import { merge } from '../../src/client/actions/physics'
 import { PLAYER_DIES, UPDATE_PLAYER_GHOST } from '../../src/client/actions/player'
-import { 
-  SERVER_PLAYER_DIES, 
+import {
+  SERVER_PLAYER_DIES,
   SERVER_SEND_LINE_PENALTIES,
   SERVER_UPDATES_PLAYER
 } from '../../src/common/constants'
@@ -35,7 +35,8 @@ const initialState = {
   currentPiece,
   board: EMPTY_BOARD,
   player: {
-    ghost: EMPTY_BOARD
+    ghost: EMPTY_BOARD,
+    pieceIndex: 0
   }
 }
 
@@ -122,7 +123,7 @@ describe('Redux update test', () => {
   it ('should move the piece to the left', done => {
     const initialPos = currentPiece.pos
     const store = configureStore(rootReducer, null, initialState, {
-      MOVE_PIECE: ({getState}) => {
+      MOVE_PIECE: ({ getState }) => {
         const { currentPiece: movedPiece } = getState()
         movedPiece.pos.should.deep.equal([initialPos[0], initialPos[1] - 1])
         done()
@@ -132,7 +133,7 @@ describe('Redux update test', () => {
   }),
   it ('should update the board with moved piece', done => {
     const store = configureStore(rootReducer, null, initialState, {
-      UPDATE_ACTIVE_BOARD: ({getState}) => {
+      UPDATE_ACTIVE_BOARD: ({ getState }) => {
         const { board: updatedBoard, currentPiece: movedPiece } = getState()
         const expected = merge(initialState.player.ghost, movedPiece)
         updatedBoard.should.deep.equal(expected)
@@ -271,7 +272,11 @@ describe("Redux locking piece test", () => {
     store.dispatch(handlePieceLock(currentPiece))
   }),
   it ("Should send line penalties to other players", done => {
-    const store = configureStore(rootReducer, null, initialState, {
+    const playerBoard = [...EMPTY_BOARD]
+    playerBoard[23] = Array(10).fill(2)
+
+    const state = { ... initialState, player: { ghost: playerBoard } }
+    const store = configureStore(rootReducer, null, state, {
       SERVER_SEND_LINE_PENALTIES: () => {
         done()
       }
@@ -282,6 +287,9 @@ describe("Redux locking piece test", () => {
     const store = configureStore(rootReducer, null, initialState, {
       SERVER_UPDATES_PLAYER: () => {
         done()
+      },
+      SERVER_SEND_LINE_PENALTIES: () => {
+        done(new Error('should not have send line penalty'))
       }
     })
     store.dispatch(handlePieceLock(currentPiece))
