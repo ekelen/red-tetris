@@ -1,4 +1,4 @@
-import { PIECE_FALL, RESET_PIECE, MOVE_PIECE, ROTATE, OFFSET } from '../actions/piece'
+import { PIECE_FALL, RESET_PIECE, MOVE_PIECE, ROTATE, OFFSET, GET_NEXT_PIECE } from '../actions/piece'
 import { pieces } from '../../pieces'
 import { rotate, getOffsetPos, computeOffset } from '../actions/physics'
 
@@ -29,6 +29,11 @@ const currentPiece = (state=initialState, action) => {
       return {
         ...state,
         pos: getOffsetPos(pos, offset)
+      }
+    case GET_NEXT_PIECE:
+      return {
+        ...state,
+        ...action.nextPiece
       }
     default:
       return state

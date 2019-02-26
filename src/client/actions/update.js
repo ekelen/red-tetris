@@ -1,4 +1,4 @@
-import { pieceFall, resetPiece, movePiece, rotate, offset } from './piece'
+import { pieceFall, resetPiece, movePiece, rotate, offset, getNextPiece } from './piece'
 import { updateActiveBoard, pieceLand, checkLine } from './board'
 import { isColliding, isPlayerDead, merge, getClearedLines, clearLines } from './physics'
 import { handleEvents } from './events'
@@ -39,10 +39,11 @@ export const handlePieceLock = piece => (dispatch, getState) => {
   const clearedLinesIndexes = getClearedLines(updatedLockedBoard)
   const updatedLockedBoardWithLinesCleared = clearLines(updatedLockedBoard, clearedLinesIndexes)
   dispatch(updatePlayerGhost(updatedLockedBoardWithLinesCleared))
-  const { player: updatedPlayer } = getState()
+  const { player: updatedPlayer, game } = getState()
   dispatch(serverSendLinePenalities(clearedLinesIndexes.length))
   dispatch(serverUpdatesPlayer(updatedPlayer))
-  dispatch(resetPiece())
+  dispatch(resetPiece) //TODO: replace this with getNextPiece
+  // dispatch(getNextPiece(game.pieces, updatedPlayer.pieceIndex))
 }
 
 //TODO: maybe test this
