@@ -2,7 +2,7 @@ import { pieceFall, resetPiece, movePiece, rotate, offset, getNextPiece } from '
 import { updateActiveBoard, pieceLand, checkLine } from './board'
 import { isColliding, isPlayerDead, merge, getClearedLines, clearLines } from './physics'
 import { handleEvents } from './events'
-import { 
+import {
   playerDies,
   serverPlayerDies,
   serverPlayerLocksPiece,
@@ -28,7 +28,7 @@ export const handlePieceDown = () => (dispatch, getState) => {
   dispatch(updateActiveBoard(getState().currentPiece, player.ghost))
 }
 
-// handle events when a piece is locked: 
+// handle events when a piece is locked:
 // update lockedBoard
 // check for completed lines and clear them if necesary
 // send malus to other players if necessary
@@ -39,11 +39,12 @@ export const handlePieceLock = piece => (dispatch, getState) => {
   const clearedLinesIndexes = getClearedLines(updatedLockedBoard)
   const updatedLockedBoardWithLinesCleared = clearLines(updatedLockedBoard, clearedLinesIndexes)
   dispatch(updatePlayerGhost(updatedLockedBoardWithLinesCleared))
-  const { player: updatedPlayer, game } = getState()
   dispatch(serverSendLinePenalities(clearedLinesIndexes.length))
+
+  const { player: updatedPlayer, game } = getState()
   dispatch(serverUpdatesPlayer(updatedPlayer))
-  dispatch(resetPiece) //TODO: replace this with getNextPiece
-  // dispatch(getNextPiece(game.pieces, updatedPlayer.pieceIndex))
+  // dispatch(resetPiece) //TODO: replace this with getNextPiece
+  dispatch(getNextPiece(game.pieceLineup, updatedPlayer.pieceIndex))
 }
 
 //TODO: maybe test this

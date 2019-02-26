@@ -53,8 +53,8 @@ class Game {
     return this._pieceLineup
   }
 
-  set pieceLineup(pieces) {
-    this._pieceLineup = [...pieces]
+  set pieceLineup(pieceLineup) {
+    this._pieceLineup = [...pieceLineup]
   }
 
   get gameInfo() {
