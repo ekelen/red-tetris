@@ -44,8 +44,7 @@ class Game {
   }
 
   get pieceLineup() {
-    if (!this._pieceLineup.length)
-      this._pieceLineup = Piece.generateLineup()
+    if (!this.inProgress) return []
     const maxPieceIndex = Math.max(...this.players.map(p => p.pieceIndex))
     const piecesRemaining = this._pieceLineup.length - maxPieceIndex
     if (piecesRemaining < MIN_N_PIECES_REMAINING) {
@@ -130,6 +129,7 @@ class Game {
   startGame({ io, player }) {
     if (player.playerName !== this.players[0].playerName)
       return
+    this.pieceLineup = Piece.generateLineup()
     this.inProgress = true
     this._informRoom({ io, action: { type: UPDATE_GAME, ...this.gameInfo, message: 'Game has started!' }} )
   }
@@ -162,8 +162,11 @@ class Game {
       .filter(p => p.playerName !== player.playerName)
       .forEach(p => { p.applyPenaltyLines(nLines) })
 
-    this._informRoom({ io, action: { type: UPDATE_GAME, message: `${player.playerName} destroys ${nLines}`,
-      ...this.gameInfo
+    this._informRoom({
+      io,
+      action: {
+        type: UPDATE_GAME, message: `${player.playerName} destroys ${nLines}`,
+        ...this.gameInfo
       }
     })
   }
@@ -178,7 +181,12 @@ class Game {
 
     return (this.alivePlayers.length === 1) ?
      this._endGame(io) :
-     this._informEveryoneExceptPlayer({ player, action: { type: UPDATE_GAME, message: `Player ${playerName} left!`, ...this.gameInfo } })
+     this._informEveryoneExceptPlayer({
+       player,
+       action: {
+         type: UPDATE_GAME,
+         message: `Player ${playerName} left!`,
+         ...this.gameInfo } })
   }
 
   _endGame(io) {
@@ -198,7 +206,9 @@ class Game {
       p.ghost = EMPTY_BOARD;
     })
 
-    this._informRoom({ io, action: { type: UPDATE_GAME, message: winner ? `Player ${winner.playerName} wins!` : 'GAME OVER', ...this.gameInfo } })
+    this._informRoom({ io,
+      action: { type: UPDATE_GAME, message: winner ? `Player ${winner.playerName} wins!` : 'GAME OVER',
+      ...this.gameInfo } })
   }
 
   /**

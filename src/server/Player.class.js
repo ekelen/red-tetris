@@ -1,10 +1,11 @@
 import validator from 'validator';
 import { cloneDeep } from 'lodash'
 import { N_PIECES_TO_APPEND } from '../common/constants';
+import { EMPTY_BOARD } from '../client/reducers/board';
 
 class Player {
   constructor(params) {
-    this.ghost = new Array(24).fill(0).map((_) => new Array(10).fill(0))
+    this.ghost = cloneDeep(EMPTY_BOARD)
     this.alive = true
     this.pieceIndex = 0
     this.waiting = false
@@ -20,12 +21,6 @@ class Player {
 
   get playerName() {
     return this._playerName
-  }
-
-  get nRemainingPieces() {
-    return this.pieceIndex > 0 ?
-      N_PIECES_TO_APPEND - (this.pieceIndex % N_PIECES_TO_APPEND) :
-        N_PIECES_TO_APPEND
   }
 
   set playerName(playerName) {
@@ -58,13 +53,8 @@ class Player {
     this.ghost = cloneDeep(ghost)
   }
 
-  destroysLine({ ghost }) { // TODO: Possibly redundant with lockPiece
-    this.ghost = cloneDeep(ghost)
-  }
-
-  dies({ ghost }) {
+  dies() {
     this.alive = false
-    // this.ghost = cloneDeep(ghost)
   }
 
   applyPenaltyLines = (nLines) => {

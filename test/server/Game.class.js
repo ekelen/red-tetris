@@ -107,9 +107,8 @@ describe('Game constructor', () => {
     res.should.be.instanceOf(Game)
   })
 
-  it('has 50 (START_N_PIECES) tetraminos', () => {
-    fredsGame.pieceLineup.length.should.equal(START_N_PIECES)
-    START_N_PIECES.should.equal(50)
+  it('has 0 tetraminos', () => {
+    fredsGame.pieceLineup.length.should.equal(0)
   })
 })
 
@@ -198,6 +197,7 @@ describe('Game action', () => {
   })
 
   it('pieceLineup getter makes sure no player has < 10 pieces', () => {
+    fredsGame.startGame({ io, player: fred })
     jim.pieceIndex = 45
     fred.pieceIndex = 9
     const nRemainingPieces = fredsGame.pieceLineup.length
