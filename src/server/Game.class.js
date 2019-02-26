@@ -174,6 +174,9 @@ class Game {
   playerLeavesGame({ io, games, player }) {
     const { playerName } = player
     this.players = this.players.filter(player => player.playerName !== playerName)
+    if (!this.inProgress) {
+      this._updateActivePlayers()
+    }
 
     if (!this.players.length) {
       return Game.deleteGame(games, this)
@@ -189,17 +192,26 @@ class Game {
          ...this.gameInfo } })
   }
 
+  _updateActivePlayers() {
+    const spacesRemaining = MAX_ACTIVE_PLAYERS - this.activePlayers.length
+    const waitingPlayers = this.players.filter(p => p.waiting)
+    for (let i = 0; i < spacesRemaining && i < waitingPlayers.length; i += 1) {
+      waitingPlayers[i].waiting = false
+    }
+  }
+
   _endGame(io) {
     this.pieceLineup = []
     this.inProgress = false
 
     const winner = this.activePlayers.find(p => p.alive) || null
 
-    const spacesRemaining = MAX_ACTIVE_PLAYERS - this.activePlayers.length
-    const waitingPlayers = this.players.filter(p => p.waiting)
-    for (let i = 0; i < spacesRemaining && i < waitingPlayers.length; i += 1) {
-      waitingPlayers[i].waiting = false
-    }
+    this._updateActivePlayers()
+    // const spacesRemaining = MAX_ACTIVE_PLAYERS - this.activePlayers.length
+    // const waitingPlayers = this.players.filter(p => p.waiting)
+    // for (let i = 0; i < spacesRemaining && i < waitingPlayers.length; i += 1) {
+    //   waitingPlayers[i].waiting = false
+    // }
     this.players.forEach(p => {
       p.alive = true;
       p.pieceIndex = 0;
