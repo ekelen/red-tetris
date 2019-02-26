@@ -60,7 +60,8 @@ const reducer = (state = initialState, action) => {
   case UPDATE_PLAYER_GHOST:
     return {
       ...state,
-      ghost: action.ghost
+      ghost: action.ghost,
+      pieceIndex: state.pieceIndex + 1
     }
   default:
     return state

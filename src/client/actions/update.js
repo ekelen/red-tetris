@@ -10,6 +10,7 @@ import {
   serverSendLinePenalities,
   serverUpdatesPlayer
 } from './player'
+import { pieces } from '../../pieces'
 
 let dropCounter = 0
 
@@ -44,7 +45,8 @@ export const handlePieceLock = piece => (dispatch, getState) => {
   const { player: updatedPlayer, game } = getState()
   dispatch(serverUpdatesPlayer(updatedPlayer))
   // dispatch(resetPiece) //TODO: replace this with getNextPiece
-  dispatch(getNextPiece(game.pieceLineup, updatedPlayer.pieceIndex))
+  const index = game.pieceLineup[updatedPlayer.pieceIndex]
+  dispatch(getNextPiece(pieces[index]))
 }
 
 //TODO: maybe test this
