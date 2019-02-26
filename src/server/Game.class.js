@@ -5,6 +5,7 @@ import {
   CREATE_GAME_SUCCESS,
   UPDATE_GAME, MIN_N_PIECES_REMAINING,
   MAX_ACTIVE_PLAYERS,
+  ALERT_POP,
 } from '../common/constants'
 import { logerror, loginfo } from '.'
 import { EMPTY_BOARD } from '../client/reducers/board';
@@ -134,14 +135,13 @@ class Game {
     this._informRoom({ io, action: { type: UPDATE_GAME, ...this.gameInfo, message: 'Game has started!' }} )
   }
 
-  playerUpdates(io, player, ghost, pieceIndex, message = '') {
+  playerUpdates(io, player, ghost, pieceIndex) {
     player.updateGhost(ghost)
     player.pieceIndex = pieceIndex
     this._informRoom({
       io,
       action: {
         type: UPDATE_GAME,
-        message: message || `Player ${player.playerName} changed`,
         ...this.gameInfo
       }
     })
