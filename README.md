@@ -44,7 +44,7 @@ $ npm run coverage
 $ npm run srv-dist
 $ npm run client-dist
 
-$ ./node_modules/babel-cli/bin/babel-node.js dist/server/main.js
+$ DEBUG=tetris:* ./node_modules/babel-cli/bin/babel-node.js dist/server/main.js
 ```
 
 The game can then be played at the URL specified in params.js with proper hash URL formatting (e.g. localhost:3000/#username\[roomname\])
