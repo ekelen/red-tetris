@@ -2,7 +2,6 @@ import { pieceFall, resetPiece, movePiece, rotate, offset, getNextPiece } from '
 import { updateActiveBoard, pieceLand, checkLine } from './board'
 import { isColliding, isPlayerDead, merge, getClearedLines, clearLines, getPieceToLock } from './physics'
 import { handleEvents } from './events'
-import { cloneDeep } from 'lodash'
 import { 
   playerDies,
   serverPlayerDies,
@@ -14,6 +13,7 @@ import {
 import { pieces } from '../../pieces'
 
 let dropCounter = 0
+let eventSubscription = false
 
 export const handlePlayerDies = () => dispatch => {
   dispatch(playerDies())
@@ -85,7 +85,8 @@ const animationHandler = lastTime => (dispatch, getState) => timestamp => {
     dropCounter = 0
     dispatch(gameUpdate())
   }
-  if (getState().player.alive) {
+  const { player, game } = getState()
+  if (player.alive && game.inProgress) {
     requestAnimationFrame(dispatch(animationHandler(timestamp)))
   }
 }
@@ -122,10 +123,14 @@ export const handleRotation = () => (dispatch, getState) => {
 
 export const startGameTimer = () => dispatch => {
   requestAnimationFrame(dispatch(animationHandler(0)))
-  window.addEventListener('keydown', dispatch(handleEvents))
+  // hack to not subscribe twice to the same event listener
+  // TODO: try to do a proper removeEventListener
+  if (!eventSubscription) {
+    window.addEventListener('keydown', dispatch(handleEvents))
+    eventSubscription = true
+  }
 }
 
-export const stopGameTimer = () => {
-  //Not working
-  window.removeEventListener('keydown', handleEvents)
+export const stopGameTimer = () => () => {
+  dropCounter = 0
 }
