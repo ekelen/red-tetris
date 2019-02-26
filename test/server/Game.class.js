@@ -83,8 +83,6 @@ describe('Game constructor', () => {
     }
   })
 
-  it('throws if roomName is not unique')
-
   it('throws if roomName is not alphanumeric', () => {
     const player = new MockPlayer(janeParams)
     const roomName = '!@#$'

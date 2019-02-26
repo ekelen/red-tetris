@@ -186,7 +186,7 @@ class Game {
       return Game.deleteGame(games, this)
     }
 
-    return (this.alivePlayers.length === 1) ?
+    return (this.alivePlayers.length <= 1) ?
      this._endGame(io) :
      this._informEveryoneExceptPlayer({
        player,

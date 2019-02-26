@@ -93,8 +93,6 @@ describe('Integration tests: multiplayer game', () => {
     store.dispatch(parseURL('/testroom[user1]'))
   })
 
-  it ('todo: if game has remaining players but they are all waiting, set inProgress = false')
-
   it('lets another player join if given good existing game URL', done => {
     const initialState = {}
     sockets.user2 = io(params.serverTest.url)
