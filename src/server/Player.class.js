@@ -64,7 +64,7 @@ class Player {
 
   dies({ ghost }) {
     this.alive = false
-    this.ghost = cloneDeep(ghost)
+    // this.ghost = cloneDeep(ghost)
   }
 
   applyPenaltyLines = (nLines) => {
