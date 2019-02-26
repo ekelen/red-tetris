@@ -12,7 +12,7 @@ const initialState = {
   activePlayers: [],
   inProgress: false,
   offlineMode: false,
-  pieces: [],
+  pieceLineup: [],
   players: [],
   roomName: '',
   urlParsed: false,
@@ -39,7 +39,7 @@ const reducer = (state = initialState, action) => {
     return {
       ...state,
       activePlayers: cloneDeep(getActivePlayers(action.players)),
-      pieces: cloneDeep(action.pieceLineup),
+      pieceLineup: cloneDeep(action.pieceLineup),
       players: cloneDeep(action.players),
       roomName: action.roomName,
       urlParsed: true,

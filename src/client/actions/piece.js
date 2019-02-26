@@ -12,7 +12,7 @@ export const pieceFall = () => ({ type: PIECE_FALL })
 export const movePiece = dir => ({ type: MOVE_PIECE, dir })
 export const rotate = () => ({ type: ROTATE })
 export const offset = (tryIndex, fromIndex) => ({ type: OFFSET, tryIndex, fromIndex })
-export const getNextPiece = (pieces, index) => ({
+export const getNextPiece = (pieceLineup, index) => ({
   type: GET_NEXT_PIECE,
-  nextPiece: pieces[index]
+  nextPiece: pieceLineup[index]
 })

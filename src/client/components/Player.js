@@ -16,7 +16,7 @@ const methods = {
   }
 }
 
-const Player = ({ board }) => {
+const Player = ({ alive, board }) => {
   return (
     <div className={'playerBoard'}>
       {splitBoard(board).map((row, i) => (

@@ -13,7 +13,8 @@ const Game = ({
   board,
   offlineMode,
   opponents,
-  pieces,
+  pieceLineup,
+  pieceIndex,
   playerName,
   inProgress,
   startGame,
@@ -32,8 +33,6 @@ const Game = ({
       <Player
         alive={alive}
         board={board}
-        offlineMode={offlineMode}
-        pieces={pieces}
         startGameTimer={startGameTimer}
         stopGameTimer={stopGameTimer} />
     </div>}
