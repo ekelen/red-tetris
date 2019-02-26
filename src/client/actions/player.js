@@ -19,7 +19,7 @@ export const serverSendLinePenalities = nLines => ({
   nLines
 })
 
-export const serverUpdatesPlayer = updatedPlayer => ({
-  type: SERVER_UPDATES_PLAYER,
-  player: updatedPlayer
-})
+// export const serverUpdatesPlayer = updatedPlayer => ({
+//   type: SERVER_UPDATES_PLAYER,
+//   player: updatedPlayer
+// })

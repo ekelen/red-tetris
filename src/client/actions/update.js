@@ -2,7 +2,7 @@ import { pieceFall, resetPiece, movePiece, rotate, offset, getNextPiece, RESET }
 import { updateActiveBoard, pieceLand, checkLine } from './board'
 import { isColliding, isPlayerDead, merge, getClearedLines, clearLines, getPieceToLock } from './physics'
 import { handleEvents } from './events'
-import { 
+import {
   playerDies,
   serverPlayerDies,
   updatePlayerGhost,
@@ -10,6 +10,7 @@ import {
   serverUpdatesPlayer
 } from './player'
 import { pieces } from '../../pieces'
+import { SERVER_UPDATES_PLAYER } from '../../common/constants';
 
 let dropCounter = 0
 let eventSubscription = false
@@ -21,7 +22,7 @@ export const handlePlayerDies = () => dispatch => {
 
 export const handleInstantLock = () => (dispatch, getState) => {
   const { currentPiece, player } = getState()
-  const pieceToLock = getPieceToLock(currentPiece, player.ghost) 
+  const pieceToLock = getPieceToLock(currentPiece, player.ghost)
   dispatch(handlePieceLock(pieceToLock))
   dispatch(updateActiveBoard(pieceToLock, player.ghost))
 }
@@ -51,7 +52,8 @@ export const handlePieceLock = piece => (dispatch, getState) => {
   if (clearedLinesIndexes.length)
     dispatch(serverSendLinePenalities(clearedLinesIndexes.length))
   const { player: updatedPlayer, game } = getState()
-  dispatch(serverUpdatesPlayer(updatedPlayer))
+  console.log('updatedPlayer.pieceIndex: ', updatedPlayer.pieceIndex);
+  dispatch({ type: SERVER_UPDATES_PLAYER, ghost: updatedPlayer.ghost, pieceIndex: updatedPlayer.pieceIndex })
   const index = game.pieceLineup[updatedPlayer.pieceIndex]
   dispatch(getNextPiece(pieces[index]))
 }

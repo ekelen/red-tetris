@@ -237,7 +237,10 @@ describe('Redux update test', () => {
       const initialState = {
         currentPiece: piece,
         board,
-        player: { ghost: board }
+        player: {
+          ghost: board,
+          pieceIndex: 0
+        }
       }
       const store = configureStore(rootReducer, null, initialState, {
         UPDATE_ACTIVE_BOARD: ({getState}) => {
@@ -257,7 +260,8 @@ describe("Redux locking piece test", () => {
   const initialState = {
     currentPiece,
     player: {
-      ghost: EMPTY_BOARD
+      ghost: EMPTY_BOARD,
+      pieceIndex: 0
     }
   }
   const expected = merge(EMPTY_BOARD, currentPiece)
@@ -271,11 +275,21 @@ describe("Redux locking piece test", () => {
     })
     store.dispatch(handlePieceLock(currentPiece))
   }),
+  it ("Should update the player's pieceIndex client side", done => {
+    const store = configureStore(rootReducer, null, initialState, {
+      UPDATE_PLAYER_GHOST: ({ getState }) => {
+        const { player } = getState()
+        player.pieceIndex.should.equal(1)
+        done()
+      }
+    })
+    store.dispatch(handlePieceLock(currentPiece))
+  }),
   it ("Should send line penalties to other players", done => {
     const playerBoard = [...EMPTY_BOARD]
     playerBoard[23] = Array(10).fill(2)
 
-    const state = { ... initialState, player: { ghost: playerBoard } }
+    const state = { ... initialState, player: { ghost: playerBoard, pieceIndex: 0 } }
     const store = configureStore(rootReducer, null, state, {
       SERVER_SEND_LINE_PENALTIES: () => {
         done()

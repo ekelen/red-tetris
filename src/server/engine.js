@@ -21,7 +21,7 @@ const inGameActionHandler = ({ action, io, currentGame, player }) => {
   case SERVER_PLAYER_DIES:
     return currentGame.playerDies({ io, playerName: player.playerName })
   case SERVER_UPDATES_PLAYER:
-    return currentGame.playerUpdates(io, player.playerName, action.player)
+    return currentGame.playerUpdates(io, player, action.ghost, action.pieceIndex)
   default:
     logerror(`Unrecognized or unauthorized action ${action.type}`)
     break;

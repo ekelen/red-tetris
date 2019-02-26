@@ -134,14 +134,14 @@ class Game {
     this._informRoom({ io, action: { type: UPDATE_GAME, ...this.gameInfo, message: 'Game has started!' }} )
   }
 
-  playerUpdates(io, playerName, playerStatus, message = '') {
-    const player = this.activePlayers.find(player => player.playerName === playerName)
-    player.playerStatus = playerStatus
+  playerUpdates(io, player, ghost, pieceIndex, message = '') {
+    player.updateGhost(ghost)
+    player.pieceIndex = pieceIndex
     this._informRoom({
       io,
       action: {
         type: UPDATE_GAME,
-        message: message || `Player ${playerName} changed`,
+        message: message || `Player ${player.playerName} changed`,
         ...this.gameInfo
       }
     })
