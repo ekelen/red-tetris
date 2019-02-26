@@ -10,6 +10,7 @@ import {
   ROTATE,
   OFFSET
 } from '../../src/client/actions/piece'
+import { EMPTY_BOARD } from "../../src/client/reducers/board";
 
 chai.should()
 
@@ -22,6 +23,11 @@ const initialState = {
     shape: [
       [-1,0], [-1, 1], [0, 0], [0, 1]
     ]
+  },
+  game: { inProgress: true},
+  player: { 
+    alive: true,
+    ghost: EMPTY_BOARD
   }
 }
 
@@ -37,8 +43,8 @@ describe('Redux events test', () => {
         done()
       }
     })
-    store.dispatch(dispatch => handleEvents(dispatch)(e))
-  }),
+    store.dispatch((dispatch, getState) => handleEvents(dispatch, getState)(e))
+  })
   it('should trigger movement on right key pressed', done => {
     const e = {...E, keyCode: RIGHT}
     const store = configureStore(rootReducer, null, initialState, {
@@ -46,8 +52,8 @@ describe('Redux events test', () => {
         done()
       }
     })
-    store.dispatch(dispatch => handleEvents(dispatch)(e))
-  }),
+    store.dispatch((dispatch, getState) => handleEvents(dispatch, getState)(e))
+  })
   it('should trigger rotation on up key pressed', done => {
     const e = {...E, keyCode: UP}
     const store = configureStore(rootReducer, null, initialState, {
@@ -55,7 +61,7 @@ describe('Redux events test', () => {
         done()
       }
     })
-    store.dispatch(dispatch => handleEvents(dispatch)(e))
+    store.dispatch((dispatch, getState) => handleEvents(dispatch, getState)(e))
   }),
   it('should trigger piece fall on down key pressed', done => {
     const e = {...E, keyCode: DOWN}
@@ -64,6 +70,6 @@ describe('Redux events test', () => {
         done()
       }
     })
-    store.dispatch(dispatch => handleEvents(dispatch)(e))
+    store.dispatch((dispatch, getState) => handleEvents(dispatch, getState)(e))
   })
 })
