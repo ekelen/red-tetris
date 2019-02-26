@@ -90,6 +90,10 @@ class Game {
     try {
       player.playerName = playerName
       const game = new Game({ player, roomName })
+      if (games.length > 10) {
+        logerror('too many games.')
+        throw new Error('Too many games! (Sorry, server is already working too hard, please try later.)')
+      }
       games.push(game)
       player.socket.join(roomName, () =>
         player.socket.emit('action', { type: CREATE_GAME_SUCCESS, ...player.playerStatus, ...game.gameInfo })
