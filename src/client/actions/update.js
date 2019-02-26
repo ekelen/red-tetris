@@ -40,11 +40,11 @@ export const handlePieceLock = piece => (dispatch, getState) => {
   const clearedLinesIndexes = getClearedLines(updatedLockedBoard)
   const updatedLockedBoardWithLinesCleared = clearLines(updatedLockedBoard, clearedLinesIndexes)
   dispatch(updatePlayerGhost(updatedLockedBoardWithLinesCleared))
-  dispatch(serverSendLinePenalities(clearedLinesIndexes.length))
 
+  if (clearedLinesIndexes.length)
+    dispatch(serverSendLinePenalities(clearedLinesIndexes.length))
   const { player: updatedPlayer, game } = getState()
   dispatch(serverUpdatesPlayer(updatedPlayer))
-  // dispatch(resetPiece) //TODO: replace this with getNextPiece
   const index = game.pieceLineup[updatedPlayer.pieceIndex]
   dispatch(getNextPiece(pieces[index]))
 }
@@ -62,7 +62,7 @@ const handlePieceFall = (dispatch, getState) => {
 }
 
 export const gameUpdate = () => (dispatch, getState) => {
-  const { player } = getState()
+  const { game, player } = getState()
   if (isPlayerDead(player.ghost)) {
     dispatch(handlePlayerDies())
     stopGameTimer()

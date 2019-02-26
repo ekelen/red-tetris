@@ -41,5 +41,6 @@ export const SERVER_UPDATES_PLAYER = 'SERVER_UPDATES_PLAYER'
 export const MIN_N_PIECES_REMAINING = 10
 export const START_N_PIECES = 50
 export const N_PIECES_TO_APPEND = 50
+export const PIECE_START_POS = [1, 4]
 
 export const MAX_ACTIVE_PLAYERS = 5

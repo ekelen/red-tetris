@@ -272,7 +272,11 @@ describe("Redux locking piece test", () => {
     store.dispatch(handlePieceLock(currentPiece))
   }),
   it ("Should send line penalties to other players", done => {
-    const store = configureStore(rootReducer, null, initialState, {
+    const playerBoard = [...EMPTY_BOARD]
+    playerBoard[23] = Array(10).fill(2)
+
+    const state = { ... initialState, player: { ghost: playerBoard } }
+    const store = configureStore(rootReducer, null, state, {
       SERVER_SEND_LINE_PENALTIES: () => {
         done()
       }
@@ -283,6 +287,9 @@ describe("Redux locking piece test", () => {
     const store = configureStore(rootReducer, null, initialState, {
       SERVER_UPDATES_PLAYER: () => {
         done()
+      },
+      SERVER_SEND_LINE_PENALTIES: () => {
+        done(new Error('should not have send line penalty'))
       }
     })
     store.dispatch(handlePieceLock(currentPiece))
