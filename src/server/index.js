@@ -1,6 +1,6 @@
 import fs from 'fs'
 import debug from 'debug'
-import { initEngine } from './engine';
+import { initEngine } from './engine'
 
 export const logerror = debug('tetris:error'), loginfo = debug('tetris:info')
 

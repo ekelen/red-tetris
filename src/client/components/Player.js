@@ -16,20 +16,17 @@ const methods = {
   }
 }
 
-const Player = ({ alive, board }) => {
-  return (
-    <div className={alive ? 'playerBoard' : 'playerBoard dead'}>
-      {splitBoard(board).map((row, i) => (
-        <div key={i} className={'playerRow'}>
-          {row.map((cell, i) => (
-            <div key={i} className={alive || cell < 1 || cell === 8 ? `cell${cell}` : 'cellDead' } />
-          ))}
-        </div>
-      ))}
-      {/* display board (different design if alive or not) */}
-    </div>
-  )
-}
+const Player = ({ alive, board }) => (
+  <div className={alive ? 'playerBoard' : 'playerBoard dead'}>
+    {splitBoard(board).map((row, i) => (
+      <div key={i} className={'playerRow'}>
+        {row.map((cell, i) => (
+          <div key={i} className={alive || cell < 1 || cell === 8 ? `cell${cell}` : 'cellDead' } />
+        ))}
+      </div>
+    ))}
+  </div>
+)
 
 const withLifecycleHooks = lifecycle(methods)(Player)
 export default withLifecycleHooks

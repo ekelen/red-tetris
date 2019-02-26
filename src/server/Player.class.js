@@ -1,7 +1,6 @@
-import validator from 'validator';
+import validator from 'validator'
 import { cloneDeep } from 'lodash'
-import { N_PIECES_TO_APPEND } from '../common/constants';
-import { EMPTY_BOARD } from '../client/reducers/board';
+import { EMPTY_BOARD } from '../client/reducers/board'
 
 class Player {
   constructor(params) {

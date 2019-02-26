@@ -4,14 +4,10 @@ import {
   ENTER_GAME_FAIL,
   CREATE_GAME_SUCCESS,
   UPDATE_GAME, MIN_N_PIECES_REMAINING,
-  MAX_ACTIVE_PLAYERS,
-  ALERT_POP,
+  MAX_ACTIVE_PLAYERS
 } from '../common/constants'
-import { logerror, loginfo } from '.'
+import { logerror } from '.'
 import { EMPTY_BOARD } from '../client/reducers/board';
-
-// TODO: So many tests
-// TODO: Async issues everywhar
 
 class Game {
   constructor(params) {
@@ -112,7 +108,13 @@ class Game {
       player.playerName = playerName
       this._addPlayer({ io, player })
     } catch (error) {
-      this._informPlayerOnly({ player, action: { type: ENTER_GAME_FAIL, errmsg: `Error joining ${roomName}: ${error.message}` }})
+      this._informPlayerOnly({
+        player,
+        action: {
+          type: ENTER_GAME_FAIL,
+          errmsg: `Error joining ${roomName}: ${error.message}`
+        }
+      })
     }
   }
 
@@ -126,8 +128,8 @@ class Game {
     player.socket.join(this.roomName, () =>
       this._informRoom({ io, action: { type: UPDATE_GAME,
         message: `Player ${player.playerName} joined!`,
-        ...this.gameInfo }}
-      )
+        ...this.gameInfo }
+      })
     )
   }
 
@@ -136,7 +138,14 @@ class Game {
       return
     this.pieceLineup = Piece.generateLineup()
     this.inProgress = true
-    this._informRoom({ io, action: { type: UPDATE_GAME, ...this.gameInfo, message: 'Game has started!' }} )
+    this._informRoom({
+      io,
+      action: {
+        type: UPDATE_GAME,
+        ...this.gameInfo,
+        message: 'Game has started!'
+      }
+    })
   }
 
   playerUpdates(io, player, ghost, pieceIndex) {
@@ -211,11 +220,6 @@ class Game {
     const winner = this.activePlayers.find(p => p.alive) || null
 
     this._updateActivePlayers()
-    // const spacesRemaining = MAX_ACTIVE_PLAYERS - this.activePlayers.length
-    // const waitingPlayers = this.players.filter(p => p.waiting)
-    // for (let i = 0; i < spacesRemaining && i < waitingPlayers.length; i += 1) {
-    //   waitingPlayers[i].waiting = false
-    // }
     this.players.forEach(p => {
       p.alive = true;
       p.pieceIndex = 0;

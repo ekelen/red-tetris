@@ -1,19 +1,38 @@
 import { pieceFall, resetPiece, movePiece, rotate, offset, getNextPiece, RESET } from './piece'
-import { updateActiveBoard, pieceLand, checkLine } from './board'
+import { updateActiveBoard } from './board'
 import { isColliding, isPlayerDead, merge, getClearedLines, clearLines, getPieceToLock } from './physics'
 import { handleEvents } from './events'
 import {
   playerDies,
   serverPlayerDies,
   updatePlayerGhost,
-  serverSendLinePenalities,
-  serverUpdatesPlayer
+  serverSendLinePenalities
 } from './player'
 import { pieces } from '../../pieces'
 import { SERVER_UPDATES_PLAYER } from '../../common/constants';
 
 let dropCounter = 0
 let eventSubscription = false
+
+// handle events when a piece is locked:
+// update lockedBoard
+// check for completed lines and clear them if necesary
+// send malus to other players if necessary
+// get next piece to keep playing
+export const handlePieceLock = piece => (dispatch, getState) => {
+  const { player } = getState()
+  const updatedLockedBoard = merge(player.ghost, piece)
+  const clearedLinesIndexes = getClearedLines(updatedLockedBoard)
+  const updatedLockedBoardWithLinesCleared = clearLines(updatedLockedBoard, clearedLinesIndexes)
+  dispatch(updatePlayerGhost(updatedLockedBoardWithLinesCleared))
+
+  if (clearedLinesIndexes.length)
+    dispatch(serverSendLinePenalities(clearedLinesIndexes.length))
+  const { player: updatedPlayer, game } = getState()
+  dispatch({ type: SERVER_UPDATES_PLAYER, ghost: updatedPlayer.ghost, pieceIndex: updatedPlayer.pieceIndex })
+  const index = game.pieceLineup[updatedPlayer.pieceIndex]
+  dispatch(getNextPiece(pieces[index]))
+}
 
 export const handlePlayerDies = () => dispatch => {
   dispatch(playerDies())
@@ -37,26 +56,6 @@ export const handlePieceDown = () => (dispatch, getState) => {
   dispatch(updateActiveBoard(getState().currentPiece, player.ghost))
 }
 
-// handle events when a piece is locked:
-// update lockedBoard
-// check for completed lines and clear them if necesary
-// send malus to other players if necessary
-// get next piece to keep playing
-export const handlePieceLock = piece => (dispatch, getState) => {
-  const { player } = getState()
-  const updatedLockedBoard = merge(player.ghost, piece)
-  const clearedLinesIndexes = getClearedLines(updatedLockedBoard)
-  const updatedLockedBoardWithLinesCleared = clearLines(updatedLockedBoard, clearedLinesIndexes)
-  dispatch(updatePlayerGhost(updatedLockedBoardWithLinesCleared))
-
-  if (clearedLinesIndexes.length)
-    dispatch(serverSendLinePenalities(clearedLinesIndexes.length))
-  const { player: updatedPlayer, game } = getState()
-  dispatch({ type: SERVER_UPDATES_PLAYER, ghost: updatedPlayer.ghost, pieceIndex: updatedPlayer.pieceIndex })
-  const index = game.pieceLineup[updatedPlayer.pieceIndex]
-  dispatch(getNextPiece(pieces[index]))
-}
-
 const handlePieceFall = (dispatch, getState) => {
   const { currentPiece: pieceBeforeFall, player } = getState()
   dispatch(pieceFall())
@@ -69,7 +68,7 @@ const handlePieceFall = (dispatch, getState) => {
 }
 
 export const gameUpdate = () => (dispatch, getState) => {
-  const { game, player } = getState()
+  const { player } = getState()
   if (isPlayerDead(player.ghost)) {
     dispatch(handlePlayerDies())
     stopGameTimer()
@@ -80,8 +79,9 @@ export const gameUpdate = () => (dispatch, getState) => {
 
 const animationHandler = lastTime => (dispatch, getState) => timestamp => {
   const deltaTime = timestamp - lastTime
-  dropCounter += deltaTime
-  if (dropCounter >= 500) {
+  const frameRate = 500
+  dropCounter = dropCounter + deltaTime
+  if (dropCounter >= frameRate) {
     dropCounter = 0
     dispatch(gameUpdate())
   }
@@ -102,7 +102,8 @@ export const handleMovement = dir => (dispatch, getState) => {
 }
 
 const rotateAndOffset = tryIndex => (dispatch, getState) => {
-  if (tryIndex < 5) {
+  const maxtry = 5
+  if (tryIndex < maxtry) {
     const { currentPiece: beforeRotation, player } = getState()
     dispatch(rotate())
     dispatch(offset(tryIndex, beforeRotation.rotationIndex))
@@ -120,11 +121,10 @@ export const handleRotation = () => (dispatch, getState) => {
   dispatch(updateActiveBoard(offsetPiece, player.ghost))
 }
 
-
 export const startGameTimer = () => dispatch => {
   requestAnimationFrame(dispatch(animationHandler(0)))
+
   // hack to not subscribe twice to the same event listener
-  // TODO: try to do a proper removeEventListener
   if (!eventSubscription) {
     window.addEventListener('keydown', dispatch(handleEvents))
     eventSubscription = true
@@ -132,6 +132,6 @@ export const startGameTimer = () => dispatch => {
 }
 
 export const stopGameTimer = () => dispatch => {
-  dispatch({type: RESET})
+  dispatch({ type: RESET })
   dropCounter = 0
 }

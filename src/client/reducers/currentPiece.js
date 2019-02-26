@@ -22,12 +22,12 @@ const currentPiece = (state = initialState, action) => {
   case RESET_PIECE:
     return action.piece
   case MOVE_PIECE:
-    return {...state, pos: [state.pos[0], state.pos[1] + action.dir]}
+    return { ...state, pos: [state.pos[0], state.pos[1] + action.dir] }
   case ROTATE:
     return {
       ...state,
       shape: rotate(state.shape, state.pivot),
-      rotationIndex: state.rotationIndex == 3 ? 0 : state.rotationIndex + 1
+      rotationIndex: state.rotationIndex === 3 ? 0 : state.rotationIndex + 1
     }
   case OFFSET:
     const { rotationIndex, offsets, pos } = state

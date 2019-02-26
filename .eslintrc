@@ -96,9 +96,6 @@
     "no-labels": 1, //disallow use of labeled statements
     "no-lone-blocks": 1, //disallow unnecessary nested blocks
     "no-loop-func": 1, //disallow creation of functions within loops
-    "no-magic-numbers": [1, {
-      "ignore": [-1, 0, 1]
-    }], // disallow the use of magic numbers
     "no-multi-spaces": 1, //disallow use of multiple spaces (fixable)
     "no-multi-str": 1, //disallow use of multiline strings
     "no-native-reassign": 1, //disallow reassignments of native objects
@@ -146,8 +143,6 @@
     "no-shadow-restricted-names": 0, //disallow shadowing of names such as arguments
     "no-shadow": 0, //disallow declaration of variables already declared in the outer scope
     "no-undef-init": 1, //disallow use of undefined when initializing variables
-    "no-undef": 1, //disallow use of undeclared variables unless mentioned in a /*global */ block (recommended)
-    "no-undefined": 1, //disallow use of undefined variable
     "no-unused-vars": [1, {
       "vars": "local",
       "args": "after-used"
@@ -156,11 +151,9 @@
 
     /* Node.js */
     "callback-return": 1, //enforce return after a callback
-    "global-require": 1, //enforce require() on top-level module scope
     "handle-callback-err": 1, //enforce error handling in callbacks
     "no-mixed-requires": 1, //disallow mixing regular variable and require declarations
     "no-new-require": 1, //disallow use of new operator with the require function
-    "no-path-concat": 1, //disallow string concatenation with __dirname and __filename
     "no-process-exit": 1, //disallow process.exit()
     "no-restricted-modules": [1, ""], //restrict usage of specified node modules
     "no-sync": 1, //disallow use of synchronous methods
@@ -233,7 +226,6 @@
     "no-unneeded-ternary": 1, //disallow the use of ternary operators when a simpler alternative exists
     "object-curly-spacing": [1, "always"], // require or disallow padding inside curly braces (fixable)
     "one-var": [0, "never"], //require or disallow one variable declaration per function
-    "operator-assignment": [1, "never"], //require assignment operator shorthand where possible or prohibit it entirely
     "operator-linebreak": [1, "after"], //enforce operators to be placed before or after line breaks
     "padded-blocks": [0, "never"], //enforce padding within blocks
     "quote-props": [0, "as-needed"], //require quotes around object literal property names
@@ -264,7 +256,6 @@
       "after": true
     }], //require space before/after arrow function's arrow (fixable)
     "constructor-super": 1, //verify calls of super() in constructors
-    "no-confusing-arrow": 1, // disallow arrow functions where a condition is expected
     "generator-star-spacing": [1, "after"], // enforce spacing around the * in generator functions (fixable)
     "no-class-assign": 1, //disallow modifying variables of class declarations
     "no-const-assign": 1, //disallow modifying variables that are declared using const
@@ -302,7 +293,6 @@
     "react/jsx-no-undef": 1, //Disallow undeclared variables in JSX
     "react/jsx-pascal-case": 1, // Enforce PascalCase for user-defined JSX components
     "react/sort-prop-types": 1, //Enforce propTypes declarations alphabetical sorting
-    "react/jsx-sort-props": 1, //Enforce props alphabetical sorting
     "react/jsx-uses-react": 1, //Prevent React to be incorrectly marked as unused
     "react/jsx-uses-vars": 1, //Prevent variables used in JSX to be incorrectly marked as unused
     "react/no-danger": 1, //Prevent usage of dangerous JSX properties

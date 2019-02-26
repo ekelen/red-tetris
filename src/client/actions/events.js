@@ -1,6 +1,6 @@
-import { 
-  handleMovement, 
-  handleRotation, 
+import {
+  handleMovement,
+  handleRotation,
   handlePieceDown,
   handleInstantLock
 } from './update'
@@ -14,7 +14,7 @@ export const SPACE = 32
 export const handleEvents = (dispatch, getState) => e => {
   const { player, game } = getState()
   if (player.alive && game.inProgress)
-  switch (e.keyCode) {
+    switch (e.keyCode) {
     case LEFT:
       e.preventDefault()
       dispatch(handleMovement(-1))
@@ -35,5 +35,7 @@ export const handleEvents = (dispatch, getState) => e => {
       e.preventDefault()
       dispatch(handleInstantLock())
       break
-  }
+    default:
+      break
+    }
 }

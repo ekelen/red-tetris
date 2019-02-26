@@ -4,11 +4,14 @@
 |--------------------------------------------------
 */
 
-export const MSG_USAGE = 'ERROR: Expected multiplayer URL format: localhost:8080/#<num_users>-<room_name>[<player_name>] \nSingle player: localhost:8080/'
+export const MSG_USAGE = 'ERROR: Expected multiplayer URL format:' +
+  ' localhost:8080/#<num_users>-<room_name>[<player_name>] \nSingle player: localhost:8080/'
 
 /**
 |--------------------------------------------------
-| ACTION TYPES
+| ACTION TYPES// playerName, alive, ghost, pieceIndex,
+| waiting// playerName, alive,// playerName, alive, ghost,
+| pieceIndex, waiting// playerName, alive, ghost, pieceIndex, waiting ghost, pieceIndex, waiting
 |--------------------------------------------------
 */
 

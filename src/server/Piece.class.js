@@ -1,7 +1,5 @@
-import validator from 'validator';
-import { cloneDeep } from 'lodash'
-import { START_N_PIECES } from '../common/constants';
-import { pieces } from '../pieces';
+import { START_N_PIECES } from '../common/constants'
+import { pieces } from '../pieces'
 
 class Piece {
   constructor() {}
