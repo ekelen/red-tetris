@@ -36,7 +36,6 @@ export const initEngine = (io, games) => {
       game = null
 
     socket.on('action', (action) => {
-      loginfo('action received : ', action)
       currentGame = games.find(g => g.players.find(p => p.id === socket.id)) || null
 
       if (currentGame)
@@ -52,7 +51,7 @@ export const initEngine = (io, games) => {
           game.joinGame({ io, player, playerName, roomName }) :
             Game.createGame({ games, player, playerName, roomName })
       default:
-        logerror(`Unrecognized or unauthorized action ${action.type}`)
+        logerror(`${socket.id}: Unrecognized or unauthorized action ${action.type}`)
         break;
       }
     })
