@@ -4,8 +4,8 @@ import {
   MSG_USAGE,
 } from '../../common/constants';
 
-const _parseURL = (url) => {
-  const validMultiplayerUrl = /^[\/][a-zA-Z0-9]{1,20}[\[][a-zA-Z0-9]{1,20}[\]]$/g
+export const parseURL = (url) => {
+  const validMultiplayerUrl = /^[\/][a-zA-Z0-9]{3,20}[\[][a-zA-Z0-9]{3,20}[\]]$/g
   const isValid = validMultiplayerUrl.test(url)
 
   if (!isValid) return ({
@@ -13,15 +13,11 @@ const _parseURL = (url) => {
     errmsg: `${MSG_USAGE}`
   })
 
-  const alphaNum = /[a-zA-Z0-9]{1,20}/g
+  const alphaNum = /[a-zA-Z0-9]{3,20}/g
   const [roomName, playerName] = url.match(alphaNum)
   return ({
     type: SERVER_ENTER_GAME,
     roomName,
     playerName
   })
-}
-
-export const parseURL = (url) => {
-  return _parseURL(url)
 }
