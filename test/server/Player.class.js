@@ -69,27 +69,17 @@ describe('Player properties', () => {
 
   it('playerStatus getter should return alive, ghost, pieceIndex, playerName, waiting', () => {
     const player = new Player(playerParams)
-    const playerStatus = player.playerStatus
-    playerStatus.should.have.all.keys('alive', 'ghost', 'playerName', 'pieceIndex', 'waiting')
+    player.playerStatus.should.have.all.keys('alive', 'ghost', 'playerName', 'pieceIndex', 'waiting')
   })
 
   it('has a dies method', () => {
     chai.expect(new Player(playerParams)).to.respondTo('dies')
   })
 
-  it('has a dies method that sets alive to false')
-
-  it('Updates the player status with new informations', () => {
+  it('has a dies method that sets alive to false', () => {
     const player = new Player(playerParams)
-    const newStatus = {
-      playerName: 'jean',
-      alive: true,
-      ghost: EMPTY_BOARD,
-      pieceIndex: 0,
-      waiting: false
-    }
-    player.playerStatus = newStatus
-    player.playerStatus.should.deep.equal(newStatus)
+    player.dies()
+    player.alive.should.equal(false)
   })
 
 })
