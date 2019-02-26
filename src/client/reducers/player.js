@@ -13,11 +13,11 @@ import { EMPTY_BOARD } from './board';
 
 const initialState = {
   alive: false,
+  ghost: EMPTY_BOARD,
   opponents: [], // { alive, ghost, pieceIndex, playerName, waiting }
-  playerName: '',
   pieceIndex: 0,
+  playerName: '',
   waiting: null,
-  ghost: EMPTY_BOARD
 }
 
 const getOpponents = (players, myName) => cloneDeep(players.filter(p => p.playerName !== myName))

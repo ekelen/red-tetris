@@ -38,7 +38,7 @@ const reducer = (state = initialState, action) => {
   case CREATE_GAME_SUCCESS:
     return {
       ...state,
-      activePlayers: cloneDeep(getActivePlayers(action.players)),
+      activePlayers: getActivePlayers(action.players),
       pieceLineup: cloneDeep(action.pieceLineup),
       players: cloneDeep(action.players),
       roomName: action.roomName,
@@ -53,11 +53,6 @@ const reducer = (state = initialState, action) => {
       players: cloneDeep(action.players),
       roomName: action.roomName,
       urlParsed: true
-    }
-  case 'GAME_LOOP_STARTED':
-    return {
-      ...state,
-      inProgress: true
     }
   default:
     return state

@@ -79,21 +79,6 @@ describe('Player properties', () => {
 
   it('has a dies method that sets alive to false')
 
-  it('has a lockPiece method', () => {
-    chai.expect(new Player(playerParams)).to.respondTo('lockPiece')
-  })
-
-  it('has a lockpiece method that updates ghost')
-
-  // TODO: let the client handle this part
-  // it('lockPiece advances player.pieceIndex by 1', () => {
-  //   const player = new Player(playerParams)
-  //   const initialIndex = player.pieceIndex
-  //   player.lockPiece({ ghost: [[]] })
-  //   const newPlayerPieceIndex = player.pieceIndex
-  //   newPlayerPieceIndex.should.equal(initialIndex + 1).and.equal(1)
-  // })
-
   it('Updates the player status with new informations', () => {
     const player = new Player(playerParams)
     const newStatus = {

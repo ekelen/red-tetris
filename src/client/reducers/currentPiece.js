@@ -1,7 +1,7 @@
 import { PIECE_FALL, RESET_PIECE, MOVE_PIECE, ROTATE, OFFSET, GET_NEXT_PIECE } from '../actions/piece'
 import { pieces } from '../../pieces'
 import { rotate, getOffsetPos, computeOffset } from '../actions/physics'
-import { CREATE_GAME_SUCCESS } from '../../common/constants';
+import { CREATE_GAME_SUCCESS, UPDATE_GAME } from '../../common/constants';
 
 const getRandomValue = max => Math.round(Math.random() * Math.floor(max))
 // const getRandomPiece = () => pieces[getRandomValue(pieces.length - 1)]
@@ -10,8 +10,11 @@ const getNewPiece = piece => ({ pos: [1, 4], ...piece })
 // const initialState = getNewPiece(getRandomPiece())
 
 const initialState = {
-  pos: [1, 4],
-  piece: []
+  color: null,
+  pos: null,
+  shape: null,
+  rotationIndex: null,
+  offsets: null
 }
 
 const currentPiece = (state = initialState, action) => {
@@ -48,6 +51,11 @@ const currentPiece = (state = initialState, action) => {
       const index = pieceLineup[0]
       const piece = pieces[index]
       return { ...state, ...piece, pos: [1, 4] }
+    // case UPDATE_GAME:
+      // const { pieceLineup } = action
+      // const index = pieceLineup[0]
+      // const piece = pieces[index]
+      // return { ...state, ...piece, pos: [1, 4] }
     default:
       return state
   }
