@@ -2,7 +2,6 @@ import {
   ENTER_GAME_FAIL,
   SERVER_ENTER_GAME,
   MSG_USAGE,
-  START_SINGLE_PLAYER_GAME
 } from '../../common/constants';
 
 const _parseURL = (url) => {
@@ -24,12 +23,5 @@ const _parseURL = (url) => {
 }
 
 export const parseURL = (url) => {
-  switch (url) {
-    case '/':
-      return ({
-        type: START_SINGLE_PLAYER_GAME
-      })
-    default:
-      return _parseURL(url)
-  }
+  return _parseURL(url)
 }

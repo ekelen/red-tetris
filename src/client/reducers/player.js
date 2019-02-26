@@ -2,7 +2,6 @@ import {
   cloneDeep
 } from 'lodash'
 import {
-  START_SINGLE_PLAYER_GAME,
   ENTER_GAME_FAIL,
   CREATE_GAME_SUCCESS,
   UPDATE_GAME,
@@ -25,46 +24,39 @@ const getPlayer = (players, myName) => cloneDeep(players.find(p => p.playerName 
 
 const reducer = (state = initialState, action) => {
   switch (action.type) {
-  case START_SINGLE_PLAYER_GAME:
-    return {
-      ...state,
-      alive: true,
-      waiting: false
-    }
-  case ENTER_GAME_FAIL:
-    return initialState
-  case CREATE_GAME_SUCCESS:
-    return {
-      ...state,
-      playerName: action.playerName,
-      roomName: action.roomName,
-      waiting: false
-    }
-  case SERVER_ENTER_GAME:
-    return {
-      ...state,
-      playerName: action.playerName,
-      roomName: action.roomName
-    }
-  case UPDATE_GAME:
-    return {
-      ...state,
-      opponents: getOpponents(action.players, state.playerName),
-      ...getPlayer(action.players, state.playerName) // playerName, alive, ghost, pieceIndex, waiting
-    }
-  case PLAYER_DIES:
-    return {
-      ...state,
-      alive: false
-    }
-  case UPDATE_PLAYER_GHOST:
-    return {
-      ...state,
-      ghost: action.ghost,
-      pieceIndex: state.pieceIndex + 1
-    }
-  default:
-    return state
+    case ENTER_GAME_FAIL:
+      return initialState
+    case CREATE_GAME_SUCCESS:
+      return {
+        ...state,
+        playerName: action.playerName,
+        roomName: action.roomName,
+        waiting: false
+      }
+    case SERVER_ENTER_GAME:
+      return {
+        ...state,
+        playerName: action.playerName,
+        roomName: action.roomName
+      }
+    case UPDATE_GAME:
+      return {
+        ...state,
+        opponents: getOpponents(action.players, state.playerName),
+        ...getPlayer(action.players, state.playerName) // playerName, alive, ghost, pieceIndex, waiting
+      }
+    case PLAYER_DIES:
+      return {
+        ...state,
+        alive: false
+      }
+    case UPDATE_PLAYER_GHOST:
+      return {
+        ...state,
+        ghost: action.ghost
+      }
+    default:
+      return state
   }
 }
 

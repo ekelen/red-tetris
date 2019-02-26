@@ -11,7 +11,6 @@ const Game = ({
   alive,
   activePlayers,
   board,
-  offlineMode,
   opponents,
   pieceLineup,
   pieceIndex,
@@ -24,7 +23,7 @@ const Game = ({
 }) => {
   return (
     <div className={'game'}>
-      {(!inProgress && (offlineMode || activePlayers[0].playerName === playerName)) &&
+      {(!inProgress && activePlayers[0].playerName === playerName) &&
         <Buttons {...{ inProgress, startGame }} />
       }
 

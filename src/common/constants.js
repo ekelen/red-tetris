@@ -20,7 +20,6 @@ export const ALERT_ERROR = 'ALERT_ERROR'
 // Game management
 export const CREATE_GAME_SUCCESS = 'CREATE_GAME_SUCCESS'
 export const ENTER_GAME_FAIL = 'ENTER_GAME_FAIL'
-export const START_SINGLE_PLAYER_GAME = 'START_SINGLE_PLAYER_GAME'
 export const UPDATE_GAME = 'UPDATE_GAME'
 
 // Emit-to-server action types

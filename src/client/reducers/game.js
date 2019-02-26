@@ -2,7 +2,6 @@ import {
   cloneDeep
 } from 'lodash'
 import {
-  START_SINGLE_PLAYER_GAME,
   ENTER_GAME_FAIL,
   CREATE_GAME_SUCCESS,
   UPDATE_GAME
@@ -11,7 +10,6 @@ import {
 const initialState = {
   activePlayers: [],
   inProgress: false,
-  offlineMode: false,
   pieceLineup: [],
   players: [],
   roomName: '',
@@ -22,14 +20,6 @@ const getActivePlayers = (players) => cloneDeep(players.filter(p => !p.waiting))
 
 const reducer = (state = initialState, action) => {
   switch (action.type) {
-  case START_SINGLE_PLAYER_GAME:
-    return {
-      ...state,
-      alive: true,
-      offlineMode: true,
-      inProgress: true,
-      urlParsed: true
-    }
   case ENTER_GAME_FAIL:
     return {
       ...state,
