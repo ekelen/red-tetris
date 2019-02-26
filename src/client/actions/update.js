@@ -5,7 +5,6 @@ import { handleEvents } from './events'
 import { 
   playerDies,
   serverPlayerDies,
-  serverPlayerLocksPiece,
   updatePlayerGhost,
   serverSendLinePenalities,
   serverUpdatesPlayer
@@ -24,6 +23,7 @@ export const handleInstantLock = () => (dispatch, getState) => {
   const { currentPiece, player } = getState()
   const pieceToLock = getPieceToLock(currentPiece, player.ghost) 
   dispatch(handlePieceLock(pieceToLock))
+  dispatch(updateActiveBoard(pieceToLock, player.ghost))
 }
 
 export const handlePieceDown = () => (dispatch, getState) => {
@@ -56,7 +56,6 @@ export const handlePieceLock = piece => (dispatch, getState) => {
   dispatch(getNextPiece(pieces[index]))
 }
 
-//TODO: maybe test this
 const handlePieceFall = (dispatch, getState) => {
   const { currentPiece: pieceBeforeFall, player } = getState()
   dispatch(pieceFall())
