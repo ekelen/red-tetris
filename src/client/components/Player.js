@@ -18,11 +18,11 @@ const methods = {
 
 const Player = ({ alive, board }) => {
   return (
-    <div className={'playerBoard'}>
+    <div className={alive ? 'playerBoard' : 'playerBoard dead'}>
       {splitBoard(board).map((row, i) => (
         <div key={i} className={'playerRow'}>
           {row.map((cell, i) => (
-            <div key={i} className={`cell${cell}`} />
+            <div key={i} className={alive || cell < 1 || cell === 8 ? `cell${cell}` : 'cellDead' } />
           ))}
         </div>
       ))}

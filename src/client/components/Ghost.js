@@ -13,11 +13,11 @@ const Ghost = ({ alive, board, playerName }) => {
       {getFormatedGhost(board).map((row, i) => (
         <div className={'ghostRow'} key={i} >
           {row.map((cell, j) => (
-            <div className={`ghostCell cell${cell}`} key={j} />
+            <div className={`ghostCell cell${cell} ${alive || cell === 0 ? 'alive' : 'dead'}`} key={j} />
           ))}
         </div>
       ))}
-      <p>{`${playerName}`}</p>
+      <p className={alive ? 'alive' : 'dead'}>{`${playerName}`}</p>
     </div>
   )
 }

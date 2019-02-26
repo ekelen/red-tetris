@@ -17,7 +17,7 @@
     text-align: center;
 
     &.dead {
-      color: $white;
+      color: lighten($black, 20%);
     }
   }
 
@@ -37,6 +37,10 @@
 
       &:first-child {
         border-left: 1px solid $black;
+      }
+
+      &.dead {
+        background-color: lighten($black, 20%);
       }
     }
 

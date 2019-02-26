@@ -23,8 +23,17 @@
   width: 300px;
   height: 600px;
 
+  &.dead {
+    background-color: lighten($black, 15%)
+  }
+
   .playerRow {
     @extend %row;
+
+    .cellDead {
+      @extend %cell;
+      background-color: lighten($black, 25%)
+    }
 
     .cell0 {
       @extend %cell
