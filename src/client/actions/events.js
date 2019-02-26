@@ -11,7 +11,9 @@ export const RIGHT = 39
 export const DOWN = 40
 export const SPACE = 32
 
-export const handleEvents = dispatch => e => {
+export const handleEvents = (dispatch, getState) => e => {
+  const { player, game } = getState()
+  if (player.alive && game.inProgress)
   switch (e.keyCode) {
     case LEFT:
       e.preventDefault()
