@@ -52,7 +52,6 @@ export const handlePieceLock = piece => (dispatch, getState) => {
   if (clearedLinesIndexes.length)
     dispatch(serverSendLinePenalities(clearedLinesIndexes.length))
   const { player: updatedPlayer, game } = getState()
-  console.log('updatedPlayer.pieceIndex: ', updatedPlayer.pieceIndex);
   dispatch({ type: SERVER_UPDATES_PLAYER, ghost: updatedPlayer.ghost, pieceIndex: updatedPlayer.pieceIndex })
   const index = game.pieceLineup[updatedPlayer.pieceIndex]
   dispatch(getNextPiece(pieces[index]))

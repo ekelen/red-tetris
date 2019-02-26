@@ -1,17 +1,9 @@
-import {
-  ALERT_POP
-} from '../actions/alert'
-import { ENTER_GAME_FAIL, CREATE_GAME_SUCCESS, UPDATE_GAME, ALERT_ERROR } from '../../common/constants';
+import { ENTER_GAME_FAIL, CREATE_GAME_SUCCESS, UPDATE_GAME, ALERT_POP, ALERT_ERROR } from '../../common/constants';
 
 const initialState = {
   message: '',
-  errmsg: '',
-  history: []
+  errmsg: ''
 }
-
-const updateMessageHistory = (errmsg, message, history) => (errmsg || message) ?
-  [message || errmsg, ...history] :
-   history
 
 const reducer = (state = initialState, action) => {
   switch (action.type) {
@@ -19,36 +11,31 @@ const reducer = (state = initialState, action) => {
     return {
       ...state,
       message: action.message,
-      errmsg: '',
-      history: updateMessageHistory(state.errmsg, state.message, state.history)
+      errmsg: ''
     }
   case CREATE_GAME_SUCCESS:
     return {
       ...state,
       errmsg: '',
-      message: '♥ You have created a game!',
-      history: updateMessageHistory(state.errmsg, state.message, state.history)
+      message: 'You have created a game!'
     }
   case ALERT_ERROR:
     return {
       ...state,
       errmsg: action.errmsg,
-      message: '',
-      history: updateMessageHistory(state.errmsg, state.message, state.history)
+      message: ''
     }
   case ENTER_GAME_FAIL:
     return {
       ...state,
       errmsg: action.errmsg || 'Failed to enter this game',
-      message: '',
-      history: updateMessageHistory(state.errmsg, state.message, state.history)
+      message: ''
     }
   case UPDATE_GAME:
     return {
       ...state,
       errmsg: '',
-      message: action.message || '',
-      history: updateMessageHistory(state.errmsg, state.message, state.history)
+      message: action.message || ''
     }
   default:
     return state

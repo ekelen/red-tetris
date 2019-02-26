@@ -3,11 +3,16 @@ import chai from "chai"
 import Piece from "../../src/server/Piece.class";
 
 chai.should()
+const expect = chai.expect
 
 describe('Piece properties', () => {
-  it('has a square matrix as a shape')
-  it('throws if not passed a shape parameter on construction')
-  it('throws if not passed a 2D square array of ints on construction')
-  it('has a static function that adds to a list of piece instances')
-  it('has a static getter to return a list of shape constant matrices')
+  it('has a constructor that returns a new Piece with no props', () => {
+    const piece = new Piece()
+    expect(piece).to.be.empty
+  })
+
+  it('has a static method that returns an array', () => {
+    const lineup = Piece.generateLineup(50)
+    expect(lineup).to.be.an('array').that.has.lengthOf(50)
+  })
 })
