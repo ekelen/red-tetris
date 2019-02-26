@@ -1,5 +1,5 @@
 import chai from "chai"
-import { merge, isColliding, isPlayerDead, getClearedLines, clearLines } from '../../src/client/actions/physics'
+import { merge, isColliding, isPlayerDead, getClearedLines, clearLines, getPieceToLock } from '../../src/client/actions/physics'
 import { EMPTY_BOARD } from "../../src/client/reducers/board"
 import { cloneDeep } from 'lodash'
 
@@ -124,7 +124,7 @@ describe('Clear lines', () => {
     updatedBoard.should.eql(board)
   })
 
-  it("Should't destroy penaltie lines", () => {
+  it("Shouldn't destroy penaltie lines", () => {
     const board = cloneDeep(EMPTY_BOARD)
     board[23] = new Array(10).fill(2)
     board[22] = new Array(10).fill(2)
@@ -134,17 +134,15 @@ describe('Clear lines', () => {
     updatedBoard.length.should.eql(24)
     updatedBoard.should.eql(EMPTY_BOARD)
   })
-})
 
-// describe('penaltie lines', () => {
-//   it('return the ghost with locked lines', () => {
-//     const ghost = cloneDeep(EMPTY_BOARD)
-//     const ghostWhithPenaltieLines = getGhostWithPenaltieLines(ghost, 3)
-//     const expected = cloneDeep(EMPTY_BOARD)
-//     const len = expected.length
-//     expected[len - 1] = Array(10).fill(8)
-//     expected[len - 2] = Array(10).fill(8)
-//     expected[len - 3] = Array(10).fill(8)
-//     ghostWhithPenaltieLines.should.deep.equal(expected)
-//   })
-// })
+  it("Should get a new piece to lock at the bottom of the board", () => {
+    const board = cloneDeep(EMPTY_BOARD)
+    const piece = {
+      shape,
+      pos: [1,4],
+      color: 1
+    }
+    const pieceToLock = getPieceToLock(piece, board)
+    pieceToLock.pos.should.deep.equal([23,4])
+  })
+})
