@@ -1,4 +1,4 @@
-import { pieceFall, resetPiece, movePiece, rotate, offset, getNextPiece } from './piece'
+import { pieceFall, resetPiece, movePiece, rotate, offset, getNextPiece, RESET } from './piece'
 import { updateActiveBoard, pieceLand, checkLine } from './board'
 import { isColliding, isPlayerDead, merge, getClearedLines, clearLines, getPieceToLock } from './physics'
 import { handleEvents } from './events'
@@ -130,6 +130,7 @@ export const startGameTimer = () => dispatch => {
   }
 }
 
-export const stopGameTimer = () => () => {
+export const stopGameTimer = () => dispatch => {
+  dispatch({type: RESET})
   dropCounter = 0
 }

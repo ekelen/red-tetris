@@ -4,6 +4,7 @@ export const MOVE_PIECE = 'MOVE_PIECE'
 export const ROTATE = 'ROTATE'
 export const OFFSET = 'OFFSET'
 export const GET_NEXT_PIECE = 'GET_NEXT_PIECE'
+export const RESET = 'RESET'
 
 export const resetPiece = piece => {
   return { type: RESET_PIECE, piece }
