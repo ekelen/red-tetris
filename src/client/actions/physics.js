@@ -10,6 +10,17 @@ export const merge = (board, piece) => {
   return newBoard
 }
 
+export const getPieceToLock = (lastPiece, board) => {
+  const newPiece = cloneDeep({
+    ...lastPiece, 
+    pos: [lastPiece.pos[0] + 1, lastPiece.pos[1]]
+  })
+  if (isColliding(board, newPiece)) {
+    return lastPiece
+  }
+  return getPieceToLock(newPiece, board)
+}
+
 export const isColliding = (board, piece) => {
   const worldShape = piece.shape.map(tile => sumMatrix(tile, piece.pos))
   const colliding = worldShape.some(([y, x]) => {

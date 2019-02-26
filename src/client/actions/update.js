@@ -1,8 +1,9 @@
 import { pieceFall, resetPiece, movePiece, rotate, offset, getNextPiece } from './piece'
 import { updateActiveBoard, pieceLand, checkLine } from './board'
-import { isColliding, isPlayerDead, merge, getClearedLines, clearLines } from './physics'
+import { isColliding, isPlayerDead, merge, getClearedLines, clearLines, getPieceToLock } from './physics'
 import { handleEvents } from './events'
-import {
+import { cloneDeep } from 'lodash'
+import { 
   playerDies,
   serverPlayerDies,
   serverPlayerLocksPiece,
@@ -17,6 +18,12 @@ let dropCounter = 0
 export const handlePlayerDies = () => dispatch => {
   dispatch(playerDies())
   dispatch(serverPlayerDies())
+}
+
+export const handleInstantLock = () => (dispatch, getState) => {
+  const { currentPiece, player } = getState()
+  const pieceToLock = getPieceToLock(currentPiece, player.ghost) 
+  dispatch(handlePieceLock(pieceToLock))
 }
 
 export const handlePieceDown = () => (dispatch, getState) => {
