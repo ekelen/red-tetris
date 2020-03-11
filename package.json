@@ -4,13 +4,13 @@
   "author": "redpelicans",
   "license": "MIT",
   "scripts": {
-    "eslint": "eslint src",
-    "client-dist": "NODE_ENV=production webpack --progress --colors",
-    "client-dev": "webpack-dev-server --devtool source-map --colors --hot --inline --host 0.0.0.0 --port 8080",
-    "srv-dev": "DEBUG=tetris:* babel-watch -L -w src src/server/main.js",
-    "srv-dist": "DEBUG=tetris:* babel src --out-dir dist",
-    "test": "mocha --watch --require babel-core/register --reporter spec",
-    "coverage": "NODE_ENV=test nyc --include src --all -r text -r lcov -r text --require babel-core/register mocha "
+    "eslint": "npx eslint src",
+    "client-dist": "NODE_ENV=production npx webpack --progress --colors",
+    "client-dev": "npx webpack-dev-server --devtool source-map --colors --hot --inline --host 0.0.0.0 --port 8080",
+    "srv-dev": "DEBUG=tetris:* npx babel-watch -L -w src src/server/main.js",
+    "srv-dist": "DEBUG=tetris:* npx babel src --out-dir dist",
+    "test": "npx mocha --watch --require babel-core/register --reporter spec",
+    "coverage": "NODE_ENV=test npx nyc --include src --all -r text -r lcov -r text --require babel-core/register mocha "
   },
   "dependencies": {
     "css-loader": "^2.1.0",
