@@ -1,8 +1,16 @@
 # Red Tetris
 
+This is a Javascript implementation of the classic game of Tetris in multiplayer mode using the [redpelicans Red Tetris boilerplate](https://github.com/redpelicans/red_tetris_boilerplate).
+
+The interface was built with React + Redux with exclusively functional components.
+
+The node server uses an object-oriented structure and communicates with the front using the [socketIO websocket API](https://socket.io/).
+
+A project for École 42 (web branch). Project requirements can be found in the `/ressources` subfolder in this repository.
+
 ## Development Mode
 
-#### Installation
+### 1. Installation
 
 Install [node](https://nodejs.org/en/) first. After that:
 
@@ -12,13 +20,13 @@ npm install
 
 Edit `params.js` for your needs.
 
-#### Launch Server
+### 2. Launch Server
 
 ```shell
 npm run srv-dev
 ```
 
-#### Launch client
+### 3. Launch client
 
 ```shell
 npm run client-dev
@@ -26,19 +34,21 @@ npm run client-dev
 
 Point your browser to `http://0.0.0.0:8080/` it will load the development version of Red Tetris.
 
-#### Test
+## Testing
+
+### Run unit tests
 
 ```shell
 npm run test
 ```
 
-#### Coverage
+### Get coverage
 
 ```shell
 npm run coverage
 ```
 
-### Production Mode
+## Production
 
 ```shell
 npm run srv-dist

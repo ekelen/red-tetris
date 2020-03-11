@@ -5,7 +5,7 @@
 */
 
 export const MSG_USAGE = 'ERROR: Expected multiplayer URL format:' +
-  ' localhost:8080/#<num_users>-<room_name>[<player_name>] \nSingle player: localhost:8080/'
+  ' localhost:8080/#<room_name>[<player_name>]'
 
 /**
 |--------------------------------------------------
